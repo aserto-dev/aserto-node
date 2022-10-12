@@ -1,0 +1,8 @@
+
+{
+    "overrides": [
+    {
+      "files": [ "lib/**/*.ts" ],
+    }
+  ]
+}

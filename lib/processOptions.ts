@@ -1,5 +1,6 @@
 // process options map
 import express from "express";
+
 import { AuthzOptions, identityContext } from "./index.d";
 const fs = require("fs");
 const log = require("./log");
@@ -140,7 +141,7 @@ export default (
   let userKey = "user";
   if (
     options &&
-    options.customUserKey != null &&
+    options.customUserKey !== null &&
     typeof options.customUserKey === "string"
   ) {
     userKey = options.customUserKey;
@@ -150,12 +151,13 @@ export default (
   let subjectKey = "sub";
   if (
     options &&
-    options.customSubjectKey != null &&
+    options.customSubjectKey !== null &&
     typeof options.customSubjectKey === "string"
   ) {
     subjectKey = options.customSubjectKey;
   }
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   /* @ts-ignore */
   //TODO: Remove the ts-ignore
   const subject = req[userKey] && req[userKey][subjectKey];
@@ -167,6 +169,7 @@ export default (
     tenantId,
     policyName: policyName as string,
     policyRoot: policyRoot as string,
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     identityContextOptions: {
       useAuthorizationHeader,
       identity,

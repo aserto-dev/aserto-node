@@ -1,20 +1,21 @@
-import {
-  IsRequest,
-  IsResponse,
-} from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_pb";
-import { AuthorizerClient } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_grpc_pb";
-import { PolicyContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_context_pb";
-import { credentials, ServiceError, Metadata } from "@grpc/grpc-js";
+import { Request } from "express";
 import {
   JavaScriptValue,
   Struct,
 } from "google-protobuf/google/protobuf/struct_pb";
-import { Request } from "express";
+import { PolicyContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_context_pb";
+import { AuthorizerClient } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_grpc_pb";
+import {
+  IsRequest,
+  IsResponse,
+} from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_pb";
+import { credentials, Metadata, ServiceError } from "@grpc/grpc-js";
+
 import identityContext from "./identityContext";
-import processOptions from "./processOptions";
-import processParams from "./processParams";
 import { AuthzOptions } from "./index.d";
 import { log } from "./log";
+import processOptions from "./processOptions";
+import processParams from "./processParams";
 
 const is = (
   decision: string,
@@ -95,7 +96,7 @@ const is = (
       }
     );
   } catch (e) {
-    console.log("ERROR", e);
+    log("'is' returned error:", e as string);
   }
 };
 

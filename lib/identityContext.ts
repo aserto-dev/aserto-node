@@ -1,8 +1,11 @@
 // create identity context
-import { IdentityContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/identity_context_pb";
 import express from "express";
+import { IdentityContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/identity_context_pb";
+
 import { identityContext } from "./index.d";
 import { log } from "./log";
+
+//TODO: Should be an import?
 const jwt_decode = require("jwt-decode");
 
 export default (req: express.Request, options: identityContext.Options) => {

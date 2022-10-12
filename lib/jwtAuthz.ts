@@ -1,20 +1,21 @@
-import {
-  IsRequest,
-  IsResponse,
-} from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_pb";
-import { AuthorizerClient } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_grpc_pb";
-import { PolicyContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_context_pb";
-import { credentials, ServiceError, Metadata } from "@grpc/grpc-js";
+import { NextFunction, Request, Response } from "express";
 import {
   JavaScriptValue,
   Struct,
 } from "google-protobuf/google/protobuf/struct_pb";
-import { Request, NextFunction, Response } from "express";
+import { PolicyContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_context_pb";
+import { AuthorizerClient } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_grpc_pb";
+import {
+  IsRequest,
+  IsResponse,
+} from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_pb";
+import { credentials, Metadata, ServiceError } from "@grpc/grpc-js";
+
 import identityContext from "./identityContext";
+import { AuthzOptions } from "./index.d";
+import { log } from "./log";
 import processOptions from "./processOptions";
 import processParams from "./processParams";
-import { log } from "./log";
-import { AuthzOptions } from "./index.d";
 
 const jwtAuthz = (
   optionsParam: AuthzOptions,
@@ -127,7 +128,7 @@ const jwtAuthz = (
     };
 
     const allowed = await callAuthorizer();
-    if (allowed != null) {
+    if (allowed !== null) {
       return allowed ? next() : error(res, `Forbidden by policy ${policy}`);
     }
   };

@@ -1,16 +1,17 @@
+import { NextFunction, Request, Response } from "express";
+import { PolicyContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_context_pb";
+import { AuthorizerClient } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_grpc_pb";
 import {
+  DecisionTreeOptions,
   DecisionTreeRequest,
   DecisionTreeResponse,
-  DecisionTreeOptions,
 } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_pb";
-import { AuthorizerClient } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_grpc_pb";
-import { PolicyContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_context_pb";
-import { credentials, ServiceError, Metadata } from "@grpc/grpc-js";
-import { Request, NextFunction, Response } from "express";
+import { credentials, Metadata, ServiceError } from "@grpc/grpc-js";
+
 import identityContext from "./identityContext";
-import processOptions from "./processOptions";
-import { log } from "./log";
 import { displayStateMap as displayStateMapD } from "./index.d";
+import { log } from "./log";
+import processOptions from "./processOptions";
 
 const displayStateMap = (
   optionsParam: displayStateMapD.DisplayStateMapOptions
