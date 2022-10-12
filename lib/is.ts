@@ -58,16 +58,18 @@ const is = (
       authorizerUrl,
       credentials.createInsecure()
     );
-    const isRequest = new IsRequest();
+
     const policyContext = new PolicyContext();
     policyContext.setPath(policy);
     policyContext.setName(policyName);
     policyContext.setDecisionsList([decision]);
 
-    const idContext = identityContext(req, identityContextOptions);
-
+    const isRequest = new IsRequest();
     isRequest.setPolicyContext(policyContext);
+
+    const idContext = identityContext(req, identityContextOptions);
     isRequest.setIdentityContext(idContext);
+
     const fields = resourceContext as { [key: string]: JavaScriptValue };
     isRequest.setResourceContext(Struct.fromJavaScript(fields));
 
@@ -77,22 +79,18 @@ const is = (
       (err: ServiceError, response: IsResponse) => {
         if (err) {
           const message = err.message;
-          log(`express-jwt-aserto: 'is' returned error: ${message}`, "ERROR");
+          log(`'is' returned error: ${message}`, "ERROR");
           return null;
         }
 
         if (!response) {
-          log(`express-jwt-aserto: 'is' returned error: No response`, "ERROR");
+          log(`'is' returned error: No response`, "ERROR");
           return false;
         }
 
-        const result = response.toObject();
-        const allowed =
-          result.decisionsList &&
-          result.decisionsList.length &&
-          result.decisionsList[0].is;
+        const result = response.getDecisionsList();
+        const allowed = result && result.length && result[0].getIs();
 
-        console.log("ALLOWED", allowed);
         return allowed;
       }
     );

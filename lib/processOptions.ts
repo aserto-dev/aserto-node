@@ -18,7 +18,7 @@ export default (
       return next({
         statusCode: 403,
         error: "Forbidden",
-        message: err_message,
+        message: `express-jwt-aserto: ${err_message}`,
       });
     }
 
@@ -31,10 +31,7 @@ export default (
     typeof options.authorizerServiceUrl === "string" &&
     options.authorizerServiceUrl;
   if (!authorizerServiceUrl && res) {
-    return error(
-      res,
-      "express-jwt-aserto: must provide authorizerServiceUrl in option map"
-    );
+    return error(res, "must provide authorizerServiceUrl in option map");
   }
   const authorizerUrl = `${authorizerServiceUrl}/api/v2/authz`;
 
@@ -86,8 +83,8 @@ export default (
       authorizerCert = fs.readFileSync(certfile);
     } catch (e) {
       const text = `Certificate for CA not found at ${authorizerCertFile}. To disable TLS certificate validation, use the 'disableTlsValidation: true' option.`;
-      log(`express-jwt-aserto: ${text}`, "ERROR");
-      return res && error(res, `express-jwt-aserto: ${text}`);
+      log(text, "ERROR");
+      return res && error(res, text);
     }
   }
 
@@ -95,10 +92,7 @@ export default (
   const policyName =
     options && typeof options.policyName === "string" && options.policyName;
   if (!policyName && res) {
-    return error(
-      res,
-      "express-jwt-aserto: must provide policyName in option map"
-    );
+    return error(res, "must provide policyName in option map");
   }
 
   // set the policy root
@@ -106,10 +100,7 @@ export default (
     options && typeof options.policyRoot === "string" && options.policyRoot;
 
   if (!policyRoot && res) {
-    return error(
-      res,
-      "express-jwt-aserto: must provide policyRoot in option map"
-    );
+    return error(res, "must provide policyRoot in option map");
   }
 
   // set the identity header

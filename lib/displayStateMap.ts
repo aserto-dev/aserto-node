@@ -1,27 +1,37 @@
 import {
-  IsRequest,
-  IsResponse,
+  DecisionTreeRequest,
+  DecisionTreeResponse,
+  DecisionTreeOptions,
 } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_pb";
 import { AuthorizerClient } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_grpc_pb";
 import { PolicyContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_context_pb";
 import { credentials, ServiceError, Metadata } from "@grpc/grpc-js";
-import {
-  JavaScriptValue,
-  Struct,
-} from "google-protobuf/google/protobuf/struct_pb";
 import { Request, NextFunction, Response } from "express";
 import identityContext from "./identityContext";
 import processOptions from "./processOptions";
-import processParams from "./processParams";
 import { log } from "./log";
-import { AuthzOptions } from "./index.d";
+import { displayStateMap as displayStateMapD } from "./index.d";
 
-const jwtAuthz = (
-  optionsParam: AuthzOptions,
-  packageName: string,
-  resourceMap: object
+const displayStateMap = (
+  optionsParam: displayStateMapD.DisplayStateMapOptions
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
+    let endpointPath = `/__displaystatemap`;
+
+    if (
+      optionsParam &&
+      optionsParam.endpointPath !== null &&
+      typeof optionsParam.endpointPath === "string"
+    ) {
+      endpointPath = optionsParam.endpointPath;
+    }
+    // bail if this isn't a request for the display state map endpoint
+    if (req.path !== endpointPath) {
+      next();
+      return;
+    }
+
+    // process options parameter
     const options = processOptions(optionsParam, req, res, next);
     if (!options) {
       return;
@@ -39,14 +49,6 @@ const jwtAuthz = (
       identityContextOptions,
     } = options;
 
-    // process the parameter values to extract policy and resourceContext
-    const { policy, resourceContext } = processParams(
-      req,
-      packageName,
-      resourceMap,
-      policyRoot
-    );
-
     const error = (
       res: Response,
       err_message = "express-jwt-aserto: unknown error"
@@ -59,16 +61,14 @@ const jwtAuthz = (
         });
       }
 
-      res.append(
-        "WWW-Authenticate",
-        `Bearer error="${encodeURIComponent(err_message)}"`
-      );
       res.status(403).send(err_message);
     };
 
     const callAuthorizer = async () => {
       return new Promise((resolve, reject) => {
         try {
+          // process the parameter values to extract policy and resourceContext
+
           const metadata = new Metadata();
           authorizerApiKey &&
             metadata.add("authorization", `basic ${authorizerApiKey}`);
@@ -78,59 +78,58 @@ const jwtAuthz = (
             authorizerUrl,
             credentials.createInsecure()
           );
-          const isRequest = new IsRequest();
-          const policyContext = new PolicyContext();
-
-          policyContext.setPath(policy);
-          policyContext.setName(policyName);
-          policyContext.setDecisionsList(["allowed"]);
 
           const idContext = identityContext(req, identityContextOptions);
 
-          isRequest.setPolicyContext(policyContext);
-          isRequest.setIdentityContext(idContext);
+          const policyContext = new PolicyContext();
+          policyContext.setPath(policyRoot);
+          policyContext.setName(policyName);
+          policyContext.setDecisionsList(["visible", "enabled"]);
 
-          const fields = resourceContext as { [key: string]: JavaScriptValue };
-          isRequest.setResourceContext(Struct.fromJavaScript(fields));
+          const decisionTreeRequest = new DecisionTreeRequest();
+          const decisionTreeOptions = new DecisionTreeOptions();
 
-          client.is(
-            isRequest,
+          decisionTreeOptions.setPathSeparator(2);
+
+          decisionTreeRequest.setPolicyContext(policyContext);
+          decisionTreeRequest.setIdentityContext(idContext);
+          decisionTreeRequest.setOptions(decisionTreeOptions);
+
+          client.decisionTree(
+            decisionTreeRequest,
             metadata,
-            (err: ServiceError, response: IsResponse) => {
+            (err: ServiceError, response: DecisionTreeResponse) => {
               if (err) {
                 const message = err.message;
                 log(`'is' returned error: ${message}`, "ERROR");
-                reject(null);
+                error(res, message);
+                return null;
               }
 
               if (!response) {
                 log(`'is' returned error: No response`, "ERROR");
-                reject(false);
+                error(res, "No response");
+                return false;
               }
 
-              const result = response.toObject();
-              const allowed =
-                result.decisionsList &&
-                result.decisionsList.length &&
-                result.decisionsList[0].is;
-
-              resolve(allowed);
+              response.hasPath()
+                ? resolve(response.getPath())
+                : reject("No path found");
             }
           );
-        } catch (err) {
-          log(`jwtAuthz caught exception ${err}`, "ERROR");
-          // TODO: Fix error
-          // error(res, err.message);
-          return null;
+        } catch (e) {
+          error(res, e as string);
         }
       });
     };
 
-    const allowed = await callAuthorizer();
-    if (allowed != null) {
-      return allowed ? next() : error(res, `Forbidden by policy ${policy}`);
+    try {
+      const result = await callAuthorizer();
+      res.send(200).send(result);
+    } catch (e) {
+      error(res, "Failed getting display state map");
     }
   };
 };
 
-export { jwtAuthz };
+export { displayStateMap };

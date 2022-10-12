@@ -13,7 +13,7 @@ const log = (message: string, level = "INFO") => {
     /* @ts-ignore */
     //TODO: Remove this ts-ignore
   } else if (logLevels[level] <= logLevels[currentLevel]) {
-    console.log(`${timestamp} ${level}: ${message}`);
+    console.log(`${timestamp} ${level}: express-jwt-aserto: ${message}`);
   }
 };
 

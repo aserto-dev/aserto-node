@@ -14,7 +14,7 @@ declare namespace is {
 
   export interface AuthzOptions {
     policyRoot: string;
-    policyName: string;
+    policyName?: string;
     authorizerServiceUrl: string;
     authorizerApiKey?: string;
     tenantId?: string;
@@ -28,9 +28,27 @@ declare namespace is {
   }
 }
 
+declare namespace displayStateMap {
+  export interface DisplayStateMapOptions {
+    policyRoot: string;
+    policyName?: string;
+    authorizerServiceUrl: string;
+    authorizerApiKey?: string;
+    tenantId?: string;
+    authorizerCertFile?: string;
+    disableTlsValidation?: boolean;
+    useAuthorizationHeader?: boolean;
+    identityHeader?: string;
+    failWithError?: boolean;
+    customUserKey?: string;
+    customSubjectKey?: string;
+    endpointPath?: string;
+  }
+}
+
 export interface AuthzOptions {
   policyRoot: string;
-  policyName: string;
+  policyName?: string;
   authorizerServiceUrl: string;
   authorizerApiKey?: string;
   tenantId?: string;
