@@ -36,7 +36,7 @@ const is = (
       authorizerUrl,
       authorizerApiKey,
       tenantId,
-      policyId,
+      policyName,
       policyRoot,
       identityContextOptions,
     } = options;
@@ -49,7 +49,7 @@ const is = (
       policyRoot
     );
 
-    var metadata = new Metadata();
+    const metadata = new Metadata();
     authorizerApiKey &&
       metadata.add("authorization", `basic ${authorizerApiKey}`);
     tenantId && metadata.add("aserto-tenant-id", tenantId);
@@ -61,7 +61,7 @@ const is = (
     const isRequest = new IsRequest();
     const policyContext = new PolicyContext();
     policyContext.setPath(policy);
-    policyContext.setName(policyId);
+    policyContext.setName(policyName);
     policyContext.setDecisionsList([decision]);
 
     const idContext = identityContext(req, identityContextOptions);
@@ -82,6 +82,7 @@ const is = (
         }
 
         if (!response) {
+          log(`express-jwt-aserto: 'is' returned error: No response`, "ERROR");
           return false;
         }
 

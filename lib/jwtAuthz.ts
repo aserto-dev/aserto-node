@@ -13,8 +13,8 @@ import { Request, NextFunction, Response } from "express";
 import identityContext from "./identityContext";
 import processOptions from "./processOptions";
 import processParams from "./processParams";
-import { AuthzOptions } from "./index.d";
 import { log } from "./log";
+import { AuthzOptions } from "./index.d";
 
 const jwtAuthz = (
   optionsParam: AuthzOptions,
@@ -34,7 +34,7 @@ const jwtAuthz = (
       authorizerUrl,
       authorizerApiKey,
       tenantId,
-      policyId,
+      policyName,
       policyRoot,
       identityContextOptions,
     } = options;
@@ -82,7 +82,7 @@ const jwtAuthz = (
           const policyContext = new PolicyContext();
 
           policyContext.setPath(policy);
-          policyContext.setName(policyId);
+          policyContext.setName(policyName);
           policyContext.setDecisionsList(["allowed"]);
 
           const idContext = identityContext(req, identityContextOptions);

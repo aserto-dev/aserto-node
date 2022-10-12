@@ -92,12 +92,12 @@ export default (
   }
 
   // set the policy ID
-  const policyId =
-    options && typeof options.policyId === "string" && options.policyId;
-  if (!policyId && res) {
+  const policyName =
+    options && typeof options.policyName === "string" && options.policyName;
+  if (!policyName && res) {
     return error(
       res,
-      "express-jwt-aserto: must provide policyId in option map"
+      "express-jwt-aserto: must provide policyName in option map"
     );
   }
 
@@ -174,7 +174,7 @@ export default (
     authorizerUrl,
     authorizerApiKey,
     tenantId,
-    policyId: policyId as string,
+    policyName: policyName as string,
     policyRoot: policyRoot as string,
     identityContextOptions: {
       useAuthorizationHeader,

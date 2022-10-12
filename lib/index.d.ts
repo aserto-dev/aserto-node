@@ -14,7 +14,7 @@ declare namespace is {
 
   export interface AuthzOptions {
     policyRoot: string;
-    policyId: string;
+    policyName: string;
     authorizerServiceUrl: string;
     authorizerApiKey?: string;
     tenantId?: string;
@@ -30,7 +30,7 @@ declare namespace is {
 
 export interface AuthzOptions {
   policyRoot: string;
-  policyId: string;
+  policyName: string;
   authorizerServiceUrl: string;
   authorizerApiKey?: string;
   tenantId?: string;
