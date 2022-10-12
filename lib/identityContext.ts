@@ -31,10 +31,7 @@ export default (req: express.Request, options: identityContext.Options) => {
       identityContext.setType(3);
     } catch (error) {
       // TODO: resolve error type ${error.message}
-      log(
-        `express-jwt-aserto: Authorization header contained malformed JWT:`,
-        "ERROR"
-      );
+      log(`Authorization header contained malformed JWT:`, "ERROR");
       identityContext.setType(1);
     }
   } else {
