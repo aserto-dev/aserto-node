@@ -24,7 +24,9 @@ export default (
     // replace all '/' path components with '.' separators
     route = route.replace(/\//g, ".");
     // construct the policy name as appname.METHOD.route
-    packageName = `${policyRoot}.${req.method}${route}`;
+    packageName = `${req.method}${route}`;
+    // TODO: What do we do with the root?
+    console.log(policyRoot);
   }
 
   // replace all '/' path components with '.' separators

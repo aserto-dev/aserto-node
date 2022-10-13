@@ -6,16 +6,14 @@ import {
   DecisionTreeRequest,
   DecisionTreeResponse,
 } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_pb";
-import { credentials, Metadata, ServiceError } from "@grpc/grpc-js";
+import { Metadata, ServiceError } from "@grpc/grpc-js";
 
 import identityContext from "./identityContext";
-import { displayStateMap as displayStateMapD } from "./index.d";
+import { DisplayStateMapOptions } from "./index.d";
 import { log } from "./log";
 import processOptions from "./processOptions";
 
-const displayStateMap = (
-  optionsParam: displayStateMapD.DisplayStateMapOptions
-) => {
+const displayStateMap = (optionsParam: DisplayStateMapOptions) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     let endpointPath = `/__displaystatemap`;
 
@@ -48,6 +46,7 @@ const displayStateMap = (
       policyName,
       policyRoot,
       identityContextOptions,
+      authorizerCert,
     } = options;
 
     const error = (
@@ -75,10 +74,7 @@ const displayStateMap = (
             metadata.add("authorization", `basic ${authorizerApiKey}`);
           tenantId && metadata.add("aserto-tenant-id", tenantId);
 
-          const client = new AuthorizerClient(
-            authorizerUrl,
-            credentials.createInsecure()
-          );
+          const client = new AuthorizerClient(authorizerUrl, authorizerCert);
 
           const idContext = identityContext(req, identityContextOptions);
 

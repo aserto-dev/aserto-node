@@ -9,7 +9,7 @@ import {
   IsRequest,
   IsResponse,
 } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_pb";
-import { credentials, Metadata, ServiceError } from "@grpc/grpc-js";
+import { Metadata, ServiceError } from "@grpc/grpc-js";
 
 import identityContext from "./identityContext";
 import { AuthzOptions } from "./index.d";
@@ -38,6 +38,7 @@ const jwtAuthz = (
       policyName,
       policyRoot,
       identityContextOptions,
+      authorizerCert,
     } = options;
 
     // process the parameter values to extract policy and resourceContext
@@ -75,10 +76,7 @@ const jwtAuthz = (
             metadata.add("authorization", `basic ${authorizerApiKey}`);
           tenantId && metadata.add("aserto-tenant-id", tenantId);
 
-          const client = new AuthorizerClient(
-            authorizerUrl,
-            credentials.createInsecure()
-          );
+          const client = new AuthorizerClient(authorizerUrl, authorizerCert);
           const isRequest = new IsRequest();
           const policyContext = new PolicyContext();
 
@@ -113,7 +111,7 @@ const jwtAuthz = (
               const allowed =
                 result.decisionsList &&
                 result.decisionsList.length &&
-                result.decisionsList[0].is;
+                result.decisionsList[0]?.is;
 
               resolve(allowed);
             }
