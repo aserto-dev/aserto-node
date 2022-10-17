@@ -21,8 +21,8 @@ const is = (
   decision: string,
   req: Request,
   optionsParam: AuthzOptions,
-  packageName: string,
-  resourceMap: object
+  packageName?: string,
+  resourceMap?: object
 ) => {
   return new Promise((resolve, reject) => {
     try {
@@ -47,9 +47,9 @@ const is = (
       // process the parameter values to extract policy and resourceContext
       const { policy, resourceContext } = processParams(
         req,
+        policyRoot,
         packageName,
-        resourceMap,
-        policyRoot
+        resourceMap
       );
 
       const metadata = new Metadata();
@@ -61,7 +61,7 @@ const is = (
 
       const policyContext = new PolicyContext();
       policyContext.setPath(policy);
-      policyContext.setName(policyName);
+      policyName && policyContext.setName(policyName);
       policyContext.setDecisionsList([decision]);
 
       const isRequest = new IsRequest();

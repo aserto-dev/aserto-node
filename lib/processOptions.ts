@@ -5,9 +5,7 @@ import { ChannelCredentials } from "@grpc/grpc-js";
 
 import { AuthzOptions, IdentityContextOptions } from "./index.d";
 import { log } from "./log";
-import { getSSLCreds } from "./ssl";
-// const fs = require("fs");
-// const log = require("./log");
+import { getSSLCredentials } from "./ssl";
 
 export default (
   options: AuthzOptions,
@@ -26,7 +24,7 @@ export default (
         message: `express-jwt-aserto: ${err_message}`,
       });
     }
-
+    log(err_message, "ERROR");
     res.status(403).send(err_message);
   };
 
@@ -77,36 +75,9 @@ export default (
     authorizerCertCAFile = options.authorizerCertCAFile;
   }
 
-  let authorizerClientKeyFile: string = "";
-  if (
-    options &&
-    typeof options.authorizerClientKeyFile === "string" &&
-    options.authorizerClientKeyFile
-  ) {
-    authorizerClientKeyFile = options.authorizerClientKeyFile;
-  }
-
-  let authorizerClientCertFile: string = "";
-  if (
-    options &&
-    typeof options.authorizerClientCertFile === "string" &&
-    options.authorizerClientCertFile
-  ) {
-    authorizerClientCertFile = options.authorizerClientCertFile;
-  }
-
   let authorizerCert: ChannelCredentials;
-  if (
-    !disableTlsValidation &&
-    authorizerCertCAFile &&
-    authorizerClientKeyFile &&
-    authorizerClientCertFile
-  ) {
-    authorizerCert = getSSLCreds(
-      authorizerCertCAFile,
-      authorizerClientKeyFile,
-      authorizerClientCertFile
-    );
+  if (!disableTlsValidation && authorizerCertCAFile) {
+    authorizerCert = getSSLCredentials(authorizerCertCAFile);
   } else {
     authorizerCert = credentials.createInsecure();
     log("INSECURE CONNECTION");
@@ -190,8 +161,8 @@ export default (
     authorizerUrl,
     authorizerApiKey,
     tenantId,
-    policyName: policyName as string,
-    policyRoot: policyRoot as string,
+    policyName,
+    policyRoot: policyRoot! as string,
     authorizerCert,
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     identityContextOptions: {

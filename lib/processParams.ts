@@ -1,11 +1,13 @@
 // process parameters
 import express from "express";
 
+import { log } from "./log";
+
 export default (
   req: express.Request,
-  packageName: string,
-  resourceMap: object,
-  policyRoot: string
+  policyRoot: string,
+  packageName?: string,
+  resourceMap?: object
 ) => {
   // if a resourceMap wasn't explicitly passed in, get it from req.params
   if (!resourceMap) {
@@ -25,8 +27,8 @@ export default (
     route = route.replace(/\//g, ".");
     // construct the policy name as appname.METHOD.route
     packageName = `${req.method}${route}`;
-    // TODO: What do we do with the root?
-    console.log(policyRoot);
+    // TODO: Put back policy root
+    log(`Should put this back${policyRoot}`);
   }
 
   // replace all '/' path components with '.' separators

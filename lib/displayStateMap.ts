@@ -80,7 +80,7 @@ const displayStateMap = (optionsParam: DisplayStateMapOptions) => {
 
           const policyContext = new PolicyContext();
           policyContext.setPath(policyRoot);
-          policyContext.setName(policyName);
+          policyName && policyContext.setName(policyName);
           policyContext.setDecisionsList(["visible", "enabled"]);
 
           const decisionTreeRequest = new DecisionTreeRequest();

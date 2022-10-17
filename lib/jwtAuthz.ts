@@ -19,8 +19,8 @@ import processParams from "./processParams";
 
 const jwtAuthz = (
   optionsParam: AuthzOptions,
-  packageName: string,
-  resourceMap: object
+  packageName?: string,
+  resourceMap?: object
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     const options = processOptions(optionsParam, req, res, next);
@@ -44,9 +44,9 @@ const jwtAuthz = (
     // process the parameter values to extract policy and resourceContext
     const { policy, resourceContext } = processParams(
       req,
+      policyRoot,
       packageName,
-      resourceMap,
-      policyRoot
+      resourceMap
     );
 
     const error = (
@@ -60,6 +60,7 @@ const jwtAuthz = (
           message: `express-jwt-aserto: ${err_message}`,
         });
       }
+      log(err_message, "ERROR");
 
       res.append(
         "WWW-Authenticate",
@@ -81,7 +82,7 @@ const jwtAuthz = (
           const policyContext = new PolicyContext();
 
           policyContext.setPath(policy);
-          policyContext.setName(policyName);
+          policyName && policyContext.setName(policyName);
           policyContext.setDecisionsList(["allowed"]);
 
           const idContext = identityContext(req, identityContextOptions);
@@ -118,8 +119,6 @@ const jwtAuthz = (
           );
         } catch (err) {
           log(`jwtAuthz caught exception ${err}`, "ERROR");
-          // TODO: Fix error
-          // error(res, err.message);
           return null;
         }
       });
