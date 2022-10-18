@@ -78,14 +78,17 @@ const is = (
         metadata,
         (err: ServiceError, response: IsResponse) => {
           if (err) {
-            const message = err.message;
-            log(`'is' returned error: ${message}`, "ERROR");
-            resolve(null);
+            const message = `'is' returned error: ${err.message}`;
+            log(message, "ERROR");
+            reject(message);
+            return;
           }
 
           if (!response) {
-            log(`'is' returned error: No response`, "ERROR");
-            resolve(false);
+            const message = `'is' returned error: No response`;
+            log(message, "ERROR");
+            reject(message);
+            return;
           }
 
           const result = response.getDecisionsList();

@@ -56,8 +56,7 @@ describe("should succeed", () => {
       authorizerServiceUrl: "localhost:8282",
       identityHeader: "Authorization",
       // TODO: Remove
-      authorizerCertCAFile:
-        "/Users/roie-schwaber-cohen/dev/topaz-run/certs/grpc-ca.crt",
+      authorizerCertCAFile: process.env.CA_FILE!,
     };
 
     const allowed = await is(decision, req, options);

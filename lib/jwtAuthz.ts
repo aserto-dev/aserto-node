@@ -11,9 +11,9 @@ import {
 } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_pb";
 import { Metadata, ServiceError } from "@grpc/grpc-js";
 
+import { errorHandler } from "./errorHandler";
 import identityContext from "./identityContext";
 import { AuthzOptions } from "./index.d";
-import { log } from "./log";
 import processOptions from "./processOptions";
 import processParams from "./processParams";
 
@@ -49,25 +49,7 @@ const jwtAuthz = (
       resourceMap
     );
 
-    const error = (
-      res: Response,
-      err_message = "express-jwt-aserto: unknown error"
-    ) => {
-      if (failWithError) {
-        return next({
-          statusCode: 403,
-          error: "Forbidden",
-          message: `express-jwt-aserto: ${err_message}`,
-        });
-      }
-      log(err_message, "ERROR");
-
-      res.append(
-        "WWW-Authenticate",
-        `Bearer error="${encodeURIComponent(err_message)}"`
-      );
-      res.status(403).send(err_message);
-    };
+    const error = errorHandler(next, failWithError);
 
     const callAuthorizer = async () => {
       return new Promise((resolve, reject) => {
@@ -99,13 +81,13 @@ const jwtAuthz = (
             (err: ServiceError, response: IsResponse) => {
               if (err) {
                 const message = err.message;
-                log(`'is' returned error: ${message}`, "ERROR");
-                reject(null);
+                reject(`'jwtAuthz' returned error: ${message}`);
+                return;
               }
 
               if (!response) {
-                log(`'is' returned error: No response`, "ERROR");
-                reject(false);
+                reject("'jwtAuthz' returned error: No response");
+                return;
               }
 
               const result = response.toObject();
@@ -118,15 +100,16 @@ const jwtAuthz = (
             }
           );
         } catch (err) {
-          log(`jwtAuthz caught exception ${err}`, "ERROR");
-          return null;
+          reject(`'jwtAuthz' caught exception ${err}`);
         }
       });
     };
 
-    const allowed = await callAuthorizer();
-    if (allowed !== null) {
+    try {
+      const allowed = await callAuthorizer();
       return allowed ? next() : error(res, `Forbidden by policy ${policy}`);
+    } catch (err) {
+      error(res, err as string);
     }
   };
 };

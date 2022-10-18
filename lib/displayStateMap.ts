@@ -8,9 +8,9 @@ import {
 } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_pb";
 import { Metadata, ServiceError } from "@grpc/grpc-js";
 
+import { errorHandler } from "./errorHandler";
 import identityContext from "./identityContext";
 import { DisplayStateMapOptions } from "./index.d";
-import { log } from "./log";
 import processOptions from "./processOptions";
 
 const displayStateMap = (optionsParam: DisplayStateMapOptions) => {
@@ -49,26 +49,11 @@ const displayStateMap = (optionsParam: DisplayStateMapOptions) => {
       authorizerCert,
     } = options;
 
-    const error = (
-      res: Response,
-      err_message = "express-jwt-aserto: unknown error"
-    ) => {
-      if (failWithError) {
-        return next({
-          statusCode: 403,
-          error: "Forbidden",
-          message: `express-jwt-aserto: ${err_message}`,
-        });
-      }
-
-      res.status(403).send(err_message);
-    };
+    const error = errorHandler(next, failWithError);
 
     const callAuthorizer = async () => {
       return new Promise((resolve, reject) => {
         try {
-          // process the parameter values to extract policy and resourceContext
-
           const metadata = new Metadata();
           authorizerApiKey &&
             metadata.add("authorization", `basic ${authorizerApiKey}`);
@@ -97,25 +82,24 @@ const displayStateMap = (optionsParam: DisplayStateMapOptions) => {
             metadata,
             (err: ServiceError, response: DecisionTreeResponse) => {
               if (err) {
-                const message = err.message;
-                log(`'is' returned error: ${message}`, "ERROR");
-                error(res, message);
-                return null;
+                reject(`'displayStateMap' returned error: ${err.message}`);
+                return;
               }
 
               if (!response) {
-                log(`'is' returned error: No response`, "ERROR");
-                error(res, "No response");
-                return false;
+                reject(`'displayStateMap' returned error: No response`);
+                return;
               }
-
-              response.hasPath()
-                ? resolve(response.getPath())
-                : reject("No path found");
+              if (response.hasPath()) {
+                resolve(response.getPath());
+              } else {
+                reject("'displayStateMap' returned error: No path found");
+                return;
+              }
             }
           );
-        } catch (e) {
-          error(res, e as string);
+        } catch (err) {
+          reject(`'displayStateMap' caught exception ${err}`);
         }
       });
     };
@@ -123,8 +107,8 @@ const displayStateMap = (optionsParam: DisplayStateMapOptions) => {
     try {
       const result = await callAuthorizer();
       res.send(200).send(result);
-    } catch (e) {
-      error(res, "Failed getting display state map");
+    } catch (err) {
+      error(res, err as string);
     }
   };
 };

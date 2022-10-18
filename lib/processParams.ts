@@ -1,8 +1,6 @@
 // process parameters
 import express from "express";
 
-import { log } from "./log";
-
 export default (
   req: express.Request,
   policyRoot: string,
@@ -26,9 +24,7 @@ export default (
     // replace all '/' path components with '.' separators
     route = route.replace(/\//g, ".");
     // construct the policy name as appname.METHOD.route
-    packageName = `${req.method}${route}`;
-    // TODO: Put back policy root
-    log(`Should put this back${policyRoot}`);
+    packageName = `${policyRoot}.${req.method}${route}`;
   }
 
   // replace all '/' path components with '.' separators
