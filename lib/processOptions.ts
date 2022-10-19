@@ -83,12 +83,8 @@ export default (
     log("INSECURE CONNECTION");
   }
 
-  // set the policy ID
   const policyName =
     options && typeof options.policyName === "string" && options.policyName;
-  if (!policyName && res) {
-    return error(res, "must provide policyName in option map");
-  }
 
   // set the policy root
   const policyRoot =
