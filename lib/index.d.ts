@@ -14,45 +14,10 @@ declare function jwtAuthz(
   resourceMap?: jwtAuthz.ResourceMap
 ): express.Handler;
 
-declare namespace jwtAuthz {
-  export type Policy = string;
-  export type ResourceMap = Record<string, string>;
-
-  export interface AuthzOptions {
-    policyRoot: string;
-    policyName: string;
-    authorizerServiceUrl: string;
-    authorizerApiKey?: string;
-    tenantId?: string;
-    authorizerCertCAFile: string;
-    disableTlsValidation?: boolean;
-    useAuthorizationHeader?: boolean;
-    identityHeader?: string;
-    failWithError?: boolean;
-    customUserKey?: string;
-    customSubjectKey?: string;
-  }
-}
-
 declare function displayStateMap(
   options: displayStateMap.DisplayStateMapOptions
 ): express.Handler;
 
-export interface DisplayStateMapOptions {
-  policyRoot: string;
-  policyName: string;
-  authorizerServiceUrl: string;
-  authorizerApiKey?: string;
-  tenantId?: string;
-  authorizerCertCAFile: string;
-  disableTlsValidation?: boolean;
-  useAuthorizationHeader?: boolean;
-  identityHeader?: string;
-  failWithError?: boolean;
-  customUserKey?: string;
-  customSubjectKey?: string;
-  endpointPath?: string;
-}
 declare function is(
   decision: string,
   req: express.Request,
@@ -61,42 +26,20 @@ declare function is(
   resourceMap?: is.ResourceMap
 ): boolean;
 
-declare namespace is {
-  export type Policy = string;
-  export type ResourceMap = Record<string, string>;
-
-  export interface AuthzOptions {
-    policyRoot: string;
-    policyName?: string;
-    authorizerServiceUrl: string;
-    authorizerApiKey?: string;
-    tenantId?: string;
-    authorizerCertCAFile: string;
-    disableTlsValidation?: boolean;
-    useAuthorizationHeader?: boolean;
-    identityHeader?: string;
-    failWithError?: boolean;
-    customUserKey?: string;
-    customSubjectKey?: string;
-  }
-}
-
-declare namespace displayStateMap {
-  export interface DisplayStateMapOptions {
-    policyRoot: string;
-    policyName?: string;
-    authorizerServiceUrl: string;
-    authorizerApiKey?: string;
-    tenantId?: string;
-    authorizerCertCAFile: string;
-    disableTlsValidation?: boolean;
-    useAuthorizationHeader?: boolean;
-    identityHeader?: string;
-    failWithError?: boolean;
-    customUserKey?: string;
-    customSubjectKey?: string;
-    endpointPath?: string;
-  }
+export interface DisplayStateMapOptions {
+  policyRoot: string;
+  policyName: string;
+  authorizerServiceUrl: string;
+  authorizerApiKey?: string;
+  tenantId?: string;
+  authorizerCertCAFile?: string;
+  disableTlsValidation?: boolean;
+  useAuthorizationHeader?: boolean;
+  identityHeader?: string;
+  failWithError?: boolean;
+  customUserKey?: string;
+  customSubjectKey?: string;
+  endpointPath?: string;
 }
 
 export interface AuthzOptions {
@@ -105,7 +48,7 @@ export interface AuthzOptions {
   authorizerServiceUrl: string;
   authorizerApiKey?: string;
   tenantId?: string;
-  authorizerCertCAFile: string;
+  authorizerCertCAFile?: string;
   disableTlsValidation?: boolean;
   useAuthorizationHeader?: boolean;
   identityHeader?: string;
