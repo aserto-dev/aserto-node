@@ -58,11 +58,7 @@ exports.default = (options, req, res, next) => {
         authorizerCert = grpc_js_1.credentials.createInsecure();
         (0, log_1.log)("INSECURE CONNECTION");
     }
-    // set the policy ID
     const policyName = options && typeof options.policyName === "string" && options.policyName;
-    if (!policyName && res) {
-        return error(res, "must provide policyName in option map");
-    }
     // set the policy root
     const policyRoot = options && typeof options.policyRoot === "string" && options.policyRoot;
     if (!policyRoot && res) {

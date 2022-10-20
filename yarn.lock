@@ -19,6 +19,24 @@
     google-protobuf "^3.21.0"
     grpc-tools "^1.11.2"
 
+"@aserto/node-directory@https://github.com/aserto-dev/node-directory":
+  version "0.0.7"
+  resolved "https://github.com/aserto-dev/node-directory#33865bbc44017a8a74b3815cceeaebaa1e5bf48a"
+  dependencies:
+    "@grpc/grpc-js" "^1.6.11"
+    "@types/google-protobuf" "^3.15.6"
+    google-protobuf "^3.21.0"
+    grpc-tools "^1.11.2"
+
+"@aserto/node-directory@https://github.com/ogazitt/node-directory-v2":
+  version "0.0.7"
+  resolved "https://github.com/ogazitt/node-directory-v2#ccb6571021223c5725a1c050f438de17bf5b4a6f"
+  dependencies:
+    "@grpc/grpc-js" "^1.6.11"
+    "@types/google-protobuf" "^3.15.6"
+    google-protobuf "^3.21.0"
+    grpc-tools "^1.11.2"
+
 "@aserto/ts-linting-configs@^2.5.0":
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/@aserto/ts-linting-configs/-/ts-linting-configs-2.5.0.tgz#8c86d10715fc74e692d769406ee649be0570ff06"

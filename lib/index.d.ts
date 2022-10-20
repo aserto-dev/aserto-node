@@ -1,9 +1,9 @@
 import * as express from "express";
-
 export = {
   jwtAuthz,
   displayStateMap,
   is,
+  ds,
   IdentityContextOptions,
   DisplayStateMapOptions,
 };
@@ -25,6 +25,11 @@ declare function is(
   policy?: is.Policy,
   resourceMap?: is.ResourceMap
 ): boolean;
+
+declare function ds(authorizerCertCAFile: string): {
+  object: function;
+  relation: function;
+};
 
 export interface DisplayStateMapOptions {
   policyRoot: string;
