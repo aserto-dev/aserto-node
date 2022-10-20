@@ -54,7 +54,7 @@ const displayStateMap = (optionsParam) => {
                     const idContext = (0, identityContext_1.default)(req, identityContextOptions);
                     const policyContext = new policy_context_pb_1.PolicyContext();
                     policyContext.setPath(policyRoot);
-                    policyName && policyContext.setName(policyName);
+                    policyName && policyContext.setPath(policyName);
                     policyContext.setDecisionsList(["visible", "enabled"]);
                     const decisionTreeRequest = new authorizer_pb_1.DecisionTreeRequest();
                     const decisionTreeOptions = new authorizer_pb_1.DecisionTreeOptions();

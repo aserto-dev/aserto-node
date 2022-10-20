@@ -33,7 +33,8 @@ declare function ds(authorizerCertCAFile: string): {
 
 export interface DisplayStateMapOptions {
   policyRoot: string;
-  policyName: string;
+  instanceName: string;
+  instanceLabel?: string;
   authorizerServiceUrl: string;
   authorizerApiKey?: string;
   tenantId?: string;
@@ -49,7 +50,8 @@ export interface DisplayStateMapOptions {
 
 export interface AuthzOptions {
   policyRoot: string;
-  policyName?: string;
+  instanceName?: string;
+  instanceLabel?: string;
   authorizerServiceUrl: string;
   authorizerApiKey?: string;
   tenantId?: string;

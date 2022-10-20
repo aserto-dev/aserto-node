@@ -4,6 +4,7 @@ import {
   Struct,
 } from "google-protobuf/google/protobuf/struct_pb";
 import { PolicyContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_context_pb";
+import { PolicyInstance } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_instance_pb";
 import { AuthorizerClient } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_grpc_pb";
 import {
   IsRequest,
@@ -38,7 +39,8 @@ const is = (
         authorizerUrl,
         authorizerApiKey,
         tenantId,
-        policyName,
+        instanceName,
+        instanceLabel,
         policyRoot,
         identityContextOptions,
         authorizerCert,
@@ -61,10 +63,16 @@ const is = (
 
       const policyContext = new PolicyContext();
       policyContext.setPath(policy);
-      policyName && policyContext.setName(policyName);
       policyContext.setDecisionsList([decision]);
 
       const isRequest = new IsRequest();
+      if (instanceName && instanceLabel) {
+        const policyInstance = new PolicyInstance();
+        policyInstance.setName(instanceName);
+        policyInstance.setInstanceLabel(instanceLabel);
+        isRequest.setPolicyInstance(policyInstance);
+      }
+
       isRequest.setPolicyContext(policyContext);
 
       const idContext = identityContext(req, identityContextOptions);

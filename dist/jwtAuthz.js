@@ -46,7 +46,8 @@ const jwtAuthz = (optionsParam, packageName, resourceMap) => {
                     const isRequest = new authorizer_pb_1.IsRequest();
                     const policyContext = new policy_context_pb_1.PolicyContext();
                     policyContext.setPath(policy);
-                    policyName && policyContext.setName(policyName);
+                    // policyName && policyContext.setPath(policyName);
+                    console.log(policyName);
                     policyContext.setDecisionsList(["allowed"]);
                     const idContext = (0, identityContext_1.default)(req, identityContextOptions);
                     isRequest.setPolicyContext(policyContext);

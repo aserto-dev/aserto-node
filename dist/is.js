@@ -33,7 +33,7 @@ const is = (decision, req, optionsParam, packageName, resourceMap) => {
             const client = new authorizer_grpc_pb_1.AuthorizerClient(authorizerUrl, authorizerCert);
             const policyContext = new policy_context_pb_1.PolicyContext();
             policyContext.setPath(policy);
-            policyName && policyContext.setName(policyName);
+            policyName && policyContext.setPath(policyName);
             policyContext.setDecisionsList([decision]);
             const isRequest = new authorizer_pb_1.IsRequest();
             isRequest.setPolicyContext(policyContext);

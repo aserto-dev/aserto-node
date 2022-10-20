@@ -83,9 +83,23 @@ export default (
     log("INSECURE CONNECTION");
   }
 
-  const policyName =
-    options && typeof options.policyName === "string" && options.policyName;
+  const instanceName =
+    options && typeof options.instanceName === "string" && options.instanceName;
 
+  const instanceLabel =
+    options &&
+    typeof options.instanceLabel === "string" &&
+    options.instanceLabel;
+
+  if (
+    ((instanceName && !instanceLabel) || (!instanceName && instanceLabel)) &&
+    res
+  ) {
+    return error(
+      res,
+      "must provide both an instance name and an instance label in option map"
+    );
+  }
   // set the policy root
   const policyRoot =
     options && typeof options.policyRoot === "string" && options.policyRoot;
@@ -157,7 +171,8 @@ export default (
     authorizerUrl,
     authorizerApiKey,
     tenantId,
-    policyName,
+    instanceName,
+    instanceLabel,
     policyRoot: policyRoot! as string,
     authorizerCert,
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions

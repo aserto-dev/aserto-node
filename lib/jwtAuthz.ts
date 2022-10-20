@@ -4,6 +4,7 @@ import {
   Struct,
 } from "google-protobuf/google/protobuf/struct_pb";
 import { PolicyContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_context_pb";
+import { PolicyInstance } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_instance_pb";
 import { AuthorizerClient } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_grpc_pb";
 import {
   IsRequest,
@@ -35,7 +36,8 @@ const jwtAuthz = (
       authorizerUrl,
       authorizerApiKey,
       tenantId,
-      policyName,
+      instanceName,
+      instanceLabel,
       policyRoot,
       identityContextOptions,
       authorizerCert,
@@ -64,7 +66,6 @@ const jwtAuthz = (
           const policyContext = new PolicyContext();
 
           policyContext.setPath(policy);
-          policyName && policyContext.setName(policyName);
           policyContext.setDecisionsList(["allowed"]);
 
           const idContext = identityContext(req, identityContextOptions);
@@ -75,6 +76,12 @@ const jwtAuthz = (
           const fields = resourceContext as { [key: string]: JavaScriptValue };
           isRequest.setResourceContext(Struct.fromJavaScript(fields));
 
+          if (instanceName && instanceLabel) {
+            const policyInstance = new PolicyInstance();
+            policyInstance.setName(instanceName);
+            policyInstance.setInstanceLabel(instanceLabel);
+            isRequest.setPolicyInstance(policyInstance);
+          }
           client.is(
             isRequest,
             metadata,

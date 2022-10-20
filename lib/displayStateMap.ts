@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { PolicyContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_context_pb";
+import { PolicyInstance } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_instance_pb";
 import { AuthorizerClient } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_grpc_pb";
 import {
   DecisionTreeOptions,
@@ -43,7 +44,8 @@ const displayStateMap = (optionsParam: DisplayStateMapOptions) => {
       authorizerUrl,
       authorizerApiKey,
       tenantId,
-      policyName,
+      instanceName,
+      instanceLabel,
       policyRoot,
       identityContextOptions,
       authorizerCert,
@@ -65,11 +67,17 @@ const displayStateMap = (optionsParam: DisplayStateMapOptions) => {
 
           const policyContext = new PolicyContext();
           policyContext.setPath(policyRoot);
-          policyName && policyContext.setName(policyName);
           policyContext.setDecisionsList(["visible", "enabled"]);
 
           const decisionTreeRequest = new DecisionTreeRequest();
           const decisionTreeOptions = new DecisionTreeOptions();
+
+          if (instanceName && instanceLabel) {
+            const policyInstance = new PolicyInstance();
+            policyInstance.setName(instanceName);
+            policyInstance.setInstanceLabel(instanceLabel);
+            decisionTreeRequest.setPolicyInstance(policyInstance);
+          }
 
           decisionTreeOptions.setPathSeparator(2);
 

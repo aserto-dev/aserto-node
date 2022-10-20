@@ -17,7 +17,7 @@
     "@lib": "./lib"
   },
   "dependencies": {
-    "@aserto/node-authorizer": "https://github.com/aserto-dev/node-authorizer",
+    "@aserto/node-authorizer": "https://github.com/aserto-dev/node-authorizer.git",
     "@aserto/node-directory": "https://github.com/ogazitt/node-directory-v2",
     "@grpc/grpc-js": "^1.7.1",
     "express": "^4.18.2",
