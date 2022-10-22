@@ -388,13 +388,13 @@ const jwtAuthz = (
 &nbsp;
     const error = <span class="fstat-no" title="function not covered" >(</span>
       res: Response,
-      err_message = <span class="branch-0 cbranch-no" title="branch not covered" >"express-jwt-aserto: unknown error"</span>
+      err_message = <span class="branch-0 cbranch-no" title="branch not covered" >"aserto-node: unknown error"</span>
     ) =&gt; {
 <span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (failWithError) {</span>
 <span class="cstat-no" title="statement not covered" >        return next({</span>
           statusCode: 403,
           error: "Forbidden",
-          message: `express-jwt-aserto: ${err_message}`,
+          message: `aserto-node: ${err_message}`,
         });
       }
 <span class="cstat-no" title="statement not covered" >      log(err_message, "ERROR");</span>

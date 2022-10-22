@@ -1,24 +1,29 @@
-# express-jwt-aserto ![](https://travis-ci.org/aserto/express-jwt-aserto.svg?branch=master)
+# aserto-node 
 
 Aserto authorization middleware for the node Express server, based on
 Auth0's [express-jwt-authz](https://github.com/auth0/express-jwt-authz)
 package.
 
-This package provides three capabilities:
+This package provides four capabilities:
 
 1. `jwtAuthz`: middleware that sits on a route, and validates a request to authorize access to that route.
 2. `displayStateMap`: middleware that adds an endpoint for returning the display state map for a service, based on its authorization policy.
 3. `is`: a function that can be called to make a decision about a user's access to a resource based on a policy.
+4. `ds`: an object containing the `object` and `relation` functions, which can be called to retrieve an object or relation, respectively, from the directory.
 
-All three of these capabilities call out to an authorizer service, which must be configured as part of the `options` map passed in.
+The first three capabilities call out to an authorizer service, which must be configured as part of the `options` map passed in.
+
+The fourth calls out to a directory service.
 
 ## Installation
 
-    $ npm install express-jwt-aserto
+    $ npm install aserto-node
 
 > `express@^4.0.0` is a peer dependency. Make sure it is installed in your project.
 
 ## Usage
+
+> Note: the `authorizerServiceUrl` option that is used throughout is no longer a URL, but the option name is retained for backward-compatibility. It is now expected to be a hostname that exposes a gRPC binding. Any "https://" prefix is stripped out of the value provided.
 
 ### jwtAuthz middleware
 
@@ -28,12 +33,13 @@ You can use the jwtAuthz function together with [express-jwt](https://github.com
 
 ```javascript
 const jwt = require('express-jwt');
-const { jwtAuthz } = require('express-jwt-aserto');
+const { jwtAuthz } = require('aserto-node');
 
 const options = {
-  authorizerServiceUrl: 'https://localhost:8383', // required - must pass a valid URL
-  policyName: 'policy-name', // required
-  policyRoot: 'mycars' // required - must be a string representing the policy root (the first component of the policy module name)
+  authorizerServiceUrl: 'localhost:8282', // required - must pass a valid host:port
+  policyRoot: 'mycars', // required - must be a string representing the policy root (the first component of the policy module name)
+  instanceName: 'instance-name', // optional (required only for a hosted authorizer)
+  instanceLabel: 'instance-label' // optional (required only for a hosted authorizer)
 };
 
 app.get('/users/:id',
@@ -54,9 +60,10 @@ By default, `jwtAuthz` derives the policy file name and resource key from the Ex
 
 #### options argument
 
-- `authorizerServiceUrl`: URL of authorizer service (_required_)
-- `policyName`: Policy ID (_required_)
+- `authorizerServiceUrl`: hostname:port of authorizer service (_required_)
 - `policyRoot`: Policy root (_required_)
+- `instanceName`: instance name (_required_ if using hosted authorizer)
+- `instanceLabel`: instance label (_required_ if using hosted authorizer)
 - `authorizerApiKey`: API key for authorizer service (_required_ if using hosted authorizer)
 - `tenantId`: Aserto tenant ID (_required_ if using hosted authorizer)
 - `authorizerCertFile`: location on the filesystem of the CA certificate that signed the Aserto authorizer self-signed certificate. See the "Certificates" section for more information.
@@ -87,11 +94,10 @@ Passing in the `resourceMap` parameter into the `jwtAuthz()` function will overr
 Use the displayStateMap middleware to set up an endpoint that returns the display state map to a caller. The endpoint is named `__displaystatemap` by default, but can be overridden in `options`.
 
 ```javascript
-const { displayStateMap } = require('express-jwt-aserto');
+const { displayStateMap } = require('aserto-node');
 
 const options = {
-  authorizerServiceUrl: 'https://localhost:8383', // required - must pass a valid URL
-  policyName: 'policy-name', // required
+  authorizerServiceUrl: 'localhost:8282', // required - must pass a valid host:port
   policyRoot: 'policy' // required - must be a string representing the policy root (the first component of the policy module name)
 };
 app.use(displayStateMap(options));
@@ -103,9 +109,10 @@ app.use(displayStateMap(options));
 
 #### options argument
 
-- `authorizerServiceUrl`: URL of authorizer service (_required_)
-- `policyName`: Policy Name (_required_)
+- `authorizerServiceUrl`: hostname:port of authorizer service (_required_)
 - `policyRoot`: Policy root (_required_)
+- `instanceName`: instance name (_required_ if using hosted authorizer)
+- `instanceLabel`: instance label (_required_ if using hosted authorizer)
 - `authorizerApiKey`: API key for authorizer service (_required_ if using hosted authorizer)
 - `tenantId`: Aserto tenant ID (_required_ if using hosted authorizer)
 - `authorizerCertFile`: location on the filesystem of the CA certificate that signed the Aserto authorizer self-signed certificate. See the "Certificates" section for more information.
@@ -124,11 +131,10 @@ While `jwtAuthz` is meant to be used as dispatch middleware for a route, `is` pr
 Use the `is` function to call the authorizer with a `decision`, policy, and resource, and get a boolean `true` or `false` response. The `decision` is a named value in the policy: the string `allowed` is used by convention. Examples: `is('allowed')`, `is('enabled')`, `is('visible')`, etc.
 
 ```javascript
-const { is } = require('express-jwt-aserto');
+const { is } = require('aserto-node');
 
 const options = {
-  authorizerServiceUrl: 'https://localhost:8383', // required - must pass a valid URL
-  policyName: 'policy-name', // required
+  authorizerServiceUrl: 'localhost:8282', // required - must pass a valid host:port
   policyRoot: 'policy' // required - must be a string representing the policy root (the first component of the policy module name)
 };
 
@@ -152,7 +158,7 @@ app.get('/users/:id', async function(req, res) {
 
 - `decision`: a string representing the name of the decision - typically `allowed` (_required_)
 - `req`: Express request object (_required_)
-- `options`: a javascript map containing at least `{ authorizerServiceUrl, policyName }` as well as `authorizerApiKey` and `tenantId` for the hosted authorizer (_required_)
+- `options`: a javascript map containing at least `{ authorizerServiceUrl, policyRoot }` as well as `authorizerApiKey` and `tenantId` for the hosted authorizer (_required_)
 - `packageName`: a string representing the package name for the the policy (optional)
 - `resourceMap`: a map of key/value pairs to use as the resource context for evaluation (optional)
 
@@ -166,9 +172,10 @@ The Express request object.
 
 #### options argument
 
-- `authorizerServiceUrl`: URL of authorizer service (_required_)
-- `policyName`: Policy ID (_required_)
+- `authorizerServiceUrl`: hostname:port of authorizer service (_required_)
 - `policyRoot`: Policy root (_required_)
+- `instanceName`: instance name (_required_ if using hosted authorizer)
+- `instanceLabel`: instance label (_required_ if using hosted authorizer)
 - `authorizerApiKey`: API key for authorizer service (_required_ if using hosted authorizer)
 - `tenantId`: Aserto tenant ID (_required_ if using hosted authorizer)
 - `authorizerCertFile`: location on the filesystem of the CA certificate that signed the Aserto authorizer self-signed certificate. See the "Certificates" section for more information.
@@ -194,15 +201,15 @@ Passing in the `resourceMap` parameter into the `is()` function will override th
 
 ## Certificates
 
-The Aserto [authorizer](github.com/aserto-dev/aserto-one) exposes HTTPS-only endpoints. In order for a node.js policy to properly communicate with the authorizer, TLS certificates must be verified.
+The Topaz / Aserto [authorizers](github.com/aserto-dev/topaz) exposes SSL-only endpoints. In order for a node.js policy to properly communicate with the authorizer, TLS certificates must be verified.
 
 For a hosted authorizer that has a TLS certificate that is signed by a trusted Certificate Authority, this section isn't relevant because that TLS certificate will be successfully validated.
 
-In a development environment, the Aserto [one-box](github.com/aserto-dev/aserto-one) automatically creates a set of self-signed certificates and certificates of the CA (certificate authority) that signed them. It places them in a well-known location on the filesystem, defaulting to `$HOME/.config/aserto/aserto-one/certs/`.
+In a development environment, the Aserto [one-box](github.com/aserto-dev/aserto-one) automatically creates a set of self-signed certificates and certificates of the CA (certificate authority) that signed them. It places them in a well-known location on the filesystem, defaulting to `$HOME/.config/aserto/aserto-one/certs/`. For Topaz this is `$HOME/.config/topaz/certs/`.
 
-In order for the `express-jwt-aserto` package to perform the TLS handshake, it needs to verify the TLS certificate of the one-box using the certificate of the CA that signed it - which was placed in `$HOME/.config/aserto/aserto-one/certs/aserto-one-gateway-ca.crt`. Therefore, in order for this middleware to work successfully, either the `authorizerCertFile` must be set to the correct path for the CA cert file, or the `disableTlsValidation` flag must be set to `true`.
+In order for the `aserto-node` package to perform the TLS handshake, it needs to verify the TLS certificate of the one-box using the certificate of the CA that signed it - which was placed in `$HOME/.config/aserto/aserto-one/certs/aserto-one-gateway-ca.crt`. Therefore, in order for this middleware to work successfully, either the `authorizerCertFile` must be set to the correct path for the CA cert file, or the `disableTlsValidation` flag must be set to `true`.
 
-Furthermore, when packaging a policy for deployment (e.g. in a Docker container) which uses `express-jwt-aserto` to communicate with an authorizer that has a self-signed TLS certificate, you must copy this CA certificate into the container as part of the Docker build (typically performed in the Dockerfile). When you do that, you'll need to override the `authorizerCertFile` option that is passed into any of the API calls defined above with the location of this cert file.
+Furthermore, when packaging a policy for deployment (e.g. in a Docker container) which uses `aserto-node` to communicate with an authorizer that has a self-signed TLS certificate, you must copy this CA certificate into the container as part of the Docker build (typically performed in the Dockerfile). When you do that, you'll need to override the `authorizerCertFile` option that is passed into any of the API calls defined above with the location of this cert file.
 
 Alternately, to ignore TLS certificate validation when creating a TLS connection to the authorizer, you can set the `disableTlsValidation` option to `true` and avoid TLS certificate validation. This option is **not recommended for production**.
 

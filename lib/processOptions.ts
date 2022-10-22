@@ -15,13 +15,13 @@ export default (
 ) => {
   const error = (
     res: express.Response,
-    err_message = "express-jwt-aserto: unknown error"
+    err_message = "aserto-node: unknown error"
   ) => {
     if (options && options.failWithError && next) {
       return next({
         statusCode: 403,
         error: "Forbidden",
-        message: `express-jwt-aserto: ${err_message}`,
+        message: `aserto-node: ${err_message}`,
       });
     }
     log(err_message, "ERROR");
@@ -36,7 +36,14 @@ export default (
   if (!authorizerServiceUrl && res) {
     return error(res, "must provide authorizerServiceUrl in option map");
   }
-  const authorizerUrl = `${authorizerServiceUrl}`;
+  let authorizerUrl = `${authorizerServiceUrl}`;
+  // strip any https:// or http:// prefix since this is a gRPC address
+  if (authorizerUrl.startsWith('https://')) {
+    authorizerUrl = authorizerUrl.split('https://')[1]!
+  }
+  if (authorizerUrl.startsWith('http://')) {
+    authorizerUrl = authorizerUrl.split('http://')[1]!
+  }
 
   // set the authorizer API key
   let authorizerApiKey = null;

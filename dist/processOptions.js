@@ -4,12 +4,12 @@ const grpc_js_1 = require("@grpc/grpc-js");
 const log_1 = require("./log");
 const ssl_1 = require("./ssl");
 exports.default = (options, req, res, next) => {
-    const error = (res, err_message = "express-jwt-aserto: unknown error") => {
+    const error = (res, err_message = "aserto-node: unknown error") => {
         if (options && options.failWithError && next) {
             return next({
                 statusCode: 403,
                 error: "Forbidden",
-                message: `express-jwt-aserto: ${err_message}`,
+                message: `aserto-node: ${err_message}`,
             });
         }
         (0, log_1.log)(err_message, "ERROR");

@@ -20,9 +20,9 @@
     grpc-tools "^1.11.2"
     ts-node-dev "^2.0.0"
 
-"@aserto/node-directory@https://github.com/ogazitt/node-directory-v2":
+"@aserto/node-directory@https://github.com/aserto-dev/node-directory-v2":
   version "0.0.7"
-  resolved "https://github.com/ogazitt/node-directory-v2#ccb6571021223c5725a1c050f438de17bf5b4a6f"
+  resolved "https://github.com/aserto-dev/node-directory-v2#ccb6571021223c5725a1c050f438de17bf5b4a6f"
   dependencies:
     "@grpc/grpc-js" "^1.6.11"
     "@types/google-protobuf" "^3.15.6"

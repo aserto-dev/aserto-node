@@ -18,7 +18,7 @@ const log = (message, level = "INFO") => {
     }
     else if (logLevels[level] <= logLevels[currentLevel]) {
         // eslint-disable-next-line no-console
-        console.log(`${timestamp} ${level}: express-jwt-aserto: ${message}`);
+        console.log(`${timestamp} ${level}: aserto-node: ${message}`);
     }
 };
 exports.log = log;

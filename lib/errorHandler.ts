@@ -4,13 +4,13 @@ import { log } from "./log";
 
 const errorHandler =
   (next: NextFunction, failWithError: boolean) =>
-  (res: Response, err_message = "express-jwt-aserto: unknown error") => {
+  (res: Response, err_message = "aserto-node: unknown error") => {
     {
       if (failWithError) {
         return next({
           statusCode: 403,
           error: "Forbidden",
-          message: `express-jwt-aserto: ${err_message}`,
+          message: `aserto-node: ${err_message}`,
         });
       }
       log(err_message, "ERROR");
