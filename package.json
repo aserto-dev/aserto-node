@@ -1,21 +1,42 @@
 {
-  "name": "aserto-node",
-  "version": "2.0.0",
+  "name": "@aserto/aserto-node",
+  "description": "Authorize access to an endpoint",
+  "version": "0.20.0",
   "main": "dist/index.js",
   "types": "lib/index.d.ts",
-  "author": "Roie Schwaber-Cohen <roie@aserto.com>",
+  "author": "Aserto",
   "license": "MIT",
   "scripts": {
     "build": "tsc --build",
+    "format": "prettier --write src",
+    "prepublishOnly": "NODE_ENV=production yarn build",
+    "publish": "npm publish --access public",
     "test": "jest test --coverage",
     "find-deadcode": "ts-prune"
   },
   "files": [
-    "lib"
+    "lib",
+    "dist"
   ],
   "imports": {
     "@lib": "./lib"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aserto-dev/aserto-node.git"
+  },
+  "keywords": [
+    "express",
+    "topaz",
+    "jwt",
+    "authorization",
+    "aserto",
+    "authz"
+  ],
+  "bugs": {
+    "url": "https://github.com/aserto-dev/aserto-node/issues"
+  },
+  "homepage": "https://github.com/aserto-dev/aserto-node#readme",
   "dependencies": {
     "@aserto/node-authorizer": "https://github.com/aserto-dev/node-authorizer.git",
     "@aserto/node-directory": "https://github.com/aserto-dev/node-directory-v2",
@@ -30,6 +51,8 @@
     "@types/express": "^4.17.14",
     "@types/jest": "^29.1.2",
     "@types/jwt-decode": "^3.1.0",
+    "prettier": "^2.5.1",
+    "typescript": "^4.5.4",
     "axios": "^1.1.3",
     "axios-mock-adapter": "^1.21.2",
     "dotenv": "^16.0.3",
