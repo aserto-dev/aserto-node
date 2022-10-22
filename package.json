@@ -10,7 +10,7 @@
     "build": "tsc --build",
     "format": "prettier --write src",
     "prepublishOnly": "NODE_ENV=production yarn build",
-    "publish": "scripts/publish.sh",
+    "push": "scripts/publish.sh",
     "test": "jest test --coverage",
     "find-deadcode": "ts-prune"
   },
