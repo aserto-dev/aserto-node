@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.displayStateMap = void 0;
 const policy_context_pb_1 = require("@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_context_pb");
+const policy_instance_pb_1 = require("@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_instance_pb");
 const authorizer_grpc_pb_1 = require("@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_grpc_pb");
 const authorizer_pb_1 = require("@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_pb");
 const grpc_js_1 = require("@grpc/grpc-js");
@@ -41,7 +42,7 @@ const displayStateMap = (optionsParam) => {
         if (typeof options !== "object") {
             return options;
         }
-        const { failWithError, authorizerUrl, authorizerApiKey, tenantId, policyName, policyRoot, identityContextOptions, authorizerCert, } = options;
+        const { failWithError, authorizerUrl, authorizerApiKey, tenantId, instanceName, instanceLabel, policyRoot, identityContextOptions, authorizerCert, } = options;
         const error = (0, errorHandler_1.errorHandler)(next, failWithError);
         const callAuthorizer = () => __awaiter(void 0, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
@@ -54,10 +55,15 @@ const displayStateMap = (optionsParam) => {
                     const idContext = (0, identityContext_1.default)(req, identityContextOptions);
                     const policyContext = new policy_context_pb_1.PolicyContext();
                     policyContext.setPath(policyRoot);
-                    policyName && policyContext.setPath(policyName);
                     policyContext.setDecisionsList(["visible", "enabled"]);
                     const decisionTreeRequest = new authorizer_pb_1.DecisionTreeRequest();
                     const decisionTreeOptions = new authorizer_pb_1.DecisionTreeOptions();
+                    if (instanceName && instanceLabel) {
+                        const policyInstance = new policy_instance_pb_1.PolicyInstance();
+                        policyInstance.setName(instanceName);
+                        policyInstance.setInstanceLabel(instanceLabel);
+                        decisionTreeRequest.setPolicyInstance(policyInstance);
+                    }
                     decisionTreeOptions.setPathSeparator(2);
                     decisionTreeRequest.setPolicyContext(policyContext);
                     decisionTreeRequest.setIdentityContext(idContext);

@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.is = void 0;
 const struct_pb_1 = require("google-protobuf/google/protobuf/struct_pb");
 const policy_context_pb_1 = require("@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_context_pb");
+const policy_instance_pb_1 = require("@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_instance_pb");
 const authorizer_grpc_pb_1 = require("@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_grpc_pb");
 const authorizer_pb_1 = require("@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_pb");
 const grpc_js_1 = require("@grpc/grpc-js");
@@ -23,7 +24,7 @@ const is = (decision, req, optionsParam, packageName, resourceMap) => {
             if (typeof options !== "object") {
                 return false;
             }
-            const { authorizerUrl, authorizerApiKey, tenantId, policyName, policyRoot, identityContextOptions, authorizerCert, } = options;
+            const { authorizerUrl, authorizerApiKey, tenantId, instanceName, instanceLabel, policyRoot, identityContextOptions, authorizerCert, } = options;
             // process the parameter values to extract policy and resourceContext
             const { policy, resourceContext } = (0, processParams_1.default)(req, policyRoot, packageName, resourceMap);
             const metadata = new grpc_js_1.Metadata();
@@ -33,9 +34,14 @@ const is = (decision, req, optionsParam, packageName, resourceMap) => {
             const client = new authorizer_grpc_pb_1.AuthorizerClient(authorizerUrl, authorizerCert);
             const policyContext = new policy_context_pb_1.PolicyContext();
             policyContext.setPath(policy);
-            policyName && policyContext.setPath(policyName);
             policyContext.setDecisionsList([decision]);
             const isRequest = new authorizer_pb_1.IsRequest();
+            if (instanceName && instanceLabel) {
+                const policyInstance = new policy_instance_pb_1.PolicyInstance();
+                policyInstance.setName(instanceName);
+                policyInstance.setInstanceLabel(instanceLabel);
+                isRequest.setPolicyInstance(policyInstance);
+            }
             isRequest.setPolicyContext(policyContext);
             const idContext = (0, identityContext_1.default)(req, identityContextOptions);
             isRequest.setIdentityContext(idContext);

@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.jwtAuthz = void 0;
 const struct_pb_1 = require("google-protobuf/google/protobuf/struct_pb");
 const policy_context_pb_1 = require("@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_context_pb");
+const policy_instance_pb_1 = require("@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_instance_pb");
 const authorizer_grpc_pb_1 = require("@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_grpc_pb");
 const authorizer_pb_1 = require("@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_pb");
 const grpc_js_1 = require("@grpc/grpc-js");
@@ -31,7 +32,7 @@ const jwtAuthz = (optionsParam, packageName, resourceMap) => {
         if (typeof options !== "object") {
             return options;
         }
-        const { failWithError, authorizerUrl, authorizerApiKey, tenantId, policyName, policyRoot, identityContextOptions, authorizerCert, } = options;
+        const { failWithError, authorizerUrl, authorizerApiKey, tenantId, instanceName, instanceLabel, policyRoot, identityContextOptions, authorizerCert, } = options;
         // process the parameter values to extract policy and resourceContext
         const { policy, resourceContext } = (0, processParams_1.default)(req, policyRoot, packageName, resourceMap);
         const error = (0, errorHandler_1.errorHandler)(next, failWithError);
@@ -46,14 +47,18 @@ const jwtAuthz = (optionsParam, packageName, resourceMap) => {
                     const isRequest = new authorizer_pb_1.IsRequest();
                     const policyContext = new policy_context_pb_1.PolicyContext();
                     policyContext.setPath(policy);
-                    // policyName && policyContext.setPath(policyName);
-                    console.log(policyName);
                     policyContext.setDecisionsList(["allowed"]);
                     const idContext = (0, identityContext_1.default)(req, identityContextOptions);
                     isRequest.setPolicyContext(policyContext);
                     isRequest.setIdentityContext(idContext);
                     const fields = resourceContext;
                     isRequest.setResourceContext(struct_pb_1.Struct.fromJavaScript(fields));
+                    if (instanceName && instanceLabel) {
+                        const policyInstance = new policy_instance_pb_1.PolicyInstance();
+                        policyInstance.setName(instanceName);
+                        policyInstance.setInstanceLabel(instanceLabel);
+                        isRequest.setPolicyInstance(policyInstance);
+                    }
                     client.is(isRequest, metadata, (err, response) => {
                         var _a;
                         if (err) {
