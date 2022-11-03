@@ -32,7 +32,7 @@ interface GetRelationParams {
   relation: RelationParams;
 }
 
-const asertoProductionDirectoryServiceUrl = "authorizer.prod.aserto.com:8443";
+const asertoProductionDirectoryServiceUrl = "directory.prod.aserto.com:8443";
 
 const ds = (authorizerCertCAFile: string, directoryServiceUrl?: string) => {
   const creds = authorizerCertCAFile
