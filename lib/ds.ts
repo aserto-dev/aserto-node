@@ -32,11 +32,21 @@ interface GetRelationParams {
   relation: RelationParams;
 }
 
-const ds = (authorizerCertCAFile: string) => {
+const asertoProductionDirectoryServiceUrl = "authorizer.prod.aserto.com:8443";
+
+const ds = (authorizerCertCAFile: string, directoryServiceUrl?: string) => {
   const creds = authorizerCertCAFile
     ? getSSLCredentials(authorizerCertCAFile)
-    : credentials.createInsecure();
-  const client = new ReaderClient("localhost:9292", creds);
+    : credentials.createSsl();
+  let directoryService =
+    directoryServiceUrl ?? asertoProductionDirectoryServiceUrl;
+
+  // If the directory service URL starts with https, remove it
+  if (directoryService?.startsWith("https://")) {
+    directoryService = directoryService.split("https://")[1]!;
+  }
+
+  const client = new ReaderClient(directoryService, creds);
 
   const getObject = (params: ObjectParams) => {
     const { type, id, key } = params ?? {};

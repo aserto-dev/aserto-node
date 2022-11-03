@@ -26,7 +26,10 @@ declare function is(
   resourceMap?: is.ResourceMap
 ): boolean;
 
-declare function ds(authorizerCertCAFile: string): {
+declare function ds(
+  authorizerCertCAFile: string,
+  directoryServiceUrl?: string
+): {
   object: function;
   relation: function;
 };
