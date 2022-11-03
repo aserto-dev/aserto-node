@@ -38,11 +38,11 @@ export default (
   }
   let authorizerUrl = `${authorizerServiceUrl}`;
   // strip any https:// or http:// prefix since this is a gRPC address
-  if (authorizerUrl.startsWith('https://')) {
-    authorizerUrl = authorizerUrl.split('https://')[1]!
+  if (authorizerUrl.startsWith("https://")) {
+    authorizerUrl = authorizerUrl.split("https://")[1]!;
   }
-  if (authorizerUrl.startsWith('http://')) {
-    authorizerUrl = authorizerUrl.split('http://')[1]!
+  if (authorizerUrl.startsWith("http://")) {
+    authorizerUrl = authorizerUrl.split("http://")[1]!;
   }
 
   // set the authorizer API key
@@ -86,7 +86,7 @@ export default (
   if (!disableTlsValidation && authorizerCertCAFile) {
     authorizerCert = getSSLCredentials(authorizerCertCAFile);
   } else {
-    authorizerCert = credentials.createInsecure();
+    authorizerCert = credentials.createSsl();
     log("INSECURE CONNECTION");
   }
 

@@ -10,7 +10,7 @@ import {
   GetRelationRequest,
   GetRelationResponse,
 } from "@aserto/node-directory/pkg/aserto/directory/reader/v2/reader_pb";
-import { credentials, ServiceError } from "@grpc/grpc-js";
+import { credentials, Metadata, ServiceError } from "@grpc/grpc-js";
 
 import { getSSLCredentials } from "./ssl";
 
@@ -32,11 +32,26 @@ interface GetRelationParams {
   relation: RelationParams;
 }
 
-const ds = (authorizerCertCAFile: string) => {
+const asertoProductionDirectoryServiceUrl = "directory.prod.aserto.com:8443";
+
+const ds = (
+  authorizerCertCAFile: string,
+  tenantId: string,
+  directoryApiKey: string,
+  directoryServiceUrl?: string
+) => {
   const creds = authorizerCertCAFile
     ? getSSLCredentials(authorizerCertCAFile)
-    : credentials.createInsecure();
-  const client = new ReaderClient("localhost:9292", creds);
+    : credentials.createSsl();
+  let directoryService =
+    directoryServiceUrl ?? asertoProductionDirectoryServiceUrl;
+
+  // If the directory service URL starts with https, remove it
+  if (directoryService?.startsWith("https://")) {
+    directoryService = directoryService.split("https://")[1]!;
+  }
+
+  const client = new ReaderClient(directoryService, creds);
 
   const getObject = (params: ObjectParams) => {
     const { type, id, key } = params ?? {};
@@ -57,9 +72,15 @@ const ds = (authorizerCertCAFile: string) => {
         key && type && objParam.setKey(key);
         id && objParam.setId(id);
 
+        const metadata = new Metadata();
+        directoryApiKey &&
+          metadata.add("authorization", `basic ${directoryApiKey}`);
+        tenantId && metadata.add("aserto-tenant-id", tenantId);
+
         getObjectRequest.setParam(objParam);
         client.getObject(
           getObjectRequest,
+          metadata,
           (err: ServiceError, response: GetObjectResponse) => {
             if (err) {
               reject(err);
