@@ -28,6 +28,8 @@ declare function is(
 
 declare function ds(
   authorizerCertCAFile: string,
+  tenantId?: string,
+  directoryApiKey?: string,
   directoryServiceUrl?: string
 ): {
   object: function;
