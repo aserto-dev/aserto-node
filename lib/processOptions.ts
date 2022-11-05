@@ -83,11 +83,13 @@ export default (
   }
 
   let authorizerCert: ChannelCredentials;
+  if (disableTlsValidation) {
+    log("INSECURE CONNECTION");
+  }
   if (!disableTlsValidation && authorizerCertCAFile) {
     authorizerCert = getSSLCredentials(authorizerCertCAFile);
   } else {
     authorizerCert = credentials.createSsl();
-    log("INSECURE CONNECTION");
   }
 
   const instanceName =
