@@ -99,7 +99,7 @@ const displayStateMap = (optionsParam: DisplayStateMapOptions) => {
                 return;
               }
               if (response.hasPath()) {
-                resolve(response.getPath());
+                resolve(response.getPath()?.toJavaScript());
               } else {
                 reject("'displayStateMap' returned error: No path found");
                 return;
@@ -114,7 +114,7 @@ const displayStateMap = (optionsParam: DisplayStateMapOptions) => {
 
     try {
       const result = await callAuthorizer();
-      res.send(200).send(result);
+      res.status(200).send(result);
     } catch (err) {
       error(res, err as string);
     }
