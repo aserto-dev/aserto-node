@@ -1,3 +1,5 @@
+import { JavaScriptValue } from "google-protobuf/google/protobuf/struct_pb";
+import { Timestamp } from "google-protobuf/google/protobuf/timestamp_pb";
 import {
   ObjectIdentifier,
   RelationIdentifier,
@@ -12,185 +14,192 @@ import {
 } from "@aserto/node-directory/pkg/aserto/directory/reader/v2/reader_pb";
 import { credentials, Metadata, ServiceError } from "@grpc/grpc-js";
 
+import { ServiceConfig as Config } from "./index.d";
 import { getSSLCredentials } from "./ssl";
 
-interface ObjectParams {
+export interface ObjectParams {
   type?: string;
   id?: string;
   key?: string;
 }
 
-interface RelationParams {
+export interface RelationParams {
   objectType?: string;
   name?: string;
   id?: number;
 }
 
-interface GetRelationParams {
+export interface GetRelationParams {
   subject: ObjectParams;
   object: ObjectParams;
   relation: RelationParams;
 }
 
-const asertoProductionDirectoryServiceUrl = "directory.prod.aserto.com:8443";
+export interface Object {
+  id: string;
+  key: string;
+  type: string;
+  displayName: string;
+  properties?: { [key: string]: JavaScriptValue };
+  createdAt?: Timestamp.AsObject;
+  updatedAt?: Timestamp.AsObject;
+  deletedAt?: Timestamp.AsObject;
+  hash: string;
+}
 
-const ds = (
-  authorizerCertCAFile: string,
-  tenantId: string,
-  directoryApiKey: string,
-  directoryServiceUrl?: string
-) => {
-  const creds = authorizerCertCAFile
-    ? getSSLCredentials(authorizerCertCAFile)
-    : credentials.createSsl();
-  let directoryService =
-    directoryServiceUrl ?? asertoProductionDirectoryServiceUrl;
+export class Directory {
+  client: ReaderClient;
+  metadata: Metadata;
 
-  // If the directory service URL starts with https, remove it
-  if (directoryService?.startsWith("https://")) {
-    directoryService = directoryService.split("https://")[1]!;
+  constructor(config: Config) {
+    const url = config.url ?? asertoProductionDirectoryServiceUrl;
+
+    const creds = config.caFile
+      ? getSSLCredentials(config.caFile)
+      : credentials.createSsl();
+
+    const metadata = new Metadata();
+    config.apiKey && metadata.add("authorization", `basic ${config.apiKey}`);
+    config.tenantId && metadata.add("aserto-tenant-id", config.tenantId);
+    this.metadata = metadata;
+
+    this.client = new ReaderClient(url, creds);
   }
 
-  const client = new ReaderClient(directoryService, creds);
+  async object(params: ObjectParams) {
+    if (!params.id && !params.type) {
+      throw Error("You must provide either an object ID or a type");
+    }
+    if (params.key && !params.type) {
+      throw Error("You must provide an object type");
+    }
 
-  const getObject = (params: ObjectParams) => {
-    const { type, id, key } = params ?? {};
+    const getObjectRequest = new GetObjectRequest();
+    getObjectRequest.setParam(toObjectIdentifier(params));
+
     return new Promise((resolve, reject) => {
       try {
-        const getObjectRequest = new GetObjectRequest();
-        const objParam = new ObjectIdentifier();
-        if (!id && !type) {
-          reject("You must provide either an object ID or a type");
-          return;
-        }
-        if (key && !type) {
-          reject("You must provide an object type");
-          return;
-        }
-
-        type && objParam.setType(type);
-        key && type && objParam.setKey(key);
-        id && objParam.setId(id);
-
-        const metadata = new Metadata();
-        directoryApiKey &&
-          metadata.add("authorization", `basic ${directoryApiKey}`);
-        tenantId && metadata.add("aserto-tenant-id", tenantId);
-
-        getObjectRequest.setParam(objParam);
-        client.getObject(
+        this.client.getObject(
           getObjectRequest,
-          metadata,
+          this.metadata,
           (err: ServiceError, response: GetObjectResponse) => {
             if (err) {
               reject(err);
               return;
-            } else {
-              const result = response.getResult();
-              const properties = result?.getProperties()?.toJavaScript();
-              const resultObj = result?.toObject();
-              resolve({
-                ...resultObj,
-                properties,
-              });
             }
+
+            if (!response) {
+              reject(Error("No response from directory service"));
+              return;
+            }
+
+            const result = response.getResult();
+            const properties = result?.getProperties()?.toJavaScript();
+            const resultObj = result?.toObject();
+            resolve({
+              ...resultObj,
+              properties,
+            });
           }
         );
       } catch (err) {
         reject(err);
       }
     });
-  };
+  }
 
-  const getRelation = (params: GetRelationParams) => {
-    const { subject, object, relation } = params ?? {};
+  async relation(params: GetRelationParams) {
+    validateGetRelationParams(params);
+
+    const getRelationRequest = new GetRelationRequest();
+    getRelationRequest.setParam(toRelationIdentifier(params));
+
     return new Promise((resolve, reject) => {
       try {
-        const getRelationRequest = new GetRelationRequest();
-        const {
-          type: subjectType,
-          id: subjectId,
-          key: subjectKey,
-        } = subject ?? {};
-
-        const { type: objectType, id: objectId, key: objectKey } = object ?? {};
-
-        if (
-          (!subjectId && !subjectKey) ||
-          (!subjectId && !subjectType) ||
-          (subjectKey && !subjectType)
-        ) {
-          reject(
-            "You must provide subject type and subject key or an subject id"
-          );
-          return;
-        }
-
-        if (
-          (!objectId && !objectKey) ||
-          (!objectId && !objectType) ||
-          (objectKey && !objectType)
-        ) {
-          reject("You must provide object type and object key or an object id");
-          return;
-        }
-
-        if (
-          (!relation.id && !relation.name) ||
-          (!relation.name && relation.objectType) ||
-          (relation.name && !relation.objectType)
-        ) {
-          reject(
-            "You must provide either a relation id or a relation name and relation object type"
-          );
-          return;
-        }
-        const relationParam = new RelationIdentifier();
-
-        const objectParam = new ObjectIdentifier();
-        objectType && objectParam.setType(objectType);
-        objectKey && objectType && objectParam.setKey(objectKey);
-        objectId && objectParam.setId(objectId);
-
-        const subjectParam = new ObjectIdentifier();
-        subjectType && subjectParam.setType(subjectType);
-        subjectKey && subjectType && subjectParam.setKey(subjectKey);
-        subjectId && subjectParam.setId(subjectId);
-
-        const relationTypeParam = new RelationTypeIdentifier();
-        relation.name &&
-          relation.objectType &&
-          relationTypeParam.setName(relation.name);
-        relation.name &&
-          relation.objectType &&
-          relationTypeParam.setObjectType(relation.objectType);
-        relation.id && relationTypeParam.setId(relation.id);
-
-        relationParam.setObject(objectParam);
-        relationParam.setSubject(subjectParam);
-        relationParam.setRelation(relationTypeParam);
-        getRelationRequest.setParam(relationParam);
-
-        client.getRelation(
+        this.client.getRelation(
           getRelationRequest,
+          this.metadata,
           (err: ServiceError, response: GetRelationResponse) => {
             if (err) {
               reject(err);
               return;
-            } else {
-              const result = response.toObject();
-              resolve(result);
             }
+            if (!response) {
+              reject(Error("No response from directory service"));
+              return;
+            }
+            resolve(response.toObject());
           }
         );
-      } catch (err) {}
+      } catch (err) {
+        reject(err);
+      }
     });
-  };
+  }
+}
 
-  return {
-    object: getObject,
-    relation: getRelation,
-  };
+const validateGetRelationParams = (params: GetRelationParams) => {
+  validateObjectRef(params.object, "object");
+  validateObjectRef(params.subject, "subject");
+  validateRelationRef(params.relation);
 };
 
-export { ds };
+const validateObjectRef = (ref: ObjectParams, side: "subject" | "object") => {
+  if (ref.id) {
+    return;
+  }
+
+  if (!ref.type || !ref.key) {
+    throw new Error(
+      `Either ${side} id or ${side} type and ${side} key must be provided`
+    );
+  }
+};
+
+const validateRelationRef = (ref: RelationParams) => {
+  if (ref.id) {
+    return;
+  }
+
+  if (!ref.objectType || !ref.name) {
+    throw new Error(
+      "Either relation id or relation object type and relation name must be provided"
+    );
+  }
+};
+
+const toRelationIdentifier = (
+  params: GetRelationParams
+): RelationIdentifier => {
+  const relationIdentifier = new RelationIdentifier();
+  relationIdentifier.setObject(toObjectIdentifier(params.object));
+  relationIdentifier.setSubject(toObjectIdentifier(params.subject));
+  relationIdentifier.setRelation(toRelationTypeIdentifier(params.relation));
+  return relationIdentifier;
+};
+
+const toObjectIdentifier = (ref: ObjectParams): ObjectIdentifier => {
+  const objectParam = new ObjectIdentifier();
+  ref.type && objectParam.setType(ref.type);
+  ref.key && ref.type && objectParam.setKey(ref.key);
+  ref.id && objectParam.setId(ref.id);
+  return objectParam;
+};
+
+const toRelationTypeIdentifier = (
+  ref: RelationParams
+): RelationTypeIdentifier => {
+  const relationTypeIdentifier = new RelationTypeIdentifier();
+  ref.name && ref.objectType && relationTypeIdentifier.setName(ref.name);
+  ref.name &&
+    ref.objectType &&
+    relationTypeIdentifier.setObjectType(ref.objectType);
+  ref.id && relationTypeIdentifier.setId(ref.id);
+  return relationTypeIdentifier;
+};
+
+const asertoProductionDirectoryServiceUrl = "directory.prod.aserto.com:8443";
+
+export const ds = (config: Config): Directory => {
+  return new Directory(config);
+};

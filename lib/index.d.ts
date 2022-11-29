@@ -4,14 +4,16 @@ export = {
   displayStateMap,
   is,
   ds,
+  Directory,
+  ServiceConfig,
   IdentityContextOptions,
   DisplayStateMapOptions,
 };
 
 declare function jwtAuthz(
   options: jwtAuthz.AuthzOptions,
-  policyRoot?: jwtAuthz.Policy,
-  resourceMap?: jwtAuthz.ResourceMap
+  packageName?: string,
+  resourceMap?: ResourceMapper
 ): express.Handler;
 
 declare function displayStateMap(
@@ -23,18 +25,14 @@ declare function is(
   req: express.Request,
   options: is.AuthzOptions,
   policy?: is.Policy,
-  resourceMap?: is.ResourceMap
+  resourceMap?: ResourceMapper
 ): boolean;
 
-declare function ds(
-  authorizerCertCAFile: string,
-  tenantId?: string,
-  directoryApiKey?: string,
-  directoryServiceUrl?: string
-): {
-  object: function;
-  relation: function;
-};
+declare function ds(config: ServiceConfig): Directory;
+
+export type ResourceMapper =
+  | object
+  | ((req: express.Request) => Promise<object>);
 
 export interface DisplayStateMapOptions {
   policyRoot: string;
@@ -73,4 +71,16 @@ export interface IdentityContextOptions {
   useAuthorizationHeader: boolean;
   identity: string;
   subject: string;
+}
+
+export interface Directory {
+  object: (params: ObjectParams) => Promise<Obj>;
+  relation: (params: GetRelationParams) => Promise<Obj>;
+}
+
+export interface ServiceConfig {
+  url?: string;
+  tenantId?: string;
+  apiKey?: string;
+  caFile?: string;
 }

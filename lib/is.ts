@@ -13,74 +13,74 @@ import {
 import { Metadata, ServiceError } from "@grpc/grpc-js";
 
 import identityContext from "./identityContext";
-import { AuthzOptions } from "./index.d";
+import { AuthzOptions, ResourceMapper } from "./index.d";
 import { log } from "./log";
 import processOptions from "./processOptions";
-import processParams from "./processParams";
+import { processParams } from "./processParams";
 
-const is = (
+const is = async (
   decision: string,
   req: Request,
   optionsParam: AuthzOptions,
   packageName?: string,
-  resourceMap?: object
+  resourceMap?: ResourceMapper
 ) => {
+  const options = processOptions(optionsParam, req);
+  if (!options) {
+    return false;
+  }
+
+  if (typeof options !== "object") {
+    return false;
+  }
+  const {
+    authorizerUrl,
+    authorizerApiKey,
+    tenantId,
+    instanceName,
+    instanceLabel,
+    policyRoot,
+    identityContextOptions,
+    authorizerCert,
+  } = options;
+
+  // process the parameter values to extract policy and resourceContext
+  const { policy, resourceContext } = await processParams(
+    req,
+    policyRoot,
+    packageName,
+    resourceMap
+  );
+
+  const metadata = new Metadata();
+  authorizerApiKey &&
+    metadata.add("authorization", `basic ${authorizerApiKey}`);
+  tenantId && metadata.add("aserto-tenant-id", tenantId);
+
+  const client = new AuthorizerClient(authorizerUrl, authorizerCert);
+
+  const policyContext = new PolicyContext();
+  policyContext.setPath(policy);
+  policyContext.setDecisionsList([decision]);
+
+  const isRequest = new IsRequest();
+  if (instanceName && instanceLabel) {
+    const policyInstance = new PolicyInstance();
+    policyInstance.setName(instanceName);
+    policyInstance.setInstanceLabel(instanceLabel);
+    isRequest.setPolicyInstance(policyInstance);
+  }
+
+  isRequest.setPolicyContext(policyContext);
+
+  const idContext = identityContext(req, identityContextOptions);
+  isRequest.setIdentityContext(idContext);
+
+  const fields = resourceContext as { [key: string]: JavaScriptValue };
+  isRequest.setResourceContext(Struct.fromJavaScript(fields));
+
   return new Promise((resolve, reject) => {
     try {
-      const options = processOptions(optionsParam, req);
-      if (!options) {
-        return false;
-      }
-
-      if (typeof options !== "object") {
-        return false;
-      }
-      const {
-        authorizerUrl,
-        authorizerApiKey,
-        tenantId,
-        instanceName,
-        instanceLabel,
-        policyRoot,
-        identityContextOptions,
-        authorizerCert,
-      } = options;
-
-      // process the parameter values to extract policy and resourceContext
-      const { policy, resourceContext } = processParams(
-        req,
-        policyRoot,
-        packageName,
-        resourceMap
-      );
-
-      const metadata = new Metadata();
-      authorizerApiKey &&
-        metadata.add("authorization", `basic ${authorizerApiKey}`);
-      tenantId && metadata.add("aserto-tenant-id", tenantId);
-
-      const client = new AuthorizerClient(authorizerUrl, authorizerCert);
-
-      const policyContext = new PolicyContext();
-      policyContext.setPath(policy);
-      policyContext.setDecisionsList([decision]);
-
-      const isRequest = new IsRequest();
-      if (instanceName && instanceLabel) {
-        const policyInstance = new PolicyInstance();
-        policyInstance.setName(instanceName);
-        policyInstance.setInstanceLabel(instanceLabel);
-        isRequest.setPolicyInstance(policyInstance);
-      }
-
-      isRequest.setPolicyContext(policyContext);
-
-      const idContext = identityContext(req, identityContextOptions);
-      isRequest.setIdentityContext(idContext);
-
-      const fields = resourceContext as { [key: string]: JavaScriptValue };
-      isRequest.setResourceContext(Struct.fromJavaScript(fields));
-
       client.is(
         isRequest,
         metadata,
