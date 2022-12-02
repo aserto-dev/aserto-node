@@ -1,4 +1,4 @@
-# aserto-node 
+# aserto-node
 
 Aserto authorization middleware for the node Express server, based on
 Auth0's [express-jwt-authz](https://github.com/auth0/express-jwt-authz)
@@ -56,7 +56,8 @@ By default, `jwtAuthz` derives the policy file name and resource key from the Ex
 
 - `options`: a javascript map containing at least `{ authorizerServiceUrl, policyName, policyRoot }` as well as `authorizerApiKey` and `tenantId` for the hosted authorizer
 - `packageName`: a string representing the policy package name (optional)
-- `resourceMap`: a map of key/value pairs to use as the resource context for evaluation (optional)
+- `resourceMap`: an optional resource context to send the authorizer. This can be either an object or a function that
+  takes an HTTP request and returns an object.
 
 #### options argument
 
@@ -198,6 +199,8 @@ For example, passing in `policyRoot/GET/api/users/:id` will resolve to a policy 
 By default, `is` follows the same behavior as `jwtAuthz` in that resource map will be `req.params`. For example, if the route path is `/api/users/:id`, the resource will be `{ 'id': 'value-of-id' }`.
 
 Passing in the `resourceMap` parameter into the `is()` function will override this behavior.
+
+The provided value can be either an object or a function that takes an http request and returns an object.
 
 ## Certificates
 
