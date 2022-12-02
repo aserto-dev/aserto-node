@@ -1,25 +1,27 @@
 // process parameters
 import express from "express";
 
-export default (
+import { ResourceMapper } from "./index.d";
+
+export const processParams = async (
   req: express.Request,
   policyRoot: string,
   packageName?: string,
-  resourceMap?: object
+  resourceMap?: ResourceMapper
 ) => {
   // if a resourceMap wasn't explicitly passed in, get it from req.params
   if (!resourceMap) {
     resourceMap = req.params;
+  } else if (typeof resourceMap === "function") {
+    resourceMap = await resourceMap(req);
   }
 
   // if a package name was not provided, construct it from the route path
   if (!packageName) {
     let route = req.route.path;
     // replace the Express.js ':param' convention with the '__param' Rego convention
-    if (resourceMap) {
-      for (const key of Object.keys(resourceMap)) {
-        route = route.replace(`:${key}`, `__${key}`);
-      }
+    for (const param of Object.keys(req.params)) {
+      route = route.replace(`:${param}`, `__${param}`);
     }
     // replace all '/' path components with '.' separators
     route = route.replace(/\//g, ".");

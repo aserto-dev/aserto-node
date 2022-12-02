@@ -14,14 +14,14 @@ import { Metadata, ServiceError } from "@grpc/grpc-js";
 
 import { errorHandler } from "./errorHandler";
 import identityContext from "./identityContext";
-import { AuthzOptions } from "./index.d";
+import { AuthzOptions, ResourceMapper } from "./index.d";
 import processOptions from "./processOptions";
-import processParams from "./processParams";
+import { processParams } from "./processParams";
 
 const jwtAuthz = (
   optionsParam: AuthzOptions,
   packageName?: string,
-  resourceMap?: object
+  resourceMap?: ResourceMapper
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     const options = processOptions(optionsParam, req, res, next);
@@ -44,7 +44,7 @@ const jwtAuthz = (
     } = options;
 
     // process the parameter values to extract policy and resourceContext
-    const { policy, resourceContext } = processParams(
+    const { policy, resourceContext } = await processParams(
       req,
       policyRoot,
       packageName,
