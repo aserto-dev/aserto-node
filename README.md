@@ -17,7 +17,17 @@ The fourth calls out to a directory service.
 
 ## Installation
 
-    $ npm install aserto-node
+Using [npm](https://npmjs.org):
+
+```sh
+npm install @aserto/aserto-node
+```
+
+Using [yarn](https://yarnpkg.com):
+
+```sh
+yarn add @aserto/aserto-node
+```
 
 > `express@^4.0.0` is a peer dependency. Make sure it is installed in your project.
 
@@ -33,7 +43,7 @@ You can use the jwtAuthz function together with [express-jwt](https://github.com
 
 ```javascript
 const jwt = require('express-jwt');
-const { jwtAuthz } = require('aserto-node');
+const { jwtAuthz } = require('@aserto/aserto-node');
 
 const options = {
   authorizerServiceUrl: 'localhost:8282', // required - must pass a valid host:port
@@ -95,7 +105,7 @@ Passing in the `resourceMap` parameter into the `jwtAuthz()` function will overr
 Use the displayStateMap middleware to set up an endpoint that returns the display state map to a caller. The endpoint is named `__displaystatemap` by default, but can be overridden in `options`.
 
 ```javascript
-const { displayStateMap } = require('aserto-node');
+const { displayStateMap } = require('@aserto/aserto-node');
 
 const options = {
   authorizerServiceUrl: 'localhost:8282', // required - must pass a valid host:port
@@ -132,7 +142,7 @@ While `jwtAuthz` is meant to be used as dispatch middleware for a route, `is` pr
 Use the `is` function to call the authorizer with a `decision`, policy, and resource, and get a boolean `true` or `false` response. The `decision` is a named value in the policy: the string `allowed` is used by convention. Examples: `is('allowed')`, `is('enabled')`, `is('visible')`, etc.
 
 ```javascript
-const { is } = require('aserto-node');
+const { is } = require('@aserto/aserto-node');
 
 const options = {
   authorizerServiceUrl: 'localhost:8282', // required - must pass a valid host:port
