@@ -10,9 +10,10 @@
     "@jridgewell/gen-mapping" "^0.1.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@aserto/node-authorizer@https://github.com/aserto-dev/node-authorizer.git":
-  version "0.0.7"
-  resolved "https://github.com/aserto-dev/node-authorizer.git#43b11b9b4be904463876adfb6c266f24615ed3d8"
+"@aserto/node-authorizer@^0.20.4":
+  version "0.20.4"
+  resolved "https://registry.yarnpkg.com/@aserto/node-authorizer/-/node-authorizer-0.20.4.tgz#9a0acb73bc4ffaf008b0a879c1e92be454216f66"
+  integrity sha512-WZTQX+aZ3QoZmi5kVIkXSf4u8KPuuRB45VFBGgnxPunzRDRFLC89+4GNhLLAKX4f7U4MEpQVFKh4S3kB7ZBpVA==
   dependencies:
     "@grpc/grpc-js" "^1.6.11"
     "@types/google-protobuf" "^3.15.6"
@@ -20,9 +21,10 @@
     grpc-tools "^1.11.2"
     ts-node-dev "^2.0.0"
 
-"@aserto/node-directory@https://github.com/aserto-dev/node-directory-v2":
-  version "0.0.7"
-  resolved "https://github.com/aserto-dev/node-directory-v2#ccb6571021223c5725a1c050f438de17bf5b4a6f"
+"@aserto/node-directory@^0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@aserto/node-directory/-/node-directory-0.0.9.tgz#cc7b0268e58a1a622b94ce8793ef5a83aba42a43"
+  integrity sha512-JKDHKWdoXJi34i1QOK4gcInrcAa1cQFeCdeYzbdXl+9srK6vaJmvaKLHLxbLOXQY7WqvZ0db919Q2nmUKAwW5g==
   dependencies:
     "@grpc/grpc-js" "^1.6.11"
     "@types/google-protobuf" "^3.15.6"
