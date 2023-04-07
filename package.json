@@ -40,7 +40,7 @@
   "dependencies": {
     "@aserto/node-authorizer": "^0.20.4",
     "@aserto/node-directory": "^0.0.9",
-    "@grpc/grpc-js": "^1.7.1",
+    "@grpc/grpc-js": "^1.8.12",
     "express": "^4.18.2",
     "google-protobuf": "^3.21.2",
     "jwt-decode": "^3.1.2",
