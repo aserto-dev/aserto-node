@@ -21,15 +21,15 @@
     grpc-tools "^1.11.2"
     ts-node-dev "^2.0.0"
 
-"@aserto/node-directory@^0.0.9":
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/@aserto/node-directory/-/node-directory-0.0.9.tgz#cc7b0268e58a1a622b94ce8793ef5a83aba42a43"
-  integrity sha512-JKDHKWdoXJi34i1QOK4gcInrcAa1cQFeCdeYzbdXl+9srK6vaJmvaKLHLxbLOXQY7WqvZ0db919Q2nmUKAwW5g==
+"@aserto/node-directory@^0.20.6":
+  version "0.20.6"
+  resolved "https://registry.yarnpkg.com/@aserto/node-directory/-/node-directory-0.20.6.tgz#4715f750ff51e1ef39e7853233c36e2dece63dd1"
+  integrity sha512-ddCROMIpAcddl3dEWgw6ee6ywZInLCYOH24c8xObCI66MghXuNyq+mm+Ti4n7U9sFfILIwKbST2BSH2K8/0qXA==
   dependencies:
-    "@grpc/grpc-js" "^1.6.11"
+    "@grpc/grpc-js" "^1.8.12"
     "@types/google-protobuf" "^3.15.6"
-    google-protobuf "^3.21.0"
-    grpc-tools "^1.11.2"
+    google-protobuf "^3.21.2"
+    grpc-tools "^1.12.4"
 
 "@aserto/ts-linting-configs@^2.5.0":
   version "2.5.0"
@@ -371,6 +371,14 @@
   version "1.7.1"
   resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.7.1.tgz#cfac092e61eac6fe0f80d22943f98e1ba45f02a2"
   integrity sha512-GVtMU4oh/TeKkWGzXUEsyZtyvSUIT1z49RtGH1UnEGeL+sLuxKl8QH3KZTlSB329R1sWJmesm5hQ5CxXdYH9dg==
+  dependencies:
+    "@grpc/proto-loader" "^0.7.0"
+    "@types/node" ">=12.12.47"
+
+"@grpc/grpc-js@^1.8.12":
+  version "1.8.14"
+  resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.8.14.tgz#4fe0f9917d6f094cf59245763c275442b182e9ad"
+  integrity sha512-w84maJ6CKl5aApCMzFll0hxtFNT6or9WwMslobKaqWUEf1K+zhlL43bSQhFreyYWIWR+Z0xnVFC1KtLm4ZpM/A==
   dependencies:
     "@grpc/proto-loader" "^0.7.0"
     "@types/node" ">=12.12.47"
@@ -2347,6 +2355,13 @@ grpc-tools@^1.11.2:
   version "1.11.3"
   resolved "https://registry.yarnpkg.com/grpc-tools/-/grpc-tools-1.11.3.tgz#8218a86ef994e58bd06330b74033de8d7719ea0d"
   integrity sha512-cRSK2uhDKHtZ9hLRM35HxaMAMxyh/L7C96Ojt58DhQBdwTOQlV1VIJHSK6X/pDeSQKhaQqWMFfebt8tIcvRfjQ==
+  dependencies:
+    "@mapbox/node-pre-gyp" "^1.0.5"
+
+grpc-tools@^1.12.4:
+  version "1.12.4"
+  resolved "https://registry.yarnpkg.com/grpc-tools/-/grpc-tools-1.12.4.tgz#a044c9e8157941033ea7a5f144c2dc9dc4501de4"
+  integrity sha512-5+mLAJJma3BjnW/KQp6JBjUMgvu7Mu3dBvBPd1dcbNIb+qiR0817zDpgPjS7gRb+l/8EVNIa3cB02xI9JLToKg==
   dependencies:
     "@mapbox/node-pre-gyp" "^1.0.5"
 
