@@ -21,15 +21,15 @@
     grpc-tools "^1.11.2"
     ts-node-dev "^2.0.0"
 
-"@aserto/node-directory@^0.0.9":
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/@aserto/node-directory/-/node-directory-0.0.9.tgz#cc7b0268e58a1a622b94ce8793ef5a83aba42a43"
-  integrity sha512-JKDHKWdoXJi34i1QOK4gcInrcAa1cQFeCdeYzbdXl+9srK6vaJmvaKLHLxbLOXQY7WqvZ0db919Q2nmUKAwW5g==
+"@aserto/node-directory@^0.20.6":
+  version "0.20.6"
+  resolved "https://registry.yarnpkg.com/@aserto/node-directory/-/node-directory-0.20.6.tgz#4715f750ff51e1ef39e7853233c36e2dece63dd1"
+  integrity sha512-ddCROMIpAcddl3dEWgw6ee6ywZInLCYOH24c8xObCI66MghXuNyq+mm+Ti4n7U9sFfILIwKbST2BSH2K8/0qXA==
   dependencies:
-    "@grpc/grpc-js" "^1.6.11"
+    "@grpc/grpc-js" "^1.8.12"
     "@types/google-protobuf" "^3.15.6"
-    google-protobuf "^3.21.0"
-    grpc-tools "^1.11.2"
+    google-protobuf "^3.21.2"
+    grpc-tools "^1.12.4"
 
 "@aserto/ts-linting-configs@^2.5.0":
   version "2.5.0"
@@ -376,9 +376,9 @@
     "@types/node" ">=12.12.47"
 
 "@grpc/grpc-js@^1.8.12":
-  version "1.8.13"
-  resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.8.13.tgz#e775685962909b76f8d4b813833c3d123867165b"
-  integrity sha512-iY3jsdfbc0ARoCLFvbvUB8optgyb0r1XLPb142u+QtgBcKJYkCIFt3Fd/881KqjLYWjsBJF57N3b8Eop9NDfUA==
+  version "1.8.14"
+  resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.8.14.tgz#4fe0f9917d6f094cf59245763c275442b182e9ad"
+  integrity sha512-w84maJ6CKl5aApCMzFll0hxtFNT6or9WwMslobKaqWUEf1K+zhlL43bSQhFreyYWIWR+Z0xnVFC1KtLm4ZpM/A==
   dependencies:
     "@grpc/proto-loader" "^0.7.0"
     "@types/node" ">=12.12.47"
@@ -2358,6 +2358,13 @@ grpc-tools@^1.11.2:
   dependencies:
     "@mapbox/node-pre-gyp" "^1.0.5"
 
+grpc-tools@^1.12.4:
+  version "1.12.4"
+  resolved "https://registry.yarnpkg.com/grpc-tools/-/grpc-tools-1.12.4.tgz#a044c9e8157941033ea7a5f144c2dc9dc4501de4"
+  integrity sha512-5+mLAJJma3BjnW/KQp6JBjUMgvu7Mu3dBvBPd1dcbNIb+qiR0817zDpgPjS7gRb+l/8EVNIa3cB02xI9JLToKg==
+  dependencies:
+    "@mapbox/node-pre-gyp" "^1.0.5"
+
 has-bigints@^1.0.1, has-bigints@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/has-bigints/-/has-bigints-1.0.2.tgz#0871bd3e3d51626f6ca0966668ba35d5602d6eaa"
@@ -3627,10 +3634,28 @@ prop-types@^15.8.1:
     object-assign "^4.1.1"
     react-is "^16.13.1"
 
-protobufjs@^7.0.0, protobufjs@^7.1.2:
+protobufjs@^7.0.0:
   version "7.1.2"
   resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-7.1.2.tgz#a0cf6aeaf82f5625bffcf5a38b7cd2a7de05890c"
   integrity sha512-4ZPTPkXCdel3+L81yw3dG6+Kq3umdWKh7Dc7GW/CpNk4SX3hK58iPCWeCyhVTDrbkNeKrYNZ7EojM5WDaEWTLQ==
+  dependencies:
+    "@protobufjs/aspromise" "^1.1.2"
+    "@protobufjs/base64" "^1.1.2"
+    "@protobufjs/codegen" "^2.0.4"
+    "@protobufjs/eventemitter" "^1.1.0"
+    "@protobufjs/fetch" "^1.1.0"
+    "@protobufjs/float" "^1.0.2"
+    "@protobufjs/inquire" "^1.1.0"
+    "@protobufjs/path" "^1.1.2"
+    "@protobufjs/pool" "^1.1.0"
+    "@protobufjs/utf8" "^1.1.0"
+    "@types/node" ">=13.7.0"
+    long "^5.0.0"
+
+protobufjs@^7.2.2:
+  version "7.2.3"
+  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-7.2.3.tgz#01af019e40d9c6133c49acbb3ff9e30f4f0f70b2"
+  integrity sha512-TtpvOqwB5Gdz/PQmOjgsrGH1nHjAQVCN7JG4A6r1sXRWESL5rNMAiRcBQlCAdKxZcAbstExQePYG8xof/JVRgg==
   dependencies:
     "@protobufjs/aspromise" "^1.1.2"
     "@protobufjs/base64" "^1.1.2"

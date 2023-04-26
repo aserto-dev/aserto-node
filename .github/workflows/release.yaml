@@ -1,0 +1,29 @@
+name: Publish Package to npmjs
+on:
+  push:
+    tags:
+      - 'v*'
+env:
+  VAULT_ADDR: https://vault.eng.aserto.com/
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read Configuration
+        uses: hashicorp/vault-action@v2.5.0
+        id: vault
+        with:
+          url: ${{ env.VAULT_ADDR }}
+          token: ${{ secrets.VAULT_TOKEN }}
+          secrets: |
+            kv/data/npmjs "NPM_TOKEN" | NODE_AUTH_TOKEN;
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: npm install -g yarn
+      - run: yarn install --frozen-lockfile
+      - run: yarn publish --access public
