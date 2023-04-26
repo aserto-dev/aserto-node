@@ -1,7 +1,7 @@
 {
   "name": "@aserto/aserto-node",
   "description": "Authorize access to an endpoint",
-  "version": "0.21.2",
+  "version": "0.21.3",
   "main": "dist/index.js",
   "types": "lib/index.d.ts",
   "author": "Aserto",
