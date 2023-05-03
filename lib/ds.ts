@@ -140,7 +140,7 @@ export class Directory {
 
 const validateGetRelationParams = (params: GetRelationParams) => {
   validateObjectRef(params.object, "object");
-  validateObjectRef(params.subject, "subject");
+  validateObjectType(params.subject, "subject");
   validateRelationRef(params.relation);
 };
 
@@ -153,6 +153,16 @@ const validateObjectRef = (ref: ObjectParams, side: "subject" | "object") => {
     throw new Error(
       `Either ${side} id or ${side} type and ${side} key must be provided`
     );
+  }
+};
+
+const validateObjectType = (ref: ObjectParams, side: "subject" | "object") => {
+  if (ref.id) {
+    return;
+  }
+
+  if (!ref.type) {
+    throw new Error(`Either ${side} id or ${side} type must be provided`);
   }
 };
 
