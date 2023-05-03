@@ -83,4 +83,5 @@ export interface ServiceConfig {
   tenantId?: string;
   apiKey?: string;
   caFile?: string;
+  rejectUnauthorized?: boolean;
 }

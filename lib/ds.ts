@@ -1,21 +1,18 @@
 import { JavaScriptValue } from "google-protobuf/google/protobuf/struct_pb";
 import { Timestamp } from "google-protobuf/google/protobuf/timestamp_pb";
-import {
-  ObjectIdentifier,
-  RelationIdentifier,
-  RelationTypeIdentifier,
-} from "@aserto/node-directory/pkg/aserto/directory/common/v2/common_pb";
-import { ReaderClient } from "@aserto/node-directory/pkg/aserto/directory/reader/v2/reader_grpc_pb";
+import { Reader as ReaderClient } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_connect";
 import {
   GetObjectRequest,
-  GetObjectResponse,
   GetRelationRequest,
-  GetRelationResponse,
-} from "@aserto/node-directory/pkg/aserto/directory/reader/v2/reader_pb";
-import { credentials, Metadata, ServiceError } from "@grpc/grpc-js";
+} from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_pb";
+import {
+  ConnectError,
+  createPromiseClient,
+  PromiseClient,
+} from "@bufbuild/connect";
+import { createGrpcTransport } from "@bufbuild/connect-node";
 
 import { ServiceConfig as Config } from "./index.d";
-import { getSSLCredentials } from "./ssl";
 
 export interface ObjectParams {
   type?: string;
@@ -48,22 +45,29 @@ export interface Object {
 }
 
 export class Directory {
-  client: ReaderClient;
-  metadata: Metadata;
+  client: PromiseClient<typeof ReaderClient>;
+  headers: Headers;
 
   constructor(config: Config) {
     const url = config.url ?? asertoProductionDirectoryServiceUrl;
 
-    const creds = config.caFile
-      ? getSSLCredentials(config.caFile)
-      : credentials.createSsl();
+    const headers = new Headers();
+    config.apiKey && headers.set("authorization", `basic ${config.apiKey}`);
+    config.tenantId && headers.set("aserto-tenant-id", config.tenantId);
+    this.headers = headers;
+    let rejectUnauthorized = true;
+    if (config.rejectUnauthorized !== undefined) {
+      rejectUnauthorized = config.rejectUnauthorized;
+    }
 
-    const metadata = new Metadata();
-    config.apiKey && metadata.add("authorization", `basic ${config.apiKey}`);
-    config.tenantId && metadata.add("aserto-tenant-id", config.tenantId);
-    this.metadata = metadata;
-
-    this.client = new ReaderClient(url, creds);
+    this.client = createPromiseClient(
+      ReaderClient,
+      createGrpcTransport({
+        httpVersion: "2",
+        baseUrl: `https://${url}`,
+        nodeOptions: { rejectUnauthorized: rejectUnauthorized },
+      })
+    );
   }
 
   async object(params: ObjectParams) {
@@ -74,67 +78,35 @@ export class Directory {
       throw Error("You must provide an object type");
     }
 
-    const getObjectRequest = new GetObjectRequest();
-    getObjectRequest.setParam(toObjectIdentifier(params));
-
-    return new Promise((resolve, reject) => {
-      try {
-        this.client.getObject(
-          getObjectRequest,
-          this.metadata,
-          (err: ServiceError, response: GetObjectResponse) => {
-            if (err) {
-              reject(err);
-              return;
-            }
-
-            if (!response) {
-              reject(Error("No response from directory service"));
-              return;
-            }
-
-            const result = response.getResult();
-            const properties = result?.getProperties()?.toJavaScript();
-            const resultObj = result?.toObject();
-            resolve({
-              ...resultObj,
-              properties,
-            });
-          }
-        );
-      } catch (err) {
-        reject(err);
+    const getObjectRequest = new GetObjectRequest({ param: params });
+    try {
+      const response = await this.client.getObject(getObjectRequest, {
+        headers: this.headers,
+      });
+      return response;
+    } catch (err) {
+      if (err instanceof ConnectError) {
+        throw new Error(err.message);
       }
-    });
+      throw err;
+    }
   }
 
   async relation(params: GetRelationParams) {
     validateGetRelationParams(params);
 
-    const getRelationRequest = new GetRelationRequest();
-    getRelationRequest.setParam(toRelationIdentifier(params));
-
-    return new Promise((resolve, reject) => {
-      try {
-        this.client.getRelation(
-          getRelationRequest,
-          this.metadata,
-          (err: ServiceError, response: GetRelationResponse) => {
-            if (err) {
-              reject(err);
-              return;
-            }
-            if (!response) {
-              reject(Error("No response from directory service"));
-              return;
-            }
-            resolve(response.toObject());
-          }
-        );
-      } catch (err) {
-        reject(err);
+    const getRelationRequest = new GetRelationRequest({ param: params });
+    try {
+      const response = await this.client.getRelation(getRelationRequest, {
+        headers: this.headers,
+      });
+      return response;
+    } catch (err) {
+      if (err instanceof ConnectError) {
+        throw new Error(err.message);
       }
-    });
+      throw err;
+    }
   }
 }
 
@@ -166,36 +138,6 @@ const validateRelationRef = (ref: RelationParams) => {
       "Either relation id or relation object type and relation name must be provided"
     );
   }
-};
-
-const toRelationIdentifier = (
-  params: GetRelationParams
-): RelationIdentifier => {
-  const relationIdentifier = new RelationIdentifier();
-  relationIdentifier.setObject(toObjectIdentifier(params.object));
-  relationIdentifier.setSubject(toObjectIdentifier(params.subject));
-  relationIdentifier.setRelation(toRelationTypeIdentifier(params.relation));
-  return relationIdentifier;
-};
-
-const toObjectIdentifier = (ref: ObjectParams): ObjectIdentifier => {
-  const objectParam = new ObjectIdentifier();
-  ref.type && objectParam.setType(ref.type);
-  ref.key && ref.type && objectParam.setKey(ref.key);
-  ref.id && objectParam.setId(ref.id);
-  return objectParam;
-};
-
-const toRelationTypeIdentifier = (
-  ref: RelationParams
-): RelationTypeIdentifier => {
-  const relationTypeIdentifier = new RelationTypeIdentifier();
-  ref.name && ref.objectType && relationTypeIdentifier.setName(ref.name);
-  ref.name &&
-    ref.objectType &&
-    relationTypeIdentifier.setObjectType(ref.objectType);
-  ref.id && relationTypeIdentifier.setId(ref.id);
-  return relationTypeIdentifier;
 };
 
 const asertoProductionDirectoryServiceUrl = "directory.prod.aserto.com:8443";
