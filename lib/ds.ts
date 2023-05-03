@@ -83,7 +83,7 @@ export class Directory {
       const response = await this.client.getObject(getObjectRequest, {
         headers: this.headers,
       });
-      return response;
+      return response.result;
     } catch (err) {
       if (err instanceof ConnectError) {
         throw new Error(err.message);
@@ -100,7 +100,7 @@ export class Directory {
       const response = await this.client.getRelation(getRelationRequest, {
         headers: this.headers,
       });
-      return response;
+      return response.results;
     } catch (err) {
       if (err instanceof ConnectError) {
         throw new Error(err.message);
