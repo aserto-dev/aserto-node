@@ -3,14 +3,11 @@ import {
   RelationTypeIdentifier,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v2/common_pb";
 import { ObjectIdentifier } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v2/common_pb";
-import { Exporter as ExporterClient } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v2/exporter_connect";
-import { Importer as ImporterClient } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v2/importer_connect";
 import { Reader as ReaderClient } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_connect";
 import {
   GetObjectRequest,
   GetRelationRequest,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_pb";
-import { Writer as WriterClient } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v2/writer_connect";
 import {
   createPromiseClient,
   Interceptor,
@@ -66,9 +63,6 @@ const validateRelationRef = (ref: PartialMessage<RelationTypeIdentifier>) => {
 
 export class Directory {
   ReaderClient: PromiseClient<typeof ReaderClient>;
-  WriterClient: PromiseClient<typeof WriterClient>;
-  ImporterClient: PromiseClient<typeof ImporterClient>;
-  ExporterClient: PromiseClient<typeof ExporterClient>;
 
   constructor(config: Config) {
     const setHeader = (
@@ -103,9 +97,6 @@ export class Directory {
     });
 
     this.ReaderClient = createPromiseClient(ReaderClient, grpcTansport);
-    this.WriterClient = createPromiseClient(WriterClient, grpcTansport);
-    this.ImporterClient = createPromiseClient(ImporterClient, grpcTansport);
-    this.ExporterClient = createPromiseClient(ExporterClient, grpcTansport);
   }
 
   async object(params: PartialMessage<ObjectIdentifier>) {
