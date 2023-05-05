@@ -23,7 +23,7 @@
 
 "@aserto/node-directory@git+https://github.com/aserto-dev/node-directory.git#protobuf-es":
   version "0.20.6"
-  resolved "git+https://github.com/aserto-dev/node-directory.git#b005b21ff844a7d1e03cd6c66d2426bf78d63bb4"
+  resolved "git+https://github.com/aserto-dev/node-directory.git#880b0da18b736cc4a9630cdcf2e4926e1bd8c45b"
   dependencies:
     "@grpc/grpc-js" "^1.8.12"
     "@types/google-protobuf" "^3.15.6"
