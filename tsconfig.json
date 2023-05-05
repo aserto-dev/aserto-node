@@ -16,7 +16,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noUncheckedIndexedAccess": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "lib": ["esnext"]
   },
   "exclude": ["./node_modules"],
   "include": ["lib/**/*.ts"]
