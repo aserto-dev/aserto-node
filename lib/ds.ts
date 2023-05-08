@@ -1,154 +1,42 @@
-import { JavaScriptValue } from "google-protobuf/google/protobuf/struct_pb";
-import { Timestamp } from "google-protobuf/google/protobuf/timestamp_pb";
 import {
-  ObjectIdentifier,
   RelationIdentifier,
   RelationTypeIdentifier,
-} from "@aserto/node-directory/pkg/aserto/directory/common/v2/common_pb";
-import { ReaderClient } from "@aserto/node-directory/pkg/aserto/directory/reader/v2/reader_grpc_pb";
+} from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v2/common_pb";
+import { ObjectIdentifier } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v2/common_pb";
+import { Reader as ReaderClient } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_connect";
 import {
   GetObjectRequest,
-  GetObjectResponse,
   GetRelationRequest,
-  GetRelationResponse,
-} from "@aserto/node-directory/pkg/aserto/directory/reader/v2/reader_pb";
-import { credentials, Metadata, ServiceError } from "@grpc/grpc-js";
+} from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_pb";
+import {
+  createPromiseClient,
+  Interceptor,
+  PromiseClient,
+  StreamRequest,
+  UnaryRequest,
+} from "@bufbuild/connect";
+import { createGrpcTransport } from "@bufbuild/connect-node";
+import { AnyMessage, PartialMessage } from "@bufbuild/protobuf";
 
-import { ServiceConfig as Config } from "./index.d";
-import { getSSLCredentials } from "./ssl";
-
-export interface ObjectParams {
-  type?: string;
-  id?: string;
-  key?: string;
+export interface Config {
+  url?: string;
+  tenantId?: string;
+  apiKey?: string;
+  rejectUnauthorized?: boolean;
 }
 
-export interface RelationParams {
-  objectType?: string;
-  name?: string;
-  id?: number;
-}
-
-export interface GetRelationParams {
-  subject: ObjectParams;
-  object: ObjectParams;
-  relation: RelationParams;
-}
-
-export interface Object {
-  id: string;
-  key: string;
-  type: string;
-  displayName: string;
-  properties?: { [key: string]: JavaScriptValue };
-  createdAt?: Timestamp.AsObject;
-  updatedAt?: Timestamp.AsObject;
-  deletedAt?: Timestamp.AsObject;
-  hash: string;
-}
-
-export class Directory {
-  client: ReaderClient;
-  metadata: Metadata;
-
-  constructor(config: Config) {
-    const url = config.url ?? asertoProductionDirectoryServiceUrl;
-
-    const creds = config.caFile
-      ? getSSLCredentials(config.caFile)
-      : credentials.createSsl();
-
-    const metadata = new Metadata();
-    config.apiKey && metadata.add("authorization", `basic ${config.apiKey}`);
-    config.tenantId && metadata.add("aserto-tenant-id", config.tenantId);
-    this.metadata = metadata;
-
-    this.client = new ReaderClient(url, creds);
-  }
-
-  async object(params: ObjectParams) {
-    if (!params.id && !params.type) {
-      throw Error("You must provide either an object ID or a type");
-    }
-    if (params.key && !params.type) {
-      throw Error("You must provide an object type");
-    }
-
-    const getObjectRequest = new GetObjectRequest();
-    getObjectRequest.setParam(toObjectIdentifier(params));
-
-    return new Promise((resolve, reject) => {
-      try {
-        this.client.getObject(
-          getObjectRequest,
-          this.metadata,
-          (err: ServiceError, response: GetObjectResponse) => {
-            if (err) {
-              reject(err);
-              return;
-            }
-
-            if (!response) {
-              reject(Error("No response from directory service"));
-              return;
-            }
-
-            const result = response.getResult();
-            const properties = result?.getProperties()?.toJavaScript();
-            const resultObj = result?.toObject();
-            resolve({
-              ...resultObj,
-              properties,
-            });
-          }
-        );
-      } catch (err) {
-        reject(err);
-      }
-    });
-  }
-
-  async relation(params: GetRelationParams) {
-    validateGetRelationParams(params);
-
-    const getRelationRequest = new GetRelationRequest();
-    getRelationRequest.setParam(toRelationIdentifier(params));
-
-    return new Promise((resolve, reject) => {
-      try {
-        this.client.getRelation(
-          getRelationRequest,
-          this.metadata,
-          (err: ServiceError, response: GetRelationResponse) => {
-            if (err) {
-              reject(err);
-              return;
-            }
-            if (!response) {
-              reject(Error("No response from directory service"));
-              return;
-            }
-            resolve(response.toObject());
-          }
-        );
-      } catch (err) {
-        reject(err);
-      }
-    });
-  }
-}
-
-const validateGetRelationParams = (params: GetRelationParams) => {
-  validateObjectRef(params.object, "object");
-  validateObjectType(params.subject, "subject");
-  validateRelationRef(params.relation);
+const validateGetRelationParams = (
+  params: PartialMessage<RelationIdentifier>
+) => {
+  validateObjectRef(params.object!, "object");
+  validateObjectType(params.subject!, "subject");
+  validateRelationRef(params.relation!);
 };
 
-const validateObjectRef = (ref: ObjectParams, side: "subject" | "object") => {
-  if (ref.id) {
-    return;
-  }
-
+const validateObjectRef = (
+  ref: PartialMessage<ObjectIdentifier>,
+  side: "subject" | "object"
+) => {
   if (!ref.type || !ref.key) {
     throw new Error(
       `Either ${side} id or ${side} type and ${side} key must be provided`
@@ -156,21 +44,16 @@ const validateObjectRef = (ref: ObjectParams, side: "subject" | "object") => {
   }
 };
 
-const validateObjectType = (ref: ObjectParams, side: "subject" | "object") => {
-  if (ref.id) {
-    return;
-  }
-
+const validateObjectType = (
+  ref: PartialMessage<ObjectIdentifier>,
+  side: "subject" | "object"
+) => {
   if (!ref.type) {
     throw new Error(`Either ${side} id or ${side} type must be provided`);
   }
 };
 
-const validateRelationRef = (ref: RelationParams) => {
-  if (ref.id) {
-    return;
-  }
-
+const validateRelationRef = (ref: PartialMessage<RelationTypeIdentifier>) => {
   if (!ref.objectType || !ref.name) {
     throw new Error(
       "Either relation id or relation object type and relation name must be provided"
@@ -178,37 +61,76 @@ const validateRelationRef = (ref: RelationParams) => {
   }
 };
 
-const toRelationIdentifier = (
-  params: GetRelationParams
-): RelationIdentifier => {
-  const relationIdentifier = new RelationIdentifier();
-  relationIdentifier.setObject(toObjectIdentifier(params.object));
-  relationIdentifier.setSubject(toObjectIdentifier(params.subject));
-  relationIdentifier.setRelation(toRelationTypeIdentifier(params.relation));
-  return relationIdentifier;
-};
+export class Directory {
+  ReaderClient: PromiseClient<typeof ReaderClient>;
 
-const toObjectIdentifier = (ref: ObjectParams): ObjectIdentifier => {
-  const objectParam = new ObjectIdentifier();
-  ref.type && objectParam.setType(ref.type);
-  ref.key && ref.type && objectParam.setKey(ref.key);
-  ref.id && objectParam.setId(ref.id);
-  return objectParam;
-};
+  constructor(config: Config) {
+    const setHeader = (
+      req:
+        | UnaryRequest<AnyMessage, AnyMessage>
+        | StreamRequest<AnyMessage, AnyMessage>,
+      key: string,
+      value: string
+    ) => {
+      req.header.get(key) === null && req.header.set(key, value);
+    };
 
-const toRelationTypeIdentifier = (
-  ref: RelationParams
-): RelationTypeIdentifier => {
-  const relationTypeIdentifier = new RelationTypeIdentifier();
-  ref.name && ref.objectType && relationTypeIdentifier.setName(ref.name);
-  ref.name &&
-    ref.objectType &&
-    relationTypeIdentifier.setObjectType(ref.objectType);
-  ref.id && relationTypeIdentifier.setId(ref.id);
-  return relationTypeIdentifier;
-};
+    const headers: Interceptor = (next) => async (req) => {
+      config.apiKey &&
+        setHeader(req, "authorization", `basic ${config.apiKey}`);
+      config.tenantId && setHeader(req, "aserto-tenant-id", config.tenantId);
+      return await next(req);
+    };
 
-const asertoProductionDirectoryServiceUrl = "directory.prod.aserto.com:8443";
+    const url = config.url ?? "directory.prod.aserto.com:8443";
+
+    let rejectUnauthorized = true;
+    if (config.rejectUnauthorized !== undefined) {
+      rejectUnauthorized = config.rejectUnauthorized;
+    }
+
+    const grpcTansport = createGrpcTransport({
+      httpVersion: "2",
+      baseUrl: `https://${url}`,
+      interceptors: [headers],
+      nodeOptions: { rejectUnauthorized },
+    });
+
+    this.ReaderClient = createPromiseClient(ReaderClient, grpcTansport);
+  }
+
+  async object(params: PartialMessage<ObjectIdentifier>) {
+    if (params.key && !params.type) {
+      throw Error("You must provide an object type");
+    }
+
+    const getObjectRequest = new GetObjectRequest({ param: params });
+    try {
+      const response = await this.ReaderClient.getObject(getObjectRequest);
+      if (!response) {
+        throw new Error("No response from directory service");
+      }
+      return response.result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async relation(params: PartialMessage<RelationIdentifier>) {
+    validateGetRelationParams(params);
+
+    const getRelationRequest = new GetRelationRequest({ param: params });
+    try {
+      const response = await this.ReaderClient.getRelation(getRelationRequest);
+      if (!response) {
+        throw new Error("No response from directory service");
+      }
+      return response.results;
+    } catch (error) {
+      throw error;
+    }
+  }
+}
 
 export const ds = (config: Config): Directory => {
   return new Directory(config);

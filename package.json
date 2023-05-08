@@ -7,8 +7,8 @@
   "author": "Aserto",
   "license": "MIT",
   "scripts": {
-    "build": "tsc --build",
-    "format": "prettier --write src",
+    "build": "rm -rf dist && tsc --build",
+    "format": "prettier --write lib",
     "prepublishOnly": "NODE_ENV=production yarn build",
     "push": "scripts/publish.sh",
     "test": "jest test --coverage",
@@ -39,7 +39,10 @@
   "homepage": "https://github.com/aserto-dev/aserto-node#readme",
   "dependencies": {
     "@aserto/node-authorizer": "^0.20.4",
-    "@aserto/node-directory": "^0.20.6",
+    "@aserto/node-directory": "^0.21.0",
+    "@bufbuild/connect": "^0.8.6",
+    "@bufbuild/connect-node": "^0.8.6",
+    "@bufbuild/protobuf": "^1.2.0",
     "@grpc/grpc-js": "^1.8.12",
     "express": "^4.18.2",
     "google-protobuf": "^3.21.2",
