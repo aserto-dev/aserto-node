@@ -1,13 +1,18 @@
 import {
+  ObjectTypeIdentifier,
+  PaginationRequest,
   RelationIdentifier,
   RelationTypeIdentifier,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v2/common_pb";
 import { ObjectIdentifier } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v2/common_pb";
-import { Reader as ReaderClient } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_connect";
+import { Reader } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_connect";
 import {
   GetObjectRequest,
+  GetObjectsRequest,
   GetRelationRequest,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_pb";
+import { Writer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v2/writer_connect";
+import { SetObjectRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v2/writer_pb";
 import {
   createPromiseClient,
   Interceptor,
@@ -16,7 +21,7 @@ import {
   UnaryRequest,
 } from "@bufbuild/connect";
 import { createGrpcTransport } from "@bufbuild/connect-node";
-import { AnyMessage, PartialMessage } from "@bufbuild/protobuf";
+import { AnyMessage, JsonValue, PartialMessage } from "@bufbuild/protobuf";
 
 export interface Config {
   url?: string;
@@ -62,7 +67,8 @@ const validateRelationRef = (ref: PartialMessage<RelationTypeIdentifier>) => {
 };
 
 export class Directory {
-  ReaderClient: PromiseClient<typeof ReaderClient>;
+  ReaderClient: PromiseClient<typeof Reader>;
+  WriterClient: PromiseClient<typeof Writer>;
 
   constructor(config: Config) {
     const setHeader = (
@@ -96,7 +102,8 @@ export class Directory {
       nodeOptions: { rejectUnauthorized },
     });
 
-    this.ReaderClient = createPromiseClient(ReaderClient, grpcTansport);
+    this.ReaderClient = createPromiseClient(Reader, grpcTansport);
+    this.WriterClient = createPromiseClient(Writer, grpcTansport);
   }
 
   async object(params: PartialMessage<ObjectIdentifier>) {
@@ -110,6 +117,35 @@ export class Directory {
       if (!response) {
         throw new Error("No response from directory service");
       }
+      return response.result;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async objects(params: {
+    objectType: PartialMessage<ObjectTypeIdentifier>;
+    page?: PaginationRequest;
+  }) {
+    try {
+      const getObjectsRequest = new GetObjectsRequest({
+        param: params.objectType,
+        page: params.page,
+      });
+
+      const response = await this.ReaderClient.getObjects(getObjectsRequest);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async setObject(params: JsonValue) {
+    try {
+      const setObjectRequest = new SetObjectRequest().fromJson({
+        object: params,
+      });
+
+      const response = await this.WriterClient.setObject(setObjectRequest);
       return response.result;
     } catch (error) {
       throw error;
