@@ -7,13 +7,22 @@ import {
 import { ObjectIdentifier } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v2/common_pb";
 import { Reader } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_connect";
 import {
+  CheckPermissionRequest,
+  GetGraphRequest,
+  GetObjectManyRequest,
   GetObjectRequest,
   GetObjectsRequest,
   GetRelationRequest,
+  GetRelationsRequest,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_pb";
 import { Writer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v2/writer_connect";
-import { SetObjectRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v2/writer_pb";
 import {
+  DeleteRelationRequest,
+  SetObjectRequest,
+  SetRelationRequest,
+} from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v2/writer_pb";
+import {
+  ConnectError,
   createPromiseClient,
   Interceptor,
   PromiseClient,
@@ -106,6 +115,18 @@ export class Directory {
     this.WriterClient = createPromiseClient(Writer, grpcTansport);
   }
 
+  async checkPermission(params: PartialMessage<CheckPermissionRequest>) {
+    const checkPermissionRequest = new CheckPermissionRequest(params);
+    try {
+      const response = await this.ReaderClient.checkPermission(
+        checkPermissionRequest
+      );
+      return response.check;
+    } catch (error) {
+      handleError(error, "checkPermission");
+    }
+  }
+
   async object(params: PartialMessage<ObjectIdentifier>) {
     if (params.key && !params.type) {
       throw Error("You must provide an object type");
@@ -119,7 +140,7 @@ export class Directory {
       }
       return response.result;
     } catch (error) {
-      throw error;
+      handleError(error, "object");
     }
   }
   async objects(params: {
@@ -135,7 +156,19 @@ export class Directory {
       const response = await this.ReaderClient.getObjects(getObjectsRequest);
       return response;
     } catch (error) {
-      throw error;
+      handleError(error, "objects");
+    }
+  }
+
+  async objectMany(params: PartialMessage<GetObjectManyRequest>) {
+    try {
+      const getObjectManyRequest = new GetObjectManyRequest(params);
+      const response = await this.ReaderClient.getObjectMany(
+        getObjectManyRequest
+      );
+      return response.results;
+    } catch (error) {
+      handleError(error, "objectMany");
     }
   }
 
@@ -148,7 +181,7 @@ export class Directory {
       const response = await this.WriterClient.setObject(setObjectRequest);
       return response.result;
     } catch (error) {
-      throw error;
+      handleError(error, "setObject");
     }
   }
 
@@ -163,8 +196,65 @@ export class Directory {
       }
       return response.results;
     } catch (error) {
-      throw error;
+      handleError(error, "relation");
     }
+  }
+
+  async setRelation(params: PartialMessage<SetRelationRequest>) {
+    try {
+      const setRelationRequest = new SetRelationRequest(params);
+      const response = await this.WriterClient.setRelation(setRelationRequest);
+      return response.result;
+    } catch (error) {
+      handleError(error, "setRelation");
+    }
+  }
+
+  async deleteRelation(params: PartialMessage<DeleteRelationRequest>) {
+    try {
+      const deleteRelationRequest = new DeleteRelationRequest(params);
+      const response = await this.WriterClient.deleteRelation(
+        deleteRelationRequest
+      );
+      return response.result;
+    } catch (error) {
+      handleError(error, "deleteRelation");
+    }
+  }
+
+  async relations(params: PartialMessage<RelationIdentifier>) {
+    const getRelationsRequest = new GetRelationsRequest({ param: params });
+    try {
+      const response = await this.ReaderClient.getRelations(
+        getRelationsRequest
+      );
+      if (!response) {
+        throw new Error("No response from directory service");
+      }
+      return response;
+    } catch (error) {
+      handleError(error, "relations");
+    }
+  }
+
+  async graph(params: PartialMessage<GetGraphRequest>) {
+    try {
+      const getGraphRequest = new GetGraphRequest(params);
+      const response = await this.ReaderClient.getGraph(getGraphRequest);
+      return response.results;
+    } catch (error) {
+      handleError(error, "graph");
+    }
+  }
+}
+
+function handleError(error: unknown, method: string) {
+  if (error instanceof ConnectError) {
+    throw new Error(
+      `"${method}" failed with code: ${error.code}, message: ${error.message}`
+    );
+  } else {
+    throw error;
   }
 }
 
