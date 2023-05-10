@@ -106,10 +106,10 @@ export interface Directory {
   setObject: (params: JsonValue) => Promise<Object$>;
   relation: (params: PartialMessage<RelationIdentifier>) => Promise<Relation[]>;
   setRelation: (
-    params: PartialMessage<SetRelationRequest>
+    params: PartialMessage<Relation>
   ) => Promise<Relation | undefined>;
   deleteRelation: (
-    params: PartialMessage<DeleteRelationRequest>
+    params: PartialMessage<RelationIdentifier>
   ) => Promise<Empty | undefined>;
   relations: (
     params: PartialMessage<RelationIdentifier>
