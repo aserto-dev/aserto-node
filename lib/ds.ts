@@ -1,6 +1,7 @@
 import {
   ObjectTypeIdentifier,
   PaginationRequest,
+  Relation,
   RelationIdentifier,
   RelationTypeIdentifier,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v2/common_pb";
@@ -200,9 +201,9 @@ export class Directory {
     }
   }
 
-  async setRelation(params: PartialMessage<SetRelationRequest>) {
+  async setRelation(params: PartialMessage<Relation>) {
     try {
-      const setRelationRequest = new SetRelationRequest(params);
+      const setRelationRequest = new SetRelationRequest({ relation: params });
       const response = await this.WriterClient.setRelation(setRelationRequest);
       return response.result;
     } catch (error) {
@@ -210,9 +211,11 @@ export class Directory {
     }
   }
 
-  async deleteRelation(params: PartialMessage<DeleteRelationRequest>) {
+  async deleteRelation(params: PartialMessage<RelationIdentifier>) {
     try {
-      const deleteRelationRequest = new DeleteRelationRequest(params);
+      const deleteRelationRequest = new DeleteRelationRequest({
+        param: params,
+      });
       const response = await this.WriterClient.deleteRelation(
         deleteRelationRequest
       );
