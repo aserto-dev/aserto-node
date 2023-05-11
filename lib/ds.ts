@@ -155,6 +155,9 @@ export class Directory {
       });
 
       const response = await this.ReaderClient.getObjects(getObjectsRequest);
+      if (!response) {
+        throw new Error("No response from directory service");
+      }
       return response;
     } catch (error) {
       handleError(error, "objects");
@@ -167,6 +170,9 @@ export class Directory {
       const response = await this.ReaderClient.getObjectMany(
         getObjectManyRequest
       );
+      if (!response) {
+        throw new Error("No response from directory service");
+      }
       return response.results;
     } catch (error) {
       handleError(error, "objectMany");
@@ -180,6 +186,9 @@ export class Directory {
       });
 
       const response = await this.WriterClient.setObject(setObjectRequest);
+      if (!response) {
+        throw new Error("No response from directory service");
+      }
       return response.result;
     } catch (error) {
       handleError(error, "setObject");
@@ -205,6 +214,9 @@ export class Directory {
     try {
       const setRelationRequest = new SetRelationRequest({ relation: params });
       const response = await this.WriterClient.setRelation(setRelationRequest);
+      if (!response) {
+        throw new Error("No response from directory service");
+      }
       return response.result;
     } catch (error) {
       handleError(error, "setRelation");
@@ -219,6 +231,9 @@ export class Directory {
       const response = await this.WriterClient.deleteRelation(
         deleteRelationRequest
       );
+      if (!response) {
+        throw new Error("No response from directory service");
+      }
       return response.result;
     } catch (error) {
       handleError(error, "deleteRelation");
@@ -244,6 +259,9 @@ export class Directory {
     try {
       const getGraphRequest = new GetGraphRequest(params);
       const response = await this.ReaderClient.getGraph(getGraphRequest);
+      if (!response) {
+        throw new Error("No response from directory service");
+      }
       return response.results;
     } catch (error) {
       handleError(error, "graph");
