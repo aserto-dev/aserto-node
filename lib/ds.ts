@@ -1,14 +1,29 @@
 import {
+  ObjectTypeIdentifier,
+  PaginationRequest,
+  Relation,
   RelationIdentifier,
   RelationTypeIdentifier,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v2/common_pb";
 import { ObjectIdentifier } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v2/common_pb";
-import { Reader as ReaderClient } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_connect";
+import { Reader } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_connect";
 import {
+  CheckPermissionRequest,
+  GetGraphRequest,
+  GetObjectManyRequest,
   GetObjectRequest,
+  GetObjectsRequest,
   GetRelationRequest,
+  GetRelationsRequest,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_pb";
+import { Writer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v2/writer_connect";
 import {
+  DeleteRelationRequest,
+  SetObjectRequest,
+  SetRelationRequest,
+} from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v2/writer_pb";
+import {
+  ConnectError,
   createPromiseClient,
   Interceptor,
   PromiseClient,
@@ -16,7 +31,7 @@ import {
   UnaryRequest,
 } from "@bufbuild/connect";
 import { createGrpcTransport } from "@bufbuild/connect-node";
-import { AnyMessage, PartialMessage } from "@bufbuild/protobuf";
+import { AnyMessage, JsonValue, PartialMessage } from "@bufbuild/protobuf";
 
 export interface Config {
   url?: string;
@@ -62,7 +77,8 @@ const validateRelationRef = (ref: PartialMessage<RelationTypeIdentifier>) => {
 };
 
 export class Directory {
-  ReaderClient: PromiseClient<typeof ReaderClient>;
+  ReaderClient: PromiseClient<typeof Reader>;
+  WriterClient: PromiseClient<typeof Writer>;
 
   constructor(config: Config) {
     const setHeader = (
@@ -96,7 +112,20 @@ export class Directory {
       nodeOptions: { rejectUnauthorized },
     });
 
-    this.ReaderClient = createPromiseClient(ReaderClient, grpcTansport);
+    this.ReaderClient = createPromiseClient(Reader, grpcTansport);
+    this.WriterClient = createPromiseClient(Writer, grpcTansport);
+  }
+
+  async checkPermission(params: PartialMessage<CheckPermissionRequest>) {
+    const checkPermissionRequest = new CheckPermissionRequest(params);
+    try {
+      const response = await this.ReaderClient.checkPermission(
+        checkPermissionRequest
+      );
+      return response.check;
+    } catch (error) {
+      handleError(error, "checkPermission");
+    }
   }
 
   async object(params: PartialMessage<ObjectIdentifier>) {
@@ -112,7 +141,57 @@ export class Directory {
       }
       return response.result;
     } catch (error) {
-      throw error;
+      handleError(error, "object");
+    }
+  }
+  async objects(params: {
+    objectType: PartialMessage<ObjectTypeIdentifier>;
+    page?: PaginationRequest;
+  }) {
+    try {
+      const getObjectsRequest = new GetObjectsRequest({
+        param: params.objectType,
+        page: params.page,
+      });
+
+      const response = await this.ReaderClient.getObjects(getObjectsRequest);
+      if (!response) {
+        throw new Error("No response from directory service");
+      }
+      return response;
+    } catch (error) {
+      handleError(error, "objects");
+    }
+  }
+
+  async objectMany(params: PartialMessage<GetObjectManyRequest>) {
+    try {
+      const getObjectManyRequest = new GetObjectManyRequest(params);
+      const response = await this.ReaderClient.getObjectMany(
+        getObjectManyRequest
+      );
+      if (!response) {
+        throw new Error("No response from directory service");
+      }
+      return response.results;
+    } catch (error) {
+      handleError(error, "objectMany");
+    }
+  }
+
+  async setObject(params: JsonValue) {
+    try {
+      const setObjectRequest = new SetObjectRequest().fromJson({
+        object: params,
+      });
+
+      const response = await this.WriterClient.setObject(setObjectRequest);
+      if (!response) {
+        throw new Error("No response from directory service");
+      }
+      return response.result;
+    } catch (error) {
+      handleError(error, "setObject");
     }
   }
 
@@ -127,8 +206,76 @@ export class Directory {
       }
       return response.results;
     } catch (error) {
-      throw error;
+      handleError(error, "relation");
     }
+  }
+
+  async setRelation(params: PartialMessage<Relation>) {
+    try {
+      const setRelationRequest = new SetRelationRequest({ relation: params });
+      const response = await this.WriterClient.setRelation(setRelationRequest);
+      if (!response) {
+        throw new Error("No response from directory service");
+      }
+      return response.result;
+    } catch (error) {
+      handleError(error, "setRelation");
+    }
+  }
+
+  async deleteRelation(params: PartialMessage<RelationIdentifier>) {
+    try {
+      const deleteRelationRequest = new DeleteRelationRequest({
+        param: params,
+      });
+      const response = await this.WriterClient.deleteRelation(
+        deleteRelationRequest
+      );
+      if (!response) {
+        throw new Error("No response from directory service");
+      }
+      return response.result;
+    } catch (error) {
+      handleError(error, "deleteRelation");
+    }
+  }
+
+  async relations(params: PartialMessage<RelationIdentifier>) {
+    const getRelationsRequest = new GetRelationsRequest({ param: params });
+    try {
+      const response = await this.ReaderClient.getRelations(
+        getRelationsRequest
+      );
+      if (!response) {
+        throw new Error("No response from directory service");
+      }
+      return response;
+    } catch (error) {
+      handleError(error, "relations");
+    }
+  }
+
+  async graph(params: PartialMessage<GetGraphRequest>) {
+    try {
+      const getGraphRequest = new GetGraphRequest(params);
+      const response = await this.ReaderClient.getGraph(getGraphRequest);
+      if (!response) {
+        throw new Error("No response from directory service");
+      }
+      return response.results;
+    } catch (error) {
+      handleError(error, "graph");
+    }
+  }
+}
+
+function handleError(error: unknown, method: string) {
+  if (error instanceof ConnectError) {
+    throw new Error(
+      `"${method}" failed with code: ${error.code}, message: ${error.message}`
+    );
+  } else {
+    throw error;
   }
 }
 

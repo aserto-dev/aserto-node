@@ -1,4 +1,22 @@
 import * as express from "express";
+import {
+  GetGraphRequest,
+  Object$,
+  ObjectDependency,
+  ObjectIdentifier,
+  ObjectTypeIdentifier,
+  PaginationRequest,
+  Relation,
+  RelationIdentifier,
+} from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v2/common_pb";
+import {
+  CheckPermissionRequest,
+  GetGraphResponse,
+  GetObjectManyRequest,
+  GetObjectResponse,
+  GetRelationsResponse,
+} from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_pb";
+import { Empty, JsonValue } from "@bufbuild/protobuf";
 export = {
   jwtAuthz,
   displayStateMap,
@@ -74,8 +92,31 @@ export interface IdentityContextOptions {
 }
 
 export interface Directory {
-  object: (params: ObjectParams) => Promise<Obj>;
-  relation: (params: GetRelationParams) => Promise<Obj>;
+  checkPermission: (
+    params: PartialMessage<CheckPermissionRequest>
+  ) => Promise<boolean>;
+  object: (params: PartialMessage<ObjectIdentifier>) => Promise<Object$>;
+  objects: (params: {
+    objectType: PartialMessage<ObjectTypeIdentifier>;
+    page?: PaginationRequest;
+  }) => Promise<GetObjectResponse>;
+  objectMany: (
+    params: PartialMessage<GetObjectManyRequest>
+  ) => Promise<Object$[]>;
+  setObject: (params: JsonValue) => Promise<Object$>;
+  relation: (params: PartialMessage<RelationIdentifier>) => Promise<Relation[]>;
+  setRelation: (
+    params: PartialMessage<Relation>
+  ) => Promise<Relation | undefined>;
+  deleteRelation: (
+    params: PartialMessage<RelationIdentifier>
+  ) => Promise<Empty | undefined>;
+  relations: (
+    params: PartialMessage<RelationIdentifier>
+  ) => Promise<GetRelationsResponse>;
+  graph: (
+    params: PartialMessage<GetGraphResponse>
+  ) => Promise<ObjectDependency[]>;
 }
 
 export interface ServiceConfig {
