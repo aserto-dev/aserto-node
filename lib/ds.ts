@@ -3,7 +3,6 @@ import {
   PaginationRequest,
   Relation,
   RelationIdentifier,
-  RelationTypeIdentifier,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v2/common_pb";
 import { ObjectIdentifier } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v2/common_pb";
 import { Reader } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_connect";
@@ -39,42 +38,6 @@ export interface Config {
   apiKey?: string;
   rejectUnauthorized?: boolean;
 }
-
-const validateGetRelationParams = (
-  params: PartialMessage<RelationIdentifier>
-) => {
-  validateObjectRef(params.object!, "object");
-  validateObjectType(params.subject!, "subject");
-  validateRelationRef(params.relation!);
-};
-
-const validateObjectRef = (
-  ref: PartialMessage<ObjectIdentifier>,
-  side: "subject" | "object"
-) => {
-  if (!ref.type || !ref.key) {
-    throw new Error(
-      `Either ${side} id or ${side} type and ${side} key must be provided`
-    );
-  }
-};
-
-const validateObjectType = (
-  ref: PartialMessage<ObjectIdentifier>,
-  side: "subject" | "object"
-) => {
-  if (!ref.type) {
-    throw new Error(`Either ${side} id or ${side} type must be provided`);
-  }
-};
-
-const validateRelationRef = (ref: PartialMessage<RelationTypeIdentifier>) => {
-  if (!ref.objectType || !ref.name) {
-    throw new Error(
-      "Either relation id or relation object type and relation name must be provided"
-    );
-  }
-};
 
 export class Directory {
   ReaderClient: PromiseClient<typeof Reader>;
@@ -196,8 +159,6 @@ export class Directory {
   }
 
   async relation(params: PartialMessage<RelationIdentifier>) {
-    validateGetRelationParams(params);
-
     const getRelationRequest = new GetRelationRequest({ param: params });
     try {
       const response = await this.ReaderClient.getRelation(getRelationRequest);
