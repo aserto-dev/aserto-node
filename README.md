@@ -226,6 +226,53 @@ Furthermore, when packaging a policy for deployment (e.g. in a Docker container)
 
 Alternately, to ignore TLS certificate validation when creating a TLS connection to the authorizer, you can set the `disableTlsValidation` option to `true` and avoid TLS certificate validation. This option is **not recommended for production**.
 
+## Directory
+
+### Directory Client
+```typescript
+import { ds } from "@aserto/aserto-node";
+
+directoryClint = ds({
+  url: 'localhost:9292',
+  tenantId: '1234',
+  apiKey: 'my-api-key',
+});
+
+- `url`: hostname:port of directory service (_required_)
+- `apiKey`: API key for directory service (_required_ if using hosted directory)
+- `tenantId`: Aserto tenant ID (_required_ if using hosted directory)
+- `rejectUnauthorized`: reject clients with invalid certificates. Defaults to `true`.
+```
+
+#### Example
+
+```typescript
+const identity = 'my-identity';
+const relation = await directoryClint.relation(
+  {
+    subject: {
+      type: 'user',
+    },
+    object: {
+      type: 'identity',
+      key: identity
+    },
+    relation: {
+      name: 'identifier',
+      objectType: 'identity'
+    }
+  }
+);
+
+if (!relation || relation.length === 0) {
+  throw new Error(`No relations found for identity ${identity}`, )
+};
+
+const user = await directoryClint.object(relation[0].subject);
+```
+
+Check [Directory Interface](https://github.com/aserto-dev/aserto-node/blob/main/lib/index.d.ts#L94-L120) for more.
+
 ## Issue Reporting
 
 If you have found a bug or if you have a feature request, please report them at this repository issues section. Please do not report security vulnerabilities on the public GitHub issue tracker.
