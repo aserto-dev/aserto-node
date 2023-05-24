@@ -14,6 +14,7 @@ import {
   GetGraphResponse,
   GetObjectManyRequest,
   GetObjectResponse,
+  GetObjectsResponse,
   GetRelationsResponse,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_pb";
 import { Empty, JsonValue } from "@bufbuild/protobuf";
@@ -98,8 +99,8 @@ export interface Directory {
   object: (params: PartialMessage<ObjectIdentifier>) => Promise<Object$>;
   objects: (params: {
     objectType: PartialMessage<ObjectTypeIdentifier>;
-    page?: PaginationRequest;
-  }) => Promise<GetObjectResponse>;
+    page?: PartialMessage<PaginationRequest>;
+  }) => Promise<GetObjectsResponse>;
   objectMany: (
     params: PartialMessage<GetObjectManyRequest>
   ) => Promise<Object$[]>;

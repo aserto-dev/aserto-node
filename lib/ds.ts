@@ -109,7 +109,7 @@ export class Directory {
   }
   async objects(params: {
     objectType: PartialMessage<ObjectTypeIdentifier>;
-    page?: PaginationRequest;
+    page?: PartialMessage<PaginationRequest>;
   }) {
     try {
       const getObjectsRequest = new GetObjectsRequest({
