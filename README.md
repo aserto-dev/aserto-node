@@ -255,7 +255,7 @@ const directoryClient = ds({
 
 `object({ type: "type-name", key: "object-key" })`:
 
-Get an object instance with the type `type-name` and the key `object-key`. For example: 
+Get an object instance with the type `type-name` and the key `object-key`. For example:
 
 ```typescript
 const user = await directoryClient.object({ type: 'user', key: 'euang@acmecorp.com' });
@@ -279,7 +279,7 @@ const user = await directoryClient.object({ type: 'user', key: 'euang@acmecorp.c
   })
 ```
 
-Get an array of relations of a certain type for an object instance. For example: 
+Get an array of relations of a certain type for an object instance. For example:
 
 ```typescript
 const identity = 'euang@acmecorp.com';
@@ -304,9 +304,79 @@ const relations = await directoryClient.relation(
 
 #### 'setObject' function
 
+`setObject({ ...Object$ })`:
+
+Create an object instance with the specified fields. For example:
+
+```typescript
+user = directoryClient.setObject(
+  {
+    type: "user",
+    key: "test-object",
+    properties: {
+      displayName: "test object"
+  }
+);
+```
+
 #### 'setRelation' function
 
+`setRelation({ subject: ObjectIdentifier, relation: String, object: ObjectIdentifier })`:
+
+Create a relation with a specified name between two objects. For example:
+
+```typescript
+const relation = await directoryClient.setRelation(
+  {
+    subject: {
+      key: 'subjectKey',
+      type: 'subjectType',
+    },
+    relation: 'relationName',
+    object: {
+      type: 'objectType',
+      key: 'objectKey',
+    },
+
+  }
+);
+```
+
+#### 'deleteObject' function
+
+`deleteObject({ type: "type-name", key: "object-key" })`:
+
+Deletes an object instance with the specified type and key. For example:
+
+```typescript
+await directoryClient.deleteObject({ type: 'user', key: 'euang@acmecorp.com' });
+```
+
+
 #### 'deleteRelation' function
+
+`deleteRelation({ subject: ObjectIdentifier, relation: RelationIdentifier, object: ObjectIdentifier })`:
+
+Delete a relation:
+
+```typescript
+await directoryClient.deleteRelation(
+  {
+    subject: {
+      key: 'subjectKey',
+      type: 'subjectType',
+    },
+    relation: {
+      name: 'relationName',
+      object_type: 'objectType',
+    },
+    object: {
+      type: 'objectType',
+      key: 'objectKey',
+    },
+  }
+);
+```
 
 ### Checking permissions and relations
 
@@ -314,7 +384,52 @@ You can evaluate graph queries over the directory, to determine whether a subjec
 
 #### 'checkPermission' function
 
+`checkPermission({ subject: ObjectIdentifier, permission: PermissionIdentifier, object: ObjectIdentifier })`:
+
+Check that an `user` object with the key `euang@acmecorp.com` has the `read` permission in the `admin` group:
+
+```typescript
+const check = await directoryClient.checkPermission(
+  {
+    subject: {
+      key: 'euang@acmecorp.com',
+      type: 'user',
+    },
+    permission: {
+      name: 'read',
+    },
+    object: {
+      type: 'group',
+      key: 'admin',
+    },
+  }
+);
+```
+
 #### 'checkRelation' function
+
+`checkPermission({ subject: ObjectIdentifier, permission: PermissionIdentifier, object: ObjectIdentifier })`:
+
+Check that `euang@acmecorp.com` has an `identifier` relation to an object with key `euang@acmecorp.com` and type `identity`:
+
+```typescript
+const check = directoryClient.checkPermission(
+  {
+    subject: {
+      key: 'euang@acmecorp.com',
+      type: 'user',
+    },
+    relation: {
+       name: "identifier",
+       object_type: "identity"
+      },
+    object: {
+      type: 'identity',
+      key: 'euang@acmecorp.com',
+    },
+  }
+);
+```
 
 ### Example
 
