@@ -1,13 +1,14 @@
 import {
+  ObjectIdentifier,
   ObjectTypeIdentifier,
   PaginationRequest,
   Relation,
   RelationIdentifier,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v2/common_pb";
-import { ObjectIdentifier } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v2/common_pb";
 import { Reader } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_connect";
 import {
   CheckPermissionRequest,
+  CheckRelationRequest,
   GetGraphRequest,
   GetObjectManyRequest,
   GetObjectRequest,
@@ -17,6 +18,7 @@ import {
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_pb";
 import { Writer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v2/writer_connect";
 import {
+  DeleteObjectRequest,
   DeleteRelationRequest,
   SetObjectRequest,
   SetRelationRequest,
@@ -91,11 +93,19 @@ export class Directory {
     }
   }
 
-  async object(params: PartialMessage<ObjectIdentifier>) {
-    if (params.key && !params.type) {
-      throw Error("You must provide an object type");
+  async checkRelation(params: PartialMessage<CheckRelationRequest>) {
+    const checkRelationRequest = new CheckRelationRequest(params);
+    try {
+      const response = await this.ReaderClient.checkRelation(
+        checkRelationRequest
+      );
+      return response.check;
+    } catch (error) {
+      handleError(error, "checkRelation");
     }
+  }
 
+  async object(params: PartialMessage<ObjectIdentifier>) {
     const getObjectRequest = new GetObjectRequest({ param: params });
     try {
       const response = await this.ReaderClient.getObject(getObjectRequest);
@@ -155,6 +165,18 @@ export class Directory {
       return response.result;
     } catch (error) {
       handleError(error, "setObject");
+    }
+  }
+
+  async deleteObject(params: PartialMessage<ObjectIdentifier>) {
+    const deleteObjectRequest = new DeleteObjectRequest({ param: params });
+    try {
+      const response = await this.WriterClient.deleteObject(
+        deleteObjectRequest
+      );
+      return response.result;
+    } catch (error) {
+      handleError(error, "deleteObject");
     }
   }
 
