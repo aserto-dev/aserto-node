@@ -13,6 +13,7 @@ import { errorHandler } from "./errorHandler";
 import identityContext from "./identityContext";
 import { DisplayStateMapOptions } from "./index.d";
 import processOptions from "./processOptions";
+import { JavaScriptValue, Struct } from "google-protobuf/google/protobuf/struct_pb";
 
 const displayStateMap = (optionsParam: DisplayStateMapOptions) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -81,6 +82,9 @@ const displayStateMap = (optionsParam: DisplayStateMapOptions) => {
 
           decisionTreeOptions.setPathSeparator(2);
 
+          const fields = req.body as { [key: string]: JavaScriptValue };
+          decisionTreeRequest.setResourceContext(Struct.fromJavaScript(fields));
+        
           decisionTreeRequest.setPolicyContext(policyContext);
           decisionTreeRequest.setIdentityContext(idContext);
           decisionTreeRequest.setOptions(decisionTreeOptions);
