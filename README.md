@@ -228,11 +228,16 @@ Alternately, to ignore TLS certificate validation when creating a TLS connection
 
 ## Directory
 
+The Directory APIs can be used to get or set object instances and relation instances. They can also be used to check whether a user has a permission or relation on an object instance.
+
 ### Directory Client
+
+You can initialize a directory client as follows:
+
 ```typescript
 import { ds } from "@aserto/aserto-node";
 
-directoryClint = ds({
+const directoryClient = ds({
   url: 'localhost:9292',
   tenantId: '1234',
   apiKey: 'my-api-key',
@@ -244,11 +249,193 @@ directoryClint = ds({
 - `rejectUnauthorized`: reject clients with invalid certificates. Defaults to `true`.
 ```
 
-#### Example
+### Getting objects and relations
+
+#### 'object' function
+
+`object({ type: "type-name", key: "object-key" })`:
+
+Get an object instance with the type `type-name` and the key `object-key`. For example:
 
 ```typescript
-const identity = 'my-identity';
-const relation = await directoryClint.relation(
+const user = await directoryClient.object({ type: 'user', key: 'euang@acmecorp.com' });
+```
+
+#### 'relation' function
+
+```typescript
+  relation({
+    subject: {
+      type: 'subject-type',
+    },
+    object: {
+      type: 'object-type',
+      key: 'object-key'
+    },
+    relation: {
+      name: 'relation-name',
+      objectType: 'object-type'
+    }
+  })
+```
+
+Get an array of relations of a certain type for an object instance. For example:
+
+```typescript
+const identity = 'euang@acmecorp.com';
+const relations = await directoryClient.relation(
+  {
+    subject: {
+      type: 'user',
+    },
+    object: {
+      type: 'identity',
+      key: identity
+    },
+    relation: {
+      name: 'identifier',
+      objectType: 'identity'
+    }
+  }
+);
+```
+
+### Setting objects and relations
+
+#### 'setObject' function
+
+`setObject({ ...Object$ })`:
+
+Create an object instance with the specified fields. For example:
+
+```typescript
+user = directoryClient.setObject(
+  {
+    type: "user",
+    key: "test-object",
+    properties: {
+      displayName: "test object"
+  }
+);
+```
+
+#### 'setRelation' function
+
+`setRelation({ subject: ObjectIdentifier, relation: String, object: ObjectIdentifier })`:
+
+Create a relation with a specified name between two objects. For example:
+
+```typescript
+const relation = await directoryClient.setRelation(
+  {
+    subject: {
+      key: 'subjectKey',
+      type: 'subjectType',
+    },
+    relation: 'relationName',
+    object: {
+      type: 'objectType',
+      key: 'objectKey',
+    },
+
+  }
+);
+```
+
+#### 'deleteObject' function
+
+`deleteObject({ type: "type-name", key: "object-key" })`:
+
+Deletes an object instance with the specified type and key. For example:
+
+```typescript
+await directoryClient.deleteObject({ type: 'user', key: 'euang@acmecorp.com' });
+```
+
+
+#### 'deleteRelation' function
+
+`deleteRelation({ subject: ObjectIdentifier, relation: RelationIdentifier, object: ObjectIdentifier })`:
+
+Delete a relation:
+
+```typescript
+await directoryClient.deleteRelation(
+  {
+    subject: {
+      key: 'subjectKey',
+      type: 'subjectType',
+    },
+    relation: {
+      name: 'relationName',
+      object_type: 'objectType',
+    },
+    object: {
+      type: 'objectType',
+      key: 'objectKey',
+    },
+  }
+);
+```
+
+### Checking permissions and relations
+
+You can evaluate graph queries over the directory, to determine whether a subject (e.g. user) has a permission or a relation to an object instance.
+
+#### 'checkPermission' function
+
+`checkPermission({ subject: ObjectIdentifier, permission: PermissionIdentifier, object: ObjectIdentifier })`:
+
+Check that an `user` object with the key `euang@acmecorp.com` has the `read` permission in the `admin` group:
+
+```typescript
+const check = await directoryClient.checkPermission(
+  {
+    subject: {
+      key: 'euang@acmecorp.com',
+      type: 'user',
+    },
+    permission: {
+      name: 'read',
+    },
+    object: {
+      type: 'group',
+      key: 'admin',
+    },
+  }
+);
+```
+
+#### 'checkRelation' function
+
+`checkPermission({ subject: ObjectIdentifier, permission: PermissionIdentifier, object: ObjectIdentifier })`:
+
+Check that `euang@acmecorp.com` has an `identifier` relation to an object with key `euang@acmecorp.com` and type `identity`:
+
+```typescript
+const check = directoryClient.checkPermission(
+  {
+    subject: {
+      key: 'euang@acmecorp.com',
+      type: 'user',
+    },
+    relation: {
+       name: "identifier",
+       object_type: "identity"
+      },
+    object: {
+      type: 'identity',
+      key: 'euang@acmecorp.com',
+    },
+  }
+);
+```
+
+### Example
+
+```typescript
+const identity = 'euang@acmecorp.com';
+const relation = await directoryClient.relation(
   {
     subject: {
       type: 'user',
@@ -268,7 +455,7 @@ if (!relation || relation.length === 0) {
   throw new Error(`No relations found for identity ${identity}`, )
 };
 
-const user = await directoryClint.object(relation[0].subject);
+const user = await directoryClient.object(relation[0].subject);
 ```
 
 Check [Directory Interface](https://github.com/aserto-dev/aserto-node/blob/main/lib/index.d.ts#L94-L120) for more.

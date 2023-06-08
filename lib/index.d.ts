@@ -11,6 +11,7 @@ import {
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v2/common_pb";
 import {
   CheckPermissionRequest,
+  CheckRelationRequest,
   GetGraphResponse,
   GetObjectManyRequest,
   GetObjectResponse,
@@ -96,6 +97,9 @@ export interface Directory {
   checkPermission: (
     params: PartialMessage<CheckPermissionRequest>
   ) => Promise<boolean>;
+  checkRelation: (
+    params: PartialMessage<CheckRelationRequest>
+  ) => Promise<boolean>;
   object: (params: PartialMessage<ObjectIdentifier>) => Promise<Object$>;
   objects: (params: {
     objectType: PartialMessage<ObjectTypeIdentifier>;
@@ -105,6 +109,9 @@ export interface Directory {
     params: PartialMessage<GetObjectManyRequest>
   ) => Promise<Object$[]>;
   setObject: (params: JsonValue) => Promise<Object$>;
+  deleteObject: (
+    params: PartialMessage<ObjectIdentifier>
+  ) => Promise<Empty | undefined>;
   relation: (params: PartialMessage<RelationIdentifier>) => Promise<Relation[]>;
   setRelation: (
     params: PartialMessage<Relation>
