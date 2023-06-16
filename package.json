@@ -40,7 +40,7 @@
   "dependencies": {
     "@aserto/node-authorizer": "^0.20.4",
     "@aserto/node-directory": "^0.21.0",
-    "@bufbuild/connect": "^0.8.6",
+    "@bufbuild/connect": "^0.9.0",
     "@bufbuild/connect-node": "^0.8.6",
     "@bufbuild/protobuf": "^1.2.0",
     "@grpc/grpc-js": "^1.8.12",
