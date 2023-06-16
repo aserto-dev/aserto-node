@@ -1,6 +1,5 @@
 import * as express from "express";
 import {
-  GetGraphRequest,
   Object$,
   ObjectDependency,
   ObjectIdentifier,
@@ -12,7 +11,7 @@ import {
 import {
   CheckPermissionRequest,
   CheckRelationRequest,
-  GetGraphResponse,
+  GetGraphRequest,
   GetObjectManyRequest,
   GetObjectResponse,
   GetObjectsResponse,
@@ -123,7 +122,7 @@ export interface Directory {
     params: PartialMessage<RelationIdentifier>
   ) => Promise<GetRelationsResponse>;
   graph: (
-    params: PartialMessage<GetGraphResponse>
+    params: PartialMessage<GetGraphRequest>
   ) => Promise<ObjectDependency[]>;
 }
 
