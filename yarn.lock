@@ -345,20 +345,15 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@bufbuild/connect-node@^0.8.6":
-  version "0.8.6"
-  resolved "https://registry.yarnpkg.com/@bufbuild/connect-node/-/connect-node-0.8.6.tgz#bdb6bafc5d2119dd7eb322dfaae20364b40cc0ae"
-  integrity sha512-KqdLnQG5cTw4rieQdo6aioojY47UjwauhIcDIeQc+6GaeGLsT7Ftc+GWMZgsnEc/Jl5V1/NxBYnE2wN4EJUnGg==
+"@bufbuild/connect-node@^0.9.1":
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/@bufbuild/connect-node/-/connect-node-0.9.1.tgz#081b030f8f4bea1cac81f241034e65bb67201326"
+  integrity sha512-kUMB6QQh8S19LsvweDg057WN3Gbg+zIqSHnRcXh9CBYSN7GWd9dgJPQSgalJFJngjFSW2qnnOmnUkxMyZiWBOw==
   dependencies:
-    "@bufbuild/connect" "0.8.6"
+    "@bufbuild/connect" "0.9.1"
     headers-polyfill "^3.1.2"
 
-"@bufbuild/connect@0.8.6":
-  version "0.8.6"
-  resolved "https://registry.yarnpkg.com/@bufbuild/connect/-/connect-0.8.6.tgz#ba85ee7ad546fe380d705826b9b5bf5b8a5c0f01"
-  integrity sha512-z9gW4hcQxCz7w0kjt1JyMp7VEQQdm7CYiZHvNq4vZtMbKOje2DC8kSb62XStHHd3AdoDZq1cb1s11F5TMSwZYw==
-
-"@bufbuild/connect@^0.9.0":
+"@bufbuild/connect@0.9.1", "@bufbuild/connect@^0.9.0":
   version "0.9.1"
   resolved "https://registry.yarnpkg.com/@bufbuild/connect/-/connect-0.9.1.tgz#5ec78ceb581ab57d0b3c093c26d1540847ce36bc"
   integrity sha512-4O/PSMLWd3oQkwBuJBGBzFtPsnFC5dTRPGHFNFODna9wZJ6r45ccsOWsA4qXBL7gW2EKw93zRa0KVuge2dCOQQ==
