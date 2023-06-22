@@ -42,7 +42,7 @@
     "@aserto/node-directory": "^0.21.0",
     "@bufbuild/connect": "^0.9.0",
     "@bufbuild/connect-node": "^0.8.6",
-    "@bufbuild/protobuf": "^1.2.0",
+    "@bufbuild/protobuf": "^1.2.1",
     "@grpc/grpc-js": "^1.8.12",
     "express": "^4.18.2",
     "google-protobuf": "^3.21.2",
