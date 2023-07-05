@@ -17,6 +17,7 @@ import {
   GetObjectsResponse,
   GetRelationsResponse,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_pb";
+import { SetObjectRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v2/writer_pb";
 import { Empty, JsonValue } from "@bufbuild/protobuf";
 export = {
   jwtAuthz,
@@ -107,7 +108,7 @@ export interface Directory {
   objectMany: (
     params: PartialMessage<GetObjectManyRequest>
   ) => Promise<Object$[]>;
-  setObject: (params: JsonValue) => Promise<Object$>;
+  setObject: (params: PartialMessage<SetObjectRequest>) => Promise<Object$>;
   deleteObject: (
     params: PartialMessage<ObjectIdentifier>
   ) => Promise<Empty | undefined>;

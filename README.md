@@ -198,7 +198,7 @@ The Express request object.
 
 #### packageName argument
 
-By default, `is` will follow the same heuristic behavior as `jwtAuthz` - it will infer the packge name from the policy name, HTTP method, and route path. If provided, the `packageName` argument will override this and specify a policy package to use.
+By default, `is` will follow the same heuristic behavior as `jwtAuthz` - it will infer the package name from the policy name, HTTP method, and route path. If provided, the `packageName` argument will override this and specify a policy package to use.
 
 By convention, Aserto Rego policies are named in the form `policyRoot.METHOD.path`. Following the node.js idiom, you can also pass it in as `policyRoot/METHOD/path`, and the path can contain the Express parameter syntax.
 
@@ -304,17 +304,19 @@ const relations = await directoryClient.relation(
 
 #### 'setObject' function
 
-`setObject({ ...Object$ })`:
+`setObject({ object: $Object })`:
 
 Create an object instance with the specified fields. For example:
 
 ```typescript
 user = directoryClient.setObject(
   {
-    type: "user",
-    key: "test-object",
-    properties: {
-      displayName: "test object"
+    object: {
+      type: "user",
+      key: "test-object",
+      properties: {
+        displayName: "test object"
+    }
   }
 );
 ```

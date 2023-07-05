@@ -32,7 +32,7 @@ import {
   UnaryRequest,
 } from "@bufbuild/connect";
 import { createGrpcTransport } from "@bufbuild/connect-node";
-import { AnyMessage, JsonValue, PartialMessage } from "@bufbuild/protobuf";
+import { AnyMessage, PartialMessage } from "@bufbuild/protobuf";
 
 export interface Config {
   url?: string;
@@ -152,11 +152,9 @@ export class Directory {
     }
   }
 
-  async setObject(params: JsonValue) {
+  async setObject(params: PartialMessage<SetObjectRequest>) {
     try {
-      const setObjectRequest = new SetObjectRequest().fromJson({
-        object: params,
-      });
+      const setObjectRequest = new SetObjectRequest(params);
 
       const response = await this.WriterClient.setObject(setObjectRequest);
       if (!response) {
