@@ -82,11 +82,8 @@ export class Directory {
   }
 
   async checkPermission(params: PartialMessage<CheckPermissionRequest>) {
-    const checkPermissionRequest = new CheckPermissionRequest(params);
     try {
-      const response = await this.ReaderClient.checkPermission(
-        checkPermissionRequest
-      );
+      const response = await this.ReaderClient.checkPermission(params);
       return response.check;
     } catch (error) {
       handleError(error, "checkPermission");
@@ -94,11 +91,8 @@ export class Directory {
   }
 
   async checkRelation(params: PartialMessage<CheckRelationRequest>) {
-    const checkRelationRequest = new CheckRelationRequest(params);
     try {
-      const response = await this.ReaderClient.checkRelation(
-        checkRelationRequest
-      );
+      const response = await this.ReaderClient.checkRelation(params);
       return response.check;
     } catch (error) {
       handleError(error, "checkRelation");
@@ -139,10 +133,7 @@ export class Directory {
 
   async objectMany(params: PartialMessage<GetObjectManyRequest>) {
     try {
-      const getObjectManyRequest = new GetObjectManyRequest(params);
-      const response = await this.ReaderClient.getObjectMany(
-        getObjectManyRequest
-      );
+      const response = await this.ReaderClient.getObjectMany(params);
       if (!response) {
         throw new Error("No response from directory service");
       }
@@ -154,9 +145,7 @@ export class Directory {
 
   async setObject(params: PartialMessage<SetObjectRequest>) {
     try {
-      const setObjectRequest = new SetObjectRequest(params);
-
-      const response = await this.WriterClient.setObject(setObjectRequest);
+      const response = await this.WriterClient.setObject(params);
       if (!response) {
         throw new Error("No response from directory service");
       }
@@ -238,8 +227,7 @@ export class Directory {
 
   async graph(params: PartialMessage<GetGraphRequest>) {
     try {
-      const getGraphRequest = new GetGraphRequest(params);
-      const response = await this.ReaderClient.getGraph(getGraphRequest);
+      const response = await this.ReaderClient.getGraph(params);
       if (!response) {
         throw new Error("No response from directory service");
       }
