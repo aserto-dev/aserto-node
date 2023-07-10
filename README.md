@@ -309,16 +309,17 @@ const relations = await directoryClient.relation(
 Create an object instance with the specified fields. For example:
 
 ```typescript
-user = directoryClient.setObject(
-  {
-    object: {
-      type: "user",
-      key: "test-object",
-      properties: {
-        displayName: "test object"
-    }
-  }
-);
+import { Struct } from "@bufbuild/protobuf";
+
+const user = directoryClient.setObject({
+  object: {
+    type: "user",
+    key: "test-object1",
+    properties: Struct.fromJson({
+      displayName: "test object",
+    }),
+  },
+});
 ```
 
 #### 'setRelation' function
