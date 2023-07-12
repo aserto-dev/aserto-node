@@ -15,21 +15,20 @@
     "@jridgewell/gen-mapping" "^0.3.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@aserto/node-authorizer@^0.20.4":
-  version "0.20.4"
-  resolved "https://registry.yarnpkg.com/@aserto/node-authorizer/-/node-authorizer-0.20.4.tgz#9a0acb73bc4ffaf008b0a879c1e92be454216f66"
-  integrity sha512-WZTQX+aZ3QoZmi5kVIkXSf4u8KPuuRB45VFBGgnxPunzRDRFLC89+4GNhLLAKX4f7U4MEpQVFKh4S3kB7ZBpVA==
+"@aserto/node-authorizer@^0.20.5":
+  version "0.20.5"
+  resolved "https://registry.yarnpkg.com/@aserto/node-authorizer/-/node-authorizer-0.20.5.tgz#6c111e3ba87605e9d0c59ef4466628606cbf68b7"
+  integrity sha512-GuqUochQqhpmLHxvH+IZeQYPacrOA0pWQh8ynW+Yj247a+VM8MqVPwSAPa+R4Y+pVRigSLNh/E4u71P+ueoiOQ==
   dependencies:
-    "@grpc/grpc-js" "^1.6.11"
-    "@types/google-protobuf" "^3.15.6"
-    google-protobuf "^3.21.0"
-    grpc-tools "^1.11.2"
+    "@grpc/grpc-js" "^1.8.17"
+    google-protobuf "^3.21.2"
+    grpc-tools "^1.12.4"
     ts-node-dev "^2.0.0"
 
-"@aserto/node-directory@^0.21.1":
-  version "0.21.1"
-  resolved "https://registry.yarnpkg.com/@aserto/node-directory/-/node-directory-0.21.1.tgz#4171d13ffb87b7562e9530add2c05a5ab5473b58"
-  integrity sha512-5Ye2gGBaZ29+z0kTBeaqregK3ayybV1ip4oN0g3mK2rJZYLhkeKTrdAndxtToaLW4fz/RUlct1pd8n6+Uk6lKA==
+"@aserto/node-directory@^0.21.3":
+  version "0.21.3"
+  resolved "https://registry.yarnpkg.com/@aserto/node-directory/-/node-directory-0.21.3.tgz#890294b23f6a59863e409a433a3120b68ea87b6d"
+  integrity sha512-IhMMUiIm/2SiP7HzyDpeJ3P80clqsFTPDEII9UhwIWQ6i7Svq0ZjZk7DpwueFWU2+2Zl67tqFn/hOP5uwVPNBg==
   dependencies:
     "@grpc/grpc-js" "^1.8.17"
     google-protobuf "^3.21.2"
@@ -408,7 +407,7 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.44.0.tgz#961a5903c74139390478bdc808bcde3fc45ab7af"
   integrity sha512-Ag+9YM4ocKQx9AarydN0KY2j0ErMHNIocPDrVo8zAE44xLTjEtz81OdR68/cydGtk6m6jDb5Za3r2useMzYmSw==
 
-"@grpc/grpc-js@^1.6.11", "@grpc/grpc-js@^1.8.17":
+"@grpc/grpc-js@^1.8.17":
   version "1.8.17"
   resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.8.17.tgz#a3a2f826fc033eae7d2f5ee41e0ab39cee948838"
   integrity sha512-DGuSbtMFbaRsyffMf+VEkVu8HkSXEUfO3UyGJNtqxW9ABdtTIA+2UXAJpwbJS+xfQxuwqLUeELmL6FuZkOqPxw==
@@ -2457,7 +2456,7 @@ globby@^11.1.0:
     merge2 "^1.4.1"
     slash "^3.0.0"
 
-google-protobuf@^3.21.0, google-protobuf@^3.21.2:
+google-protobuf@^3.21.2:
   version "3.21.2"
   resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.21.2.tgz#4580a2bea8bbb291ee579d1fefb14d6fa3070ea4"
   integrity sha512-3MSOYFO5U9mPGikIYCzK0SaThypfGgS6bHqrUGXG3DPHCrb+txNqeEcns1W0lkGfk0rCyNXm7xB9rMxnCiZOoA==
@@ -2479,7 +2478,7 @@ graphemer@^1.4.0:
   resolved "https://registry.yarnpkg.com/graphemer/-/graphemer-1.4.0.tgz#fb2f1d55e0e3a1849aeffc90c4fa0dd53a0e66c6"
   integrity sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==
 
-grpc-tools@^1.11.2, grpc-tools@^1.12.4:
+grpc-tools@^1.12.4:
   version "1.12.4"
   resolved "https://registry.yarnpkg.com/grpc-tools/-/grpc-tools-1.12.4.tgz#a044c9e8157941033ea7a5f144c2dc9dc4501de4"
   integrity sha512-5+mLAJJma3BjnW/KQp6JBjUMgvu7Mu3dBvBPd1dcbNIb+qiR0817zDpgPjS7gRb+l/8EVNIa3cB02xI9JLToKg==
