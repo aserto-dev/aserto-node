@@ -41,7 +41,7 @@
     "@aserto/node-authorizer": "^0.20.5",
     "@aserto/node-directory": "^0.21.3",
     "@bufbuild/connect": "^0.10.0",
-    "@bufbuild/connect-node": "^0.10.0",
+    "@bufbuild/connect-node": "^0.11.0",
     "@bufbuild/protobuf": "^1.2.1",
     "@grpc/grpc-js": "^1.8.17",
     "express": "^4.18.2",
