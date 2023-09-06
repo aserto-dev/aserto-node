@@ -316,6 +316,7 @@ user = directoryClient.setObject(
       key: "test-object",
       properties: {
         displayName: "test object"
+      }
     }
   }
 );
@@ -339,7 +340,6 @@ const relation = await directoryClient.setRelation(
       type: 'objectType',
       key: 'objectKey',
     },
-
   }
 );
 ```
