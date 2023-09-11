@@ -9,16 +9,20 @@ import {
   RelationIdentifier,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v2/common_pb";
 import {
-  CheckPermissionRequest,
-  CheckRelationRequest,
   GetGraphRequest,
   GetObjectManyRequest,
   GetObjectResponse,
   GetObjectsResponse,
   GetRelationsResponse,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_pb";
-import { SetObjectRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v2/writer_pb";
-import { Empty, JsonValue } from "@bufbuild/protobuf";
+import { Empty, JsonValue, PlainMessage } from "@bufbuild/protobuf";
+
+import {
+  CheckPermissionRequest,
+  CheckRelationRequest,
+  SetObjectRequest,
+  SetRelationRequest,
+} from "./ds";
 export = {
   jwtAuthz,
   displayStateMap,
@@ -94,37 +98,29 @@ export interface IdentityContextOptions {
 }
 
 export interface Directory {
-  checkPermission: (
-    params: PartialMessage<CheckPermissionRequest>
-  ) => Promise<boolean>;
-  checkRelation: (
-    params: PartialMessage<CheckRelationRequest>
-  ) => Promise<boolean>;
-  object: (params: PartialMessage<ObjectIdentifier>) => Promise<Object$>;
+  checkPermission: (params: CheckPermissionRequest) => Promise<boolean>;
+  checkRelation: (params: CheckRelationRequest) => Promise<boolean>;
+  object: (params: PlainMessage<ObjectIdentifier>) => Promise<Object$>;
   objects: (params: {
-    objectType: PartialMessage<ObjectTypeIdentifier>;
-    page?: PartialMessage<PaginationRequest>;
+    objectType: ObjectTypeIdentifier;
+    page?: PlainMessage<PaginationRequest>;
   }) => Promise<GetObjectsResponse>;
   objectMany: (
-    params: PartialMessage<GetObjectManyRequest>
+    params: PlainMessage<GetObjectManyRequest>
   ) => Promise<Object$[]>;
-  setObject: (params: PartialMessage<SetObjectRequest>) => Promise<Object$>;
+  setObject: (params: SetObjectRequest) => Promise<Object$>;
   deleteObject: (
-    params: PartialMessage<ObjectIdentifier>
+    params: PlainMessage<ObjectIdentifier>
   ) => Promise<Empty | undefined>;
-  relation: (params: PartialMessage<RelationIdentifier>) => Promise<Relation[]>;
-  setRelation: (
-    params: PartialMessage<Relation>
-  ) => Promise<Relation | undefined>;
+  relation: (params: PlainMessage<RelationIdentifier>) => Promise<Relation[]>;
+  setRelation: (params: SetRelationRequest) => Promise<Relation | undefined>;
   deleteRelation: (
-    params: PartialMessage<RelationIdentifier>
+    params: PlainMessage<RelationIdentifier>
   ) => Promise<Empty | undefined>;
   relations: (
-    params: PartialMessage<RelationIdentifier>
+    params: PlainMessage<RelationIdentifier>
   ) => Promise<GetRelationsResponse>;
-  graph: (
-    params: PartialMessage<GetGraphRequest>
-  ) => Promise<ObjectDependency[]>;
+  graph: (params: PlainMessage<GetGraphRequest>) => Promise<ObjectDependency[]>;
 }
 
 export interface ServiceConfig {
