@@ -59,14 +59,24 @@ type PartialExcept<T, U extends string[]> = {
     : T[K];
 };
 
+type NestedOmit<T, K extends PropertyKey> = {
+  [P in keyof T as P extends K ? never : P]: NestedOmit<
+    T[P],
+    K extends `${Exclude<P, symbol>}.${infer R}` ? R : never
+  >;
+};
+
 export type SetRelationRequest = PartialExcept<
   PlainMessage<Relation>,
   ["hash"]
 >;
 
-export type SetObjectRequest =
-  | PartialExcept<PlainMessage<SetObjectRequest$>, ["object.hash"]>
-  | { object?: { properties: { [key: string]: JsonValue } } };
+export type SetObjectRequest = PartialExcept<
+  NestedOmit<PlainMessage<SetObjectRequest$>, "object.properties"> & {
+    object?: { properties?: { [key: string]: JsonValue } | Struct };
+  },
+  ["object.hash"]
+>;
 
 export type CheckPermissionRequest = PartialExcept<
   PlainMessage<CheckPermissionRequest$>,
@@ -192,13 +202,14 @@ export class Directory {
 
   async setObject(params: SetObjectRequest) {
     try {
-      if (params && params.object) {
-        params.object.properties = Struct.fromJsonString(
-          JSON.stringify(params.object?.properties || {})
-        );
-      }
+      const structProperties = Struct.fromJsonString(
+        JSON.stringify(params.object?.properties || {})
+      );
 
-      const newParams = new SetObjectRequest$(params);
+      const newParams: SetObjectRequest$ = new SetObjectRequest$({
+        object: { ...params.object, properties: structProperties },
+      });
+
       const response = await this.WriterClient.setObject(newParams);
       if (!response) {
         throw new Error("No response from directory service");
