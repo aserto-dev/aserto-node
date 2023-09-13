@@ -32,7 +32,12 @@ import {
   UnaryRequest,
 } from "@bufbuild/connect";
 import { createGrpcTransport } from "@bufbuild/connect-node";
-import { AnyMessage, PlainMessage } from "@bufbuild/protobuf";
+import {
+  AnyMessage,
+  JsonValue,
+  PlainMessage,
+  Struct,
+} from "@bufbuild/protobuf";
 
 export interface Config {
   url?: string;
@@ -59,10 +64,9 @@ export type SetRelationRequest = PartialExcept<
   ["hash"]
 >;
 
-type SetObjectRequest = PartialExcept<
-  PlainMessage<SetObjectRequest$>,
-  ["object.hash"]
->;
+type SetObjectRequest =
+  | PartialExcept<PlainMessage<SetObjectRequest$>, ["object.hash"]>
+  | { object?: { properties: { [key: string]: JsonValue } } };
 
 type CheckPermissionRequest = PartialExcept<
   PlainMessage<CheckPermissionRequest$>,
@@ -188,7 +192,14 @@ export class Directory {
 
   async setObject(params: SetObjectRequest) {
     try {
-      const response = await this.WriterClient.setObject(params);
+      if (params && params.object) {
+        params.object.properties = Struct.fromJsonString(
+          JSON.stringify(params.object?.properties || {})
+        );
+      }
+
+      const newParams = new SetObjectRequest$(params);
+      const response = await this.WriterClient.setObject(newParams);
       if (!response) {
         throw new Error("No response from directory service");
       }
