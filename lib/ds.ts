@@ -64,16 +64,16 @@ export type SetRelationRequest = PartialExcept<
   ["hash"]
 >;
 
-type SetObjectRequest =
+export type SetObjectRequest =
   | PartialExcept<PlainMessage<SetObjectRequest$>, ["object.hash"]>
   | { object?: { properties: { [key: string]: JsonValue } } };
 
-type CheckPermissionRequest = PartialExcept<
+export type CheckPermissionRequest = PartialExcept<
   PlainMessage<CheckPermissionRequest$>,
   ["trace"]
 >;
 
-type CheckRelationRequest = PartialExcept<
+export type CheckRelationRequest = PartialExcept<
   PlainMessage<CheckRelationRequest$>,
   ["trace"]
 >;
