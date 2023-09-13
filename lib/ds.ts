@@ -168,7 +168,7 @@ export class Directory {
     }
   }
   async objects(params: {
-    objectType: ObjectTypeIdentifier;
+    objectType: PlainMessage<ObjectTypeIdentifier>;
     page?: PlainMessage<PaginationRequest>;
   }) {
     try {

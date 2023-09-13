@@ -102,7 +102,7 @@ export interface Directory {
   checkRelation: (params: CheckRelationRequest) => Promise<boolean>;
   object: (params: PlainMessage<ObjectIdentifier>) => Promise<Object$>;
   objects: (params: {
-    objectType: ObjectTypeIdentifier;
+    objectType: PlainMessage<ObjectTypeIdentifier>;
     page?: PlainMessage<PaginationRequest>;
   }) => Promise<GetObjectsResponse>;
   objectMany: (
