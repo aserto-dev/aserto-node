@@ -314,7 +314,7 @@ user = directoryClient.setObject(
     object: {
       type: "user",
       key: "test-object",
-      properties:  {
+      properties: {
         displayName: "test object"
       }
     }
