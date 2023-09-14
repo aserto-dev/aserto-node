@@ -35,6 +35,7 @@ import { createGrpcTransport } from "@bufbuild/connect-node";
 import {
   AnyMessage,
   JsonValue,
+  PartialMessage,
   PlainMessage,
   Struct,
 } from "@bufbuild/protobuf";
@@ -169,7 +170,7 @@ export class Directory {
   }
   async objects(params: {
     objectType: PlainMessage<ObjectTypeIdentifier>;
-    page?: PlainMessage<PaginationRequest>;
+    page?: PartialMessage<PaginationRequest>;
   }) {
     try {
       const getObjectsRequest = new GetObjectsRequest({

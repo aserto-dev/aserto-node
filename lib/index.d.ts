@@ -103,7 +103,7 @@ export interface Directory {
   object: (params: PlainMessage<ObjectIdentifier>) => Promise<Object$>;
   objects: (params: {
     objectType: PlainMessage<ObjectTypeIdentifier>;
-    page?: PlainMessage<PaginationRequest>;
+    page?: PartialMessage<PaginationRequest>;
   }) => Promise<GetObjectsResponse>;
   objectMany: (
     params: PlainMessage<GetObjectManyRequest>
