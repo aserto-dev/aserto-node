@@ -7,8 +7,8 @@ import {
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v2/common_pb";
 import { Reader } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_connect";
 import {
-  CheckPermissionRequest,
-  CheckRelationRequest,
+  CheckPermissionRequest as CheckPermissionRequest$,
+  CheckRelationRequest as CheckRelationRequest$,
   GetGraphRequest,
   GetObjectManyRequest,
   GetObjectRequest,
@@ -20,8 +20,8 @@ import { Writer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writ
 import {
   DeleteObjectRequest,
   DeleteRelationRequest,
-  SetObjectRequest,
-  SetRelationRequest,
+  SetObjectRequest as SetObjectRequest$,
+  SetRelationRequest as SetRelationRequest$,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v2/writer_pb";
 import {
   ConnectError,
@@ -32,7 +32,12 @@ import {
   UnaryRequest,
 } from "@bufbuild/connect";
 import { createGrpcTransport } from "@bufbuild/connect-node";
-import { AnyMessage, PartialMessage } from "@bufbuild/protobuf";
+import {
+  AnyMessage,
+  JsonValue,
+  PlainMessage,
+  Struct,
+} from "@bufbuild/protobuf";
 
 export interface Config {
   url?: string;
@@ -40,6 +45,48 @@ export interface Config {
   apiKey?: string;
   rejectUnauthorized?: boolean;
 }
+
+// https://stackoverflow.com/a/72810677
+// Extend existing types to make specific fields optional.
+type NestedKeys<T extends string, U extends string[]> = {
+  [K in keyof U]: U[K] extends `${T}.${infer V}` ? V : never;
+};
+type PartialExcept<T, U extends string[]> = {
+  [K in keyof T as K extends U[number] ? K : never]?: T[K];
+} & {
+  [K in keyof T as K extends U[number] ? never : K]: K extends string
+    ? PartialExcept<T[K], NestedKeys<K, U>>
+    : T[K];
+};
+
+type NestedOmit<T, K extends PropertyKey> = {
+  [P in keyof T as P extends K ? never : P]: NestedOmit<
+    T[P],
+    K extends `${Exclude<P, symbol>}.${infer R}` ? R : never
+  >;
+};
+
+export type SetRelationRequest = PartialExcept<
+  PlainMessage<Relation>,
+  ["hash"]
+>;
+
+export type SetObjectRequest = PartialExcept<
+  NestedOmit<PlainMessage<SetObjectRequest$>, "object.properties"> & {
+    object?: { properties?: { [key: string]: JsonValue } | Struct };
+  },
+  ["object.hash"]
+>;
+
+export type CheckPermissionRequest = PartialExcept<
+  PlainMessage<CheckPermissionRequest$>,
+  ["trace"]
+>;
+
+export type CheckRelationRequest = PartialExcept<
+  PlainMessage<CheckRelationRequest$>,
+  ["trace"]
+>;
 
 export class Directory {
   ReaderClient: PromiseClient<typeof Reader>;
@@ -81,119 +128,145 @@ export class Directory {
     this.WriterClient = createPromiseClient(Writer, grpcTansport);
   }
 
-  async checkPermission(params: PartialMessage<CheckPermissionRequest>) {
+  async checkPermission(params: CheckPermissionRequest) {
     try {
       const response = await this.ReaderClient.checkPermission(params);
+      if (!response) {
+        throw new Error("No response from directory service");
+      }
+
       return response.check;
     } catch (error) {
       handleError(error, "checkPermission");
     }
   }
 
-  async checkRelation(params: PartialMessage<CheckRelationRequest>) {
+  async checkRelation(params: CheckRelationRequest) {
     try {
       const response = await this.ReaderClient.checkRelation(params);
+      if (!response) {
+        throw new Error("No response from directory service");
+      }
+
       return response.check;
     } catch (error) {
       handleError(error, "checkRelation");
     }
   }
 
-  async object(params: PartialMessage<ObjectIdentifier>) {
+  async object(params: PlainMessage<ObjectIdentifier>) {
     const getObjectRequest = new GetObjectRequest({ param: params });
     try {
       const response = await this.ReaderClient.getObject(getObjectRequest);
       if (!response) {
         throw new Error("No response from directory service");
       }
+
       return response.result;
     } catch (error) {
       handleError(error, "object");
     }
   }
   async objects(params: {
-    objectType: PartialMessage<ObjectTypeIdentifier>;
-    page?: PartialMessage<PaginationRequest>;
+    objectType: PlainMessage<ObjectTypeIdentifier>;
+    page?: PlainMessage<PaginationRequest>;
   }) {
     try {
       const getObjectsRequest = new GetObjectsRequest({
         param: params.objectType,
         page: params.page,
       });
-
       const response = await this.ReaderClient.getObjects(getObjectsRequest);
       if (!response) {
         throw new Error("No response from directory service");
       }
+
       return response;
     } catch (error) {
       handleError(error, "objects");
     }
   }
 
-  async objectMany(params: PartialMessage<GetObjectManyRequest>) {
+  async objectMany(params: PlainMessage<GetObjectManyRequest>) {
     try {
       const response = await this.ReaderClient.getObjectMany(params);
       if (!response) {
         throw new Error("No response from directory service");
       }
+
       return response.results;
     } catch (error) {
       handleError(error, "objectMany");
     }
   }
 
-  async setObject(params: PartialMessage<SetObjectRequest>) {
+  async setObject(params: SetObjectRequest) {
     try {
-      const response = await this.WriterClient.setObject(params);
+      const structProperties = Struct.fromJsonString(
+        JSON.stringify(params.object?.properties || {})
+      );
+
+      const newParams: SetObjectRequest$ = new SetObjectRequest$({
+        object: { ...params.object, properties: structProperties },
+      });
+
+      const response = await this.WriterClient.setObject(newParams);
       if (!response) {
         throw new Error("No response from directory service");
       }
+
       return response.result;
     } catch (error) {
       handleError(error, "setObject");
     }
   }
 
-  async deleteObject(params: PartialMessage<ObjectIdentifier>) {
+  async deleteObject(params: PlainMessage<ObjectIdentifier>) {
     const deleteObjectRequest = new DeleteObjectRequest({ param: params });
     try {
       const response = await this.WriterClient.deleteObject(
         deleteObjectRequest
       );
+      if (!response) {
+        throw new Error("No response from directory service");
+      }
+
       return response.result;
     } catch (error) {
       handleError(error, "deleteObject");
     }
   }
 
-  async relation(params: PartialMessage<RelationIdentifier>) {
+  async relation(params: PlainMessage<RelationIdentifier>) {
     const getRelationRequest = new GetRelationRequest({ param: params });
     try {
       const response = await this.ReaderClient.getRelation(getRelationRequest);
       if (!response) {
         throw new Error("No response from directory service");
       }
+
       return response.results;
     } catch (error) {
       handleError(error, "relation");
     }
   }
 
-  async setRelation(params: PartialMessage<Relation>) {
+  async setRelation(params: SetRelationRequest) {
     try {
-      const setRelationRequest = new SetRelationRequest({ relation: params });
+      const setRelationRequest = new SetRelationRequest$({ relation: params });
+
       const response = await this.WriterClient.setRelation(setRelationRequest);
       if (!response) {
         throw new Error("No response from directory service");
       }
+
       return response.result;
     } catch (error) {
       handleError(error, "setRelation");
     }
   }
 
-  async deleteRelation(params: PartialMessage<RelationIdentifier>) {
+  async deleteRelation(params: PlainMessage<RelationIdentifier>) {
     try {
       const deleteRelationRequest = new DeleteRelationRequest({
         param: params,
@@ -204,13 +277,14 @@ export class Directory {
       if (!response) {
         throw new Error("No response from directory service");
       }
+
       return response.result;
     } catch (error) {
       handleError(error, "deleteRelation");
     }
   }
 
-  async relations(params: PartialMessage<RelationIdentifier>) {
+  async relations(params: PlainMessage<RelationIdentifier>) {
     const getRelationsRequest = new GetRelationsRequest({ param: params });
     try {
       const response = await this.ReaderClient.getRelations(
@@ -219,18 +293,20 @@ export class Directory {
       if (!response) {
         throw new Error("No response from directory service");
       }
+
       return response;
     } catch (error) {
       handleError(error, "relations");
     }
   }
 
-  async graph(params: PartialMessage<GetGraphRequest>) {
+  async graph(params: PlainMessage<GetGraphRequest>) {
     try {
       const response = await this.ReaderClient.getGraph(params);
       if (!response) {
         throw new Error("No response from directory service");
       }
+
       return response.results;
     } catch (error) {
       handleError(error, "graph");

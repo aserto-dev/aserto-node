@@ -370,7 +370,7 @@ await directoryClient.deleteRelation(
     },
     relation: {
       name: 'relationName',
-      object_type: 'objectType',
+      objectType: 'objectType',
     },
     object: {
       type: 'objectType',
@@ -410,12 +410,12 @@ const check = await directoryClient.checkPermission(
 
 #### 'checkRelation' function
 
-`checkPermission({ subject: ObjectIdentifier, permission: PermissionIdentifier, object: ObjectIdentifier })`:
+`checkRelation({ subject: ObjectIdentifier, relation: RelationIdentifier, object: ObjectIdentifier })`:
 
 Check that `euang@acmecorp.com` has an `identifier` relation to an object with key `euang@acmecorp.com` and type `identity`:
 
 ```typescript
-const check = directoryClient.checkPermission(
+const check = directoryClient.checkRelation(
   {
     subject: {
       key: 'euang@acmecorp.com',
@@ -423,7 +423,7 @@ const check = directoryClient.checkPermission(
     },
     relation: {
        name: "identifier",
-       object_type: "identity"
+       objectType: "identity"
       },
     object: {
       type: 'identity',
