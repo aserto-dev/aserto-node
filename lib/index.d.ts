@@ -1,4 +1,6 @@
 import * as express from "express";
+import { IdentityContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/identity_context_pb";
+import { PolicyContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_context_pb";
 import {
   Object$,
   ObjectDependency,
@@ -17,6 +19,9 @@ import {
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_pb";
 import { Empty, JsonValue, PlainMessage } from "@bufbuild/protobuf";
 
+import { JWTIdentityMapper } from "./authorizer/mapper/identity/jwt";
+import { SubIdentityMapper } from "./authorizer/mapper/identity/sub";
+import { ResourceContext } from "./authorizer/model/resourceContext";
 import {
   CheckPermissionRequest,
   CheckRelationRequest,
@@ -32,12 +37,16 @@ export = {
   ServiceConfig,
   IdentityContextOptions,
   DisplayStateMapOptions,
+  SubIdentityMapper,
+  JWTIdentityMapper,
 };
 
 declare function jwtAuthz(
   options: jwtAuthz.AuthzOptions,
   packageName?: string,
-  resourceMap?: ResourceMapper
+  resourceMapper?: ResourceMapper,
+  identityMapper?: IdentityMapper,
+  policyMapper?: PolicyMapper
 ): express.Handler;
 
 declare function displayStateMap(
@@ -55,8 +64,11 @@ declare function is(
 declare function ds(config: ServiceConfig): Directory;
 
 export type ResourceMapper =
-  | object
-  | ((req: express.Request) => Promise<object>);
+  | ResourceContext
+  | ((req: express.Request) => Promise<ResourceContext>);
+
+export type IdentityMapper = (req: express.Request) => Promise<IdentityContext>;
+export type PolicyMapper = (req: express.Request) => Promise<PolicyContext>;
 
 export interface DisplayStateMapOptions {
   policyRoot: string;
@@ -73,6 +85,18 @@ export interface DisplayStateMapOptions {
   customUserKey?: string;
   customSubjectKey?: string;
   endpointPath?: string;
+}
+
+export interface AuthzConfig {
+  policyRoot: string;
+  instanceName?: string;
+  instanceLabel?: string;
+  authorizerServiceUrl: string;
+  authorizerApiKey?: string;
+  tenantId?: string;
+  authorizerCertCAFile?: string;
+  disableTlsValidation?: boolean;
+  failWithError?: boolean;
 }
 
 export interface AuthzOptions {

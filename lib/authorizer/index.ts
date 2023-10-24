@@ -7,6 +7,7 @@ import { PolicyContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/
 import { PolicyInstance } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_instance_pb";
 import { AuthorizerClient } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_grpc_pb";
 import {
+  DecisionTreeOptions,
   DecisionTreeRequest,
   DecisionTreeResponse,
   IsRequest,
@@ -19,6 +20,7 @@ import {
 import { ChannelCredentials, Metadata, ServiceError } from "@grpc/grpc-js";
 
 import { log } from "../log";
+import buildDecisionTreeOptions from "./model/decisionTreeOptions";
 import buildPolicyContext from "./model/policyContext";
 import { ResourceContext } from "./model/resourceContext";
 
@@ -149,11 +151,13 @@ export class Authorizer {
     policyInstance,
     policyContext = buildPolicyContext(),
     resourceContext = {},
+    decisionTreeOptions = buildDecisionTreeOptions("PATH_SEPARATOR_DOT"),
   }: {
     identityContext: IdentityContext;
     policyInstance?: PolicyInstance;
     policyContext?: PolicyContext;
     resourceContext?: ResourceContext;
+    decisionTreeOptions?: DecisionTreeOptions;
   }): Promise<{
     path:
       | {
@@ -167,6 +171,7 @@ export class Authorizer {
     request.setIdentityContext(identityContext);
     request.setPolicyContext(policyContext);
     request.setResourceContext(Struct.fromJavaScript(resourceContext));
+    request.setOptions(decisionTreeOptions);
 
     return new Promise((resolve, reject) => {
       try {

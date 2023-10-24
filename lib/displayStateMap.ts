@@ -1,24 +1,27 @@
 import { NextFunction, Request, Response } from "express";
-import { PolicyContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_context_pb";
-import { PolicyInstance } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_instance_pb";
-import { AuthorizerClient } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_grpc_pb";
-import {
-  DecisionTreeOptions,
-  DecisionTreeRequest,
-  DecisionTreeResponse,
-} from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_pb";
-import { Metadata, ServiceError } from "@grpc/grpc-js";
+import { IdentityContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/identity_context_pb";
 
+import { Authorizer } from "./authorizer";
+import ResourceParamsMapper from "./authorizer/mapper/resource/params";
+import decissionTreeOptions from "./authorizer/model/decisionTreeOptions";
+import policyContext from "./authorizer/model/policyContext";
+import policyInstance from "./authorizer/model/policyInstance";
 import { errorHandler } from "./errorHandler";
 import identityContext from "./identityContext";
-import { DisplayStateMapOptions } from "./index.d";
-import processOptions from "./processOptions";
 import {
-  JavaScriptValue,
-  Struct,
-} from "google-protobuf/google/protobuf/struct_pb";
+  DisplayStateMapOptions,
+  IdentityMapper,
+  PolicyMapper,
+  ResourceMapper,
+} from "./index.d";
+import processOptions from "./processOptions";
 
-const displayStateMap = (optionsParam: DisplayStateMapOptions) => {
+const displayStateMap = (
+  optionsParam: DisplayStateMapOptions,
+  resourceMapper?: ResourceMapper,
+  identityMapper?: IdentityMapper,
+  policyMapper?: PolicyMapper
+) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     let endpointPath = `/__displaystatemap`;
 
@@ -58,64 +61,41 @@ const displayStateMap = (optionsParam: DisplayStateMapOptions) => {
     const error = errorHandler(next, failWithError);
 
     const callAuthorizer = async () => {
-      return new Promise((resolve, reject) => {
-        try {
-          const metadata = new Metadata();
-          authorizerApiKey &&
-            metadata.add("authorization", `basic ${authorizerApiKey}`);
-          tenantId && metadata.add("aserto-tenant-id", tenantId);
+      const client = new Authorizer(
+        {
+          authorizerServiceUrl: authorizerUrl,
+          tenantId: tenantId!,
+          authorizerApiKey: authorizerApiKey!,
+        },
+        authorizerCert
+      );
 
-          const client = new AuthorizerClient(authorizerUrl, authorizerCert);
+      const identityCtx: IdentityContext = identityMapper
+        ? await identityMapper(req)
+        : identityContext(req, identityContextOptions);
+      const policyCtx = policyMapper
+        ? await policyMapper(req)
+        : policyContext(policyRoot, ["visible", "enabled"]);
 
-          const idContext = identityContext(req, identityContextOptions);
+      const resourceContext = resourceMapper
+        ? typeof resourceMapper === "function"
+          ? await resourceMapper(req)
+          : resourceMapper
+        : ResourceParamsMapper(req);
 
-          const policyContext = new PolicyContext();
-          policyContext.setPath(policyRoot);
-          policyContext.setDecisionsList(["visible", "enabled"]);
+      const policyInst =
+        instanceName && instanceLabel
+          ? policyInstance(instanceName as string, instanceLabel as string)
+          : undefined;
 
-          const decisionTreeRequest = new DecisionTreeRequest();
-          const decisionTreeOptions = new DecisionTreeOptions();
+      const decisionTreeOpt = decissionTreeOptions("PATH_SEPARATOR_SLASH");
 
-          if (instanceName && instanceLabel) {
-            const policyInstance = new PolicyInstance();
-            policyInstance.setName(instanceName);
-            policyInstance.setInstanceLabel(instanceLabel);
-            decisionTreeRequest.setPolicyInstance(policyInstance);
-          }
-
-          decisionTreeOptions.setPathSeparator(2);
-
-          const fields = req.body as { [key: string]: JavaScriptValue };
-          decisionTreeRequest.setResourceContext(Struct.fromJavaScript(fields));
-
-          decisionTreeRequest.setPolicyContext(policyContext);
-          decisionTreeRequest.setIdentityContext(idContext);
-          decisionTreeRequest.setOptions(decisionTreeOptions);
-
-          client.decisionTree(
-            decisionTreeRequest,
-            metadata,
-            (err: ServiceError, response: DecisionTreeResponse) => {
-              if (err) {
-                reject(`'displayStateMap' returned error: ${err.message}`);
-                return;
-              }
-
-              if (!response) {
-                reject(`'displayStateMap' returned error: No response`);
-                return;
-              }
-              if (response.hasPath()) {
-                resolve(response.getPath()?.toJavaScript());
-              } else {
-                reject("'displayStateMap' returned error: No path found");
-                return;
-              }
-            }
-          );
-        } catch (err) {
-          reject(`'displayStateMap' caught exception ${err}`);
-        }
+      return client.DecisionTree({
+        identityContext: identityCtx,
+        policyContext: policyCtx,
+        policyInstance: policyInst,
+        resourceContext: resourceContext,
+        decisionTreeOptions: decisionTreeOpt,
       });
     };
 

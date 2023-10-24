@@ -1,6 +1,9 @@
 import { Authorizer } from "./authorizer";
+import AnonymousIdentityMapper from "./authorizer/mapper/identity/anonymous";
 import JWTIdentityMapper from "./authorizer/mapper/identity/jwt";
 import SubIdentityMapper from "./authorizer/mapper/identity/sub";
+import PolicyPathMapper from "./authorizer/mapper/policy/path";
+import ResourceParamsMapper from "./authorizer/mapper/resource/params";
 import identityContext from "./authorizer/model/identityContext";
 import policyContext from "./authorizer/model/policyContext";
 import policyInstance from "./authorizer/model/policyInstance";
@@ -20,4 +23,7 @@ export {
   policyInstance,
   SubIdentityMapper,
   JWTIdentityMapper,
+  AnonymousIdentityMapper,
+  ResourceParamsMapper,
+  PolicyPathMapper,
 };
