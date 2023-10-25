@@ -3,6 +3,7 @@ import {
   Struct,
 } from "google-protobuf/google/protobuf/struct_pb";
 import { IdentityContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/identity_context_pb";
+import { Module } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/module_pb";
 import { PolicyContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_context_pb";
 import { PolicyInstance } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_instance_pb";
 import { AuthorizerClient } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_grpc_pb";
@@ -17,14 +18,18 @@ import {
   QueryRequest,
   QueryResponse,
 } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_pb";
-import { ChannelCredentials, Metadata, ServiceError } from "@grpc/grpc-js";
+import {
+  ChannelCredentials,
+  credentials,
+  Metadata,
+  ServiceError,
+} from "@grpc/grpc-js";
 
-import { log } from "../log";
 import buildDecisionTreeOptions from "./model/decisionTreeOptions";
 import buildPolicyContext from "./model/policyContext";
 import { ResourceContext } from "./model/resourceContext";
 
-export interface AuthorizerConfig {
+interface AuthorizerConfig {
   authorizerServiceUrl?: string;
   tenantId?: string;
   authorizerApiKey?: string;
@@ -35,7 +40,7 @@ export class Authorizer {
   Metadata: Metadata;
   constructor(
     config: AuthorizerConfig,
-    channelCredentials: ChannelCredentials
+    channelCredentials: ChannelCredentials = credentials.createSsl()
   ) {
     const url =
       config.authorizerServiceUrl ?? "authorizer.prod.aserto.com:8443";
@@ -66,8 +71,6 @@ export class Authorizer {
     request.setIdentityContext(identityContext);
     request.setPolicyContext(policyContext);
     request.setResourceContext(Struct.fromJavaScript(resourceContext));
-
-    log("identityContext", JSON.stringify(identityContext));
 
     return new Promise((resolve, reject) => {
       try {
@@ -208,7 +211,7 @@ export class Authorizer {
     policyInstance,
   }: {
     policyInstance: PolicyInstance;
-  }): Promise<unknown> {
+  }): Promise<Module.AsObject[]> {
     const request = new ListPoliciesRequest();
     request.setPolicyInstance(policyInstance);
 
@@ -241,3 +244,10 @@ export class Authorizer {
     });
   }
 }
+
+export const authz = (
+  config: AuthorizerConfig,
+  channel?: ChannelCredentials
+): Authorizer => {
+  return new Authorizer(config, channel);
+};

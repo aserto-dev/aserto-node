@@ -1,8 +1,7 @@
-
 {
-    "overrides": [
+  "overrides": [
     {
-      "files": [ "lib/**/*.ts" ],
+      "files": ["lib/**/*.ts"]
     }
   ]
 }

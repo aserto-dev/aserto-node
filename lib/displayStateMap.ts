@@ -3,19 +3,34 @@ import { IdentityContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v
 
 import { Authorizer } from "./authorizer";
 import ResourceParamsMapper from "./authorizer/mapper/resource/params";
+import {
+  IdentityMapper,
+  PolicyMapper,
+  ResourceMapper,
+} from "./authorizer/middleware";
 import decissionTreeOptions from "./authorizer/model/decisionTreeOptions";
 import policyContext from "./authorizer/model/policyContext";
 import policyInstance from "./authorizer/model/policyInstance";
 import { errorHandler } from "./errorHandler";
 import identityContext from "./identityContext";
-import {
-  DisplayStateMapOptions,
-  IdentityMapper,
-  PolicyMapper,
-  ResourceMapper,
-} from "./index.d";
 import processOptions from "./processOptions";
 
+interface DisplayStateMapOptions {
+  policyRoot: string;
+  instanceName: string;
+  instanceLabel?: string;
+  authorizerServiceUrl: string;
+  authorizerApiKey?: string;
+  tenantId?: string;
+  authorizerCertCAFile?: string;
+  disableTlsValidation?: boolean;
+  useAuthorizationHeader?: boolean;
+  identityHeader?: string;
+  failWithError?: boolean;
+  customUserKey?: string;
+  customSubjectKey?: string;
+  endpointPath?: string;
+}
 const displayStateMap = (
   optionsParam: DisplayStateMapOptions,
   resourceMapper?: ResourceMapper,

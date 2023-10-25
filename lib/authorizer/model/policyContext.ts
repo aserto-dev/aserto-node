@@ -1,6 +1,6 @@
 import { PolicyContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_context_pb";
 
-export default (
+const policyContext = (
   policyPath: string = "",
   decisionsList: Array<string> = ["allowed"]
 ) => {
@@ -10,3 +10,5 @@ export default (
 
   return policyContext;
 };
+
+export default policyContext;

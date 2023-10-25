@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Read Configuration
-        uses: hashicorp/vault-action@v2.5.0
+        uses: hashicorp/vault-action@v2.7.3
         id: vault
         with:
           url: ${{ env.VAULT_ADDR }}

@@ -3,7 +3,8 @@ import express from "express";
 import { credentials } from "@grpc/grpc-js";
 import { ChannelCredentials } from "@grpc/grpc-js";
 
-import { AuthzOptions, IdentityContextOptions } from "./index.d";
+import { IdentityContextOptions } from "./identityContext";
+import { AuthzOptions } from "./jwtAuthz";
 import { log } from "./log";
 import { getSSLCredentials } from "./ssl";
 

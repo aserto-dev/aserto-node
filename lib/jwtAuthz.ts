@@ -4,18 +4,33 @@ import { PolicyContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/
 
 import { Authorizer } from "./authorizer";
 import PolicyPathMapper from "./authorizer/mapper/policy/path";
-import ResourceParamsMapper from "./authorizer/mapper/resource/params";
+import {
+  IdentityMapper,
+  PolicyMapper,
+  ResourceMapper,
+} from "./authorizer/middleware";
 import policyContext from "./authorizer/model/policyContext";
 import policyInstance from "./authorizer/model/policyInstance";
 import { errorHandler } from "./errorHandler";
 import identityContext from "./identityContext";
-import {
-  AuthzOptions,
-  IdentityMapper,
-  PolicyMapper,
-  ResourceMapper,
-} from "./index.d";
 import processOptions from "./processOptions";
+import { processParams } from "./processParams";
+
+export interface AuthzOptions {
+  policyRoot: string;
+  instanceName?: string;
+  instanceLabel?: string;
+  authorizerServiceUrl: string;
+  authorizerApiKey?: string;
+  tenantId?: string;
+  authorizerCertCAFile?: string;
+  disableTlsValidation?: boolean;
+  useAuthorizationHeader?: boolean;
+  identityHeader?: string;
+  failWithError?: boolean;
+  customUserKey?: string;
+  customSubjectKey?: string;
+}
 
 const jwtAuthz = (
   optionsParam: AuthzOptions,
@@ -46,6 +61,14 @@ const jwtAuthz = (
 
     const error = errorHandler(next, failWithError);
 
+    // process the parameter values to extract policy and resourceContext
+    const { policy, resourceContext } = await processParams(
+      req,
+      policyRoot,
+      packageName,
+      resourceMapper
+    );
+
     const callAuthorizer = async () => {
       const client = new Authorizer(
         {
@@ -70,12 +93,6 @@ const jwtAuthz = (
           : PolicyPathMapper(policyRoot, req);
       }
 
-      const resourceContext = resourceMapper
-        ? typeof resourceMapper === "function"
-          ? await resourceMapper(req)
-          : resourceMapper
-        : ResourceParamsMapper(req);
-
       const policyInst =
         instanceName && instanceLabel
           ? policyInstance(instanceName as string, instanceLabel as string)
@@ -91,7 +108,7 @@ const jwtAuthz = (
 
     try {
       const allowed = await callAuthorizer();
-      return allowed ? next() : error(res, `Forbidden by policy ${policyRoot}`);
+      return allowed ? next() : error(res, `Forbidden by policy ${policy}`);
     } catch (err) {
       error(res, err as string);
     }

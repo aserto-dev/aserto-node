@@ -13,6 +13,9 @@ const PolicyPathMapper = (policyRoot: string, req: Request) => {
   // replace all '/' path components with '.' separators
   route = route.replace(/\//g, ".");
 
+  // replace all '-' path components with '_'
+  route = route.replace(/-/g, "_");
+
   // construct the policy name as appname.METHOD.route
   const packageName = `${policyRoot}.${req.method}${route}`;
 

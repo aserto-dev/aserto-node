@@ -35,6 +35,28 @@ yarn add @aserto/aserto-node
 
 > Note: the `authorizerServiceUrl` option that is used throughout is no longer a URL, but the option name is retained for backward-compatibility. It is now expected to be a hostname that exposes a gRPC binding. Any "https://" prefix is stripped out of the value provided.
 
+### Authorizer Client
+```ts
+const authClient = new Authorizer({
+  authorizerServiceUrl: "authorizer.eng.aserto.com:8443",
+  tenantId: "my-tenant-id",
+  authorizerApiKey: "my-authorizer-api-key",
+}, credentials.createSsl());
+
+await authClient
+  .Is({
+    identityContext: identityContext(
+      "morty@the-citadel.com",
+      "IDENTITY_TYPE_SUB"
+    ),
+    policyInstance: policyInstance("todo", "todo"),
+    policyContext: policyContext("todoApp.POST.todos", ["allowed"]),
+    resourceContext: {
+      ownerID: "fd1614d3-c39a-4781-b7bd-8b96f5a5100d",
+    },
+  })
+```
+
 ### jwtAuthz middleware
 
 `jwtAuthz` is an Express-compatible middleware that you can place in the dispatch pipeline of a route.
@@ -309,7 +331,7 @@ const relations = await directoryClient.relation(
 Create an object instance with the specified fields. For example:
 
 ```typescript
-user = directoryClient.setObject(
+const user = directoryClient.setObject(
   {
     object: {
       type: "user",

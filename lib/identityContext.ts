@@ -2,8 +2,13 @@
 import express from "express";
 import { IdentityContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/identity_context_pb";
 
-import { IdentityContextOptions } from "./index.d";
 import { log } from "./log";
+
+export interface IdentityContextOptions {
+  useAuthorizationHeader: boolean;
+  identity: string;
+  subject: string;
+}
 
 const jwt_decode = require("jwt-decode");
 

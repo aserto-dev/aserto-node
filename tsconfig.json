@@ -17,6 +17,7 @@
     "noUnusedParameters": true,
     "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
+    "declaration": true,
     "lib": ["esnext"]
   },
   "exclude": ["./node_modules"],

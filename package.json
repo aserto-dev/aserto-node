@@ -3,16 +3,19 @@
   "description": "Authorize access to an endpoint",
   "version": "0.23.0",
   "main": "dist/index.js",
-  "types": "lib/index.d.ts",
+  "types": "dist/index.d.ts",
   "author": "Aserto",
   "license": "MIT",
   "scripts": {
     "build": "rm -rf dist && tsc --build",
+    "check": "tsc --noEmit",
+    "detect-unused-exports": "scripts/detect-unused-exports.sh",
+    "dev:checks": "yarn lint --fix && yarn tsc && yarn detect-unused-exports && yarn test",
     "format": "prettier --write lib",
+    "lint": "eslint lib --max-warnings=0",
     "prepublishOnly": "NODE_ENV=production yarn build",
     "push": "scripts/publish.sh",
-    "test": "jest test --coverage",
-    "find-deadcode": "ts-prune"
+    "test": "jest test --coverage"
   },
   "files": [
     "lib",
@@ -59,7 +62,8 @@
     "axios-mock-adapter": "^1.21.2",
     "dotenv": "^16.0.3",
     "jest": "^29.2.0",
-    "node-mocks-http": "^1.11.0",
+    "njwt": "^2.0.0",
+    "node-mocks-http": "^1.13.0",
     "prettier": "^2.5.1",
     "ts-jest": "^29.0.3",
     "ts-prune": "^0.10.3",

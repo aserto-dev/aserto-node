@@ -40,7 +40,7 @@ import {
   Struct,
 } from "@bufbuild/protobuf";
 
-export interface Config {
+interface Config {
   url?: string;
   tenantId?: string;
   apiKey?: string;
@@ -67,24 +67,21 @@ type NestedOmit<T, K extends PropertyKey> = {
   >;
 };
 
-export type SetRelationRequest = PartialExcept<
-  PlainMessage<Relation>,
-  ["hash"]
->;
+type SetRelationRequest = PartialExcept<PlainMessage<Relation>, ["hash"]>;
 
-export type SetObjectRequest = PartialExcept<
+type SetObjectRequest = PartialExcept<
   NestedOmit<PlainMessage<SetObjectRequest$>, "object.properties"> & {
     object?: { properties?: { [key: string]: JsonValue } | Struct };
   },
   ["object.hash"]
 >;
 
-export type CheckPermissionRequest = PartialExcept<
+type CheckPermissionRequest = PartialExcept<
   PlainMessage<CheckPermissionRequest$>,
   ["trace"]
 >;
 
-export type CheckRelationRequest = PartialExcept<
+type CheckRelationRequest = PartialExcept<
   PlainMessage<CheckRelationRequest$>,
   ["trace"]
 >;
