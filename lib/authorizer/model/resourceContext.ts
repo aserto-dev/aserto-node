@@ -7,6 +7,6 @@ export type ResourceContext = {
 export type CheckResourceContext = {
   relation: string;
   object_type: string;
-  object_id: string;
+  object_key: string;
   subject_type: string;
 };

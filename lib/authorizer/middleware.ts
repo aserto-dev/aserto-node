@@ -96,7 +96,7 @@ export class Middleware {
       const callAuthorizer = async () => {
         const policyCtx = this.policyMapper
           ? await this.policyMapper(req)
-          : policyContext("rebac.check", ["allowed"]);
+          : policyContext(`${this.policy.root}.check`, ["allowed"]);
 
         let resourceContext: ResourceContext = await checkResourceMapper(
           options,
