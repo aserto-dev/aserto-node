@@ -1,8 +1,8 @@
-import { Request } from "express";
+import { IdentityContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/identity_context_pb";
 
 import identityContext from "../../model/identityContext";
 
-const AnonymousIdentityMapper = (_req: Request) => {
+const AnonymousIdentityMapper = async (): Promise<IdentityContext> => {
   return identityContext("", "IDENTITY_TYPE_NONE");
 };
 
