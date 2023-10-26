@@ -47,6 +47,6 @@ describe("should succeed", () => {
     const response = jwtAuthz(options);
 
     await response(request, res, next);
-    await expect(next).toBeCalled();
+    expect(next).toBeCalled();
   });
 });
