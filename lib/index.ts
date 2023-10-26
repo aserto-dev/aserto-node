@@ -11,6 +11,7 @@ import { displayStateMap } from "./displayStateMap";
 import { Directory, DirectoryConfig, ds } from "./ds";
 import { is } from "./is";
 import { AuthzOptions, jwtAuthz } from "./jwtAuthz";
+import getSSLCredentials from "./ssl";
 export {
   is,
   jwtAuthz,
@@ -30,4 +31,5 @@ export {
   identityContext,
   policyContext,
   policyInstance,
+  getSSLCredentials,
 };

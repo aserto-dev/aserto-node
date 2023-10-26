@@ -62,6 +62,17 @@ const authClient = new Authorizer({
 - `tenantId`: Aserto tenant ID (_required_ if using hosted authorizer)
 - `channelCredentials`: [gRPC channelCredentials](https://github.com/grpc/grpc-node/blob/master/packages/grpc-js/src/channel-credentials.ts)
 
+### Topaz
+```ts
+import { getSSLCredentials } from "@aserto/aserto-node";
+
+const ssLcredentials = getSSLCredentials()
+
+const authClient = new Authorizer({
+  authorizerServiceUrl: "localhost:8282",
+}, ssLcredentials);
+
+```
 
 ### Methods
 ```ts
@@ -156,10 +167,10 @@ type CheckOptions = {
 
 type ResourceMapper =
   | ResourceContext
-  | ((req: Request) => Promise<ResourceContext>);
+  | ((req?: Request) => Promise<ResourceContext>);
 
-type IdentityMapper = (req: Request) => Promise<IdentityContext>;
-type PolicyMapper = (req: Request) => Promise<PolicyContext>;
+type IdentityMapper = (req?: Request) => Promise<IdentityContext>;
+type PolicyMapper = (req?: Request) => Promise<PolicyContext>;
 ```
 
 #### Methods
@@ -250,6 +261,27 @@ const restMw = new Middleware({
 })
 ```
 
+### Policy
+
+The authorization policy's ID and the decision to be evaluated are specified when creating authorization Middleware, but the policy path is often derived from the URL or method being called.
+
+By default, the policy path is derived from the URL path
+
+To provide custom logic, use a PolicyMapper. For example:
+
+```ts
+// needs to return an IdentityContext
+import { identityContext } from "@aserto/aserto-node";
+
+const restMw = new Middleware({
+  client: authClient,
+  policy: policy,
+  policyMapper: async () => {
+    return policyContext('path', ['decission'])
+  }
+})
+```
+
 #### Resource
 A resource can be any structured data that the authorization policy uses to evaluate decisions. By default, the request params are included in the ResourceContext
 
@@ -259,10 +291,58 @@ This behavior can be overwritten by providing a custom function:
 const restMw = new Middleware({
   client: authClient,
   policy: policy,
-  resourceMapper: async (req: express.Request) => {
+  resourceMapper: async () => {
     return { customKey: "customValue" };
   },
 })
+```
+
+#### Mappers
+
+##### Resource
+
+```ts
+// provies a custom resource context,
+type ResourceMapper =
+  | ResourceContext
+  | ((req?: Request) => Promise<ResourceContext>);
+
+// examples
+async (req: Request) => { return { customKey: req.params.id } };
+// or just a plain resource context
+{ customKey: "customValue" }
+```
+
+##### Identity
+
+```ts
+type IdentityMapper = (req?: Request) => Promise<IdentityContext>;
+
+// You can also use the built-in policyContext function to create a identity context and pass it as the mapper response
+identityContext = (value: string, type: keyof IdentityTypeMap)
+
+IdentityTypeMap {
+  IDENTITY_TYPE_UNKNOWN: 0;
+  IDENTITY_TYPE_NONE: 1;
+  IDENTITY_TYPE_SUB: 2;
+  IDENTITY_TYPE_JWT: 3;
+}
+
+// example
+identityContext("morty@the-citadel.com", "IDENTITY_TYPE_SUB")
+```
+
+##### Policy
+
+```ts
+type PolicyMapper = (req?: Request) => Promise<PolicyContext>;
+
+
+// You can also use the built-in policyContext function to create a policy context and pass it as the mapper response
+policyContext = (policyPath: string, decisionsList: Array<string> = ["allowed"])
+
+// Example
+policyContext("todoApp.POST.todos", ["allowed"])
 ```
 
 ## Directory

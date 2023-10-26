@@ -6,7 +6,7 @@ import { ChannelCredentials } from "@grpc/grpc-js";
 import { IdentityContextOptions } from "./identityContext";
 import { AuthzOptions } from "./jwtAuthz";
 import { log } from "./log";
-import { getSSLCredentials } from "./ssl";
+import getSSLCredentials from "./ssl";
 
 export default (
   options: AuthzOptions,
