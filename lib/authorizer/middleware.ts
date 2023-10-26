@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { IdentityContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/identity_context_pb";
 import { PolicyContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_context_pb";
+import { PolicyInstance } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_instance_pb";
 
 import { errorHandler } from "../errorHandler";
-import { log } from "../log";
 import { Authorizer } from "./index";
 import JWTIdentityMapper from "./mapper/identity/jwt";
 import PolicyPathMapper from "./mapper/policy/path";
@@ -22,9 +22,20 @@ type Policy = {
 };
 
 export type CheckOptions = {
-  objectKey: string;
-  objectType: string;
-  relation: string;
+  object?: {
+    id?: string;
+    type?: string;
+    idMapper?: StringMapper;
+    mapper?: ObjectMapper;
+  };
+  relation?: {
+    name?: string;
+    mapper?: StringMapper;
+  };
+  subject?: {
+    type?: string;
+    mapper?: IdentityMapper;
+  };
 };
 
 export type ResourceMapper =
@@ -34,12 +45,17 @@ export type ResourceMapper =
 export type IdentityMapper = (req: Request) => Promise<IdentityContext>;
 export type PolicyMapper = (req: Request) => Promise<PolicyContext>;
 
+type ObjectMapper = (
+  req: Request
+) => Promise<{ objectId: string; objectType: string }>;
+type StringMapper = (req: Request) => Promise<string>;
+
 export class Middleware {
-  Client: Authorizer;
-  Policy: Policy;
-  ResourceMapper?: ResourceMapper;
-  IdentityMapper?: IdentityMapper;
-  PolicyMapper?: PolicyMapper;
+  client: Authorizer;
+  policy: Policy;
+  resourceMapper?: ResourceMapper;
+  identityMapper?: IdentityMapper;
+  policyMapper?: PolicyMapper;
   constructor({
     client,
     policy,
@@ -53,11 +69,23 @@ export class Middleware {
     identityMapper?: IdentityMapper;
     policyMapper?: PolicyMapper;
   }) {
-    this.Client = client;
-    this.Policy = policy;
-    this.ResourceMapper = resourceMapper;
-    this.IdentityMapper = identityMapper;
-    this.PolicyMapper = policyMapper;
+    this.client = client;
+    this.policy = policy;
+    this.resourceMapper = resourceMapper;
+    this.identityMapper = identityMapper;
+    this.policyMapper = policyMapper;
+  }
+
+  private policyInstance(): PolicyInstance | undefined {
+    return this.policy.name && this.policy.instanceLabel
+      ? policyInstance(this.policy.name, this.policy.instanceLabel)
+      : undefined;
+  }
+
+  private async identityContext(req: Request): Promise<IdentityContext> {
+    return this.identityMapper
+      ? this.identityMapper(req)
+      : JWTIdentityMapper(req);
   }
 
   // Check Middleware
@@ -66,45 +94,35 @@ export class Middleware {
       const error = errorHandler(next, true);
 
       const callAuthorizer = async () => {
-        const identityCtx: IdentityContext = this.IdentityMapper
-          ? await this.IdentityMapper(req)
-          : JWTIdentityMapper(req);
-
-        const policyCtx = this.PolicyMapper
-          ? await this.PolicyMapper(req)
+        const policyCtx = this.policyMapper
+          ? await this.policyMapper(req)
           : policyContext("rebac.check", ["allowed"]);
 
-        let resourceContext: ResourceContext = checkResourceMapper(
+        let resourceContext: ResourceContext = await checkResourceMapper(
           options,
           req
         );
-        if (typeof this.ResourceMapper === "function") {
+        if (typeof this.resourceMapper === "function") {
           resourceContext = {
             ...resourceContext,
-            ...(await this.ResourceMapper(req)),
+            ...(await this.resourceMapper(req)),
           };
         } else {
-          resourceContext = { ...resourceContext, ...this.ResourceMapper };
+          resourceContext = { ...resourceContext, ...this.resourceMapper };
         }
 
-        const policyInst =
-          this.Policy.name && this.Policy.instanceLabel
-            ? policyInstance(this.Policy.name, this.Policy.instanceLabel)
-            : undefined;
-
-        return this.Client.Is({
-          identityContext: identityCtx,
+        return this.client.Is({
+          identityContext: await this.identityContext(req),
           policyContext: policyCtx,
-          policyInstance: policyInst,
+          policyInstance: this.policyInstance(),
           resourceContext: resourceContext,
         });
       };
       try {
         const allowed = await callAuthorizer();
-        log(`Requested evaluated with: ${allowed}`);
         return allowed
           ? next()
-          : error(res, `Forbidden by policy ${this.Policy.root}`);
+          : error(res, `Forbidden by policy ${this.policy.root}`);
       } catch (err) {
         error(res, err as string);
       }
@@ -117,41 +135,37 @@ export class Middleware {
       const error = errorHandler(next, true);
 
       const callAuthorizer = async () => {
-        const identityCtx: IdentityContext = this.IdentityMapper
-          ? await this.IdentityMapper(req)
-          : JWTIdentityMapper(req);
+        const policyCtx = this.policyMapper
+          ? await this.policyMapper(req)
+          : PolicyPathMapper(this.policy.root, req);
 
-        const policyCtx = this.PolicyMapper
-          ? await this.PolicyMapper(req)
-          : PolicyPathMapper(this.Policy.root, req);
-
-        const resourceContext = this.ResourceMapper
-          ? typeof this.ResourceMapper === "function"
-            ? await this.ResourceMapper(req)
-            : this.ResourceMapper
+        const resourceContext = this.resourceMapper
+          ? typeof this.resourceMapper === "function"
+            ? await this.resourceMapper(req)
+            : this.resourceMapper
           : ResourceParamsMapper(req);
 
-        const policyInst =
-          this.Policy.name && this.Policy.instanceLabel
-            ? policyInstance(this.Policy.name, this.Policy.instanceLabel)
-            : undefined;
-
-        return this.Client.Is({
-          identityContext: identityCtx,
+        return this.client.Is({
+          identityContext: await this.identityContext(req),
           policyContext: policyCtx,
-          policyInstance: policyInst,
+          policyInstance: this.policyInstance(),
           resourceContext: resourceContext,
         });
       };
       try {
         const allowed = await callAuthorizer();
-        log(`Requested evaluated with: ${allowed}`);
         return allowed
           ? next()
-          : error(res, `Forbidden by policy ${this.Policy.root}`);
+          : error(res, `Forbidden by policy ${this.policy.root}`);
       } catch (err) {
         error(res, err as string);
       }
     };
   }
 }
+
+export const ObjectIDFromVar = (key: string) => {
+  return async (req: Request) => {
+    return req.params?.[key];
+  };
+};

@@ -36,8 +36,8 @@ interface AuthorizerConfig {
   authorizerCertFile?: string;
 }
 export class Authorizer {
-  Client: AuthorizerClient;
-  Metadata: Metadata;
+  client: AuthorizerClient;
+  metadata: Metadata;
   constructor(
     config: AuthorizerConfig,
     channelCredentials: ChannelCredentials = credentials.createSsl()
@@ -50,8 +50,8 @@ export class Authorizer {
       metadata.add("authorization", `basic ${config.authorizerApiKey}`);
     config.tenantId && metadata.add("aserto-tenant-id", config.tenantId);
 
-    this.Metadata = metadata;
-    this.Client = new AuthorizerClient(url, channelCredentials);
+    this.metadata = metadata;
+    this.client = new AuthorizerClient(url, channelCredentials);
   }
 
   async Is({
@@ -74,9 +74,9 @@ export class Authorizer {
 
     return new Promise((resolve, reject) => {
       try {
-        this.Client.is(
+        this.client.is(
           request,
-          this.Metadata,
+          this.metadata,
           (err: ServiceError, response: IsResponse) => {
             if (err) {
               const message = `'is' returned error: ${err.message}`;
@@ -123,9 +123,9 @@ export class Authorizer {
 
     return new Promise((resolve, reject) => {
       try {
-        this.Client.query(
+        this.client.query(
           request,
-          this.Metadata,
+          this.metadata,
           (err: ServiceError, response: QueryResponse) => {
             if (err) {
               const message = `'query' returned error: ${err.message}`;
@@ -178,9 +178,9 @@ export class Authorizer {
 
     return new Promise((resolve, reject) => {
       try {
-        this.Client.decisionTree(
+        this.client.decisionTree(
           request,
-          this.Metadata,
+          this.metadata,
           (err: ServiceError, response: DecisionTreeResponse) => {
             if (err) {
               const message = `'decisionTree' returned error: ${err.message}`;
@@ -217,9 +217,9 @@ export class Authorizer {
 
     return new Promise((resolve, reject) => {
       try {
-        this.Client.listPolicies(
+        this.client.listPolicies(
           request,
-          this.Metadata,
+          this.metadata,
           (err: ServiceError, response: ListPoliciesResponse) => {
             if (err) {
               const message = `'listPolicies' returned error: ${err.message}`;

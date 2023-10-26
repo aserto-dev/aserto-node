@@ -2,11 +2,12 @@ import { Authorizer, authz } from "./authorizer";
 import AnonymousIdentityMapper from "./authorizer/mapper/identity/anonymous";
 import JWTIdentityMapper from "./authorizer/mapper/identity/jwt";
 import SubIdentityMapper from "./authorizer/mapper/identity/sub";
-import { Middleware } from "./authorizer/middleware";
+import PolicyPathMapper from "./authorizer/mapper/policy/path";
+import { Middleware, ObjectIDFromVar } from "./authorizer/middleware";
 import { displayStateMap } from "./displayStateMap";
-import { Directory, ds } from "./ds";
+import { Directory, DirectoryConfig, ds } from "./ds";
 import { is } from "./is";
-import { jwtAuthz } from "./jwtAuthz";
+import { AuthzOptions, jwtAuthz } from "./jwtAuthz";
 export {
   is,
   jwtAuthz,
@@ -19,4 +20,8 @@ export {
   SubIdentityMapper,
   JWTIdentityMapper,
   AnonymousIdentityMapper,
+  DirectoryConfig,
+  AuthzOptions,
+  PolicyPathMapper,
+  ObjectIDFromVar,
 };

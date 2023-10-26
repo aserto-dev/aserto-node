@@ -40,7 +40,7 @@ import {
   Struct,
 } from "@bufbuild/protobuf";
 
-interface Config {
+export interface DirectoryConfig {
   url?: string;
   tenantId?: string;
   apiKey?: string;
@@ -90,7 +90,7 @@ export class Directory {
   ReaderClient: PromiseClient<typeof Reader>;
   WriterClient: PromiseClient<typeof Writer>;
 
-  constructor(config: Config) {
+  constructor(config: DirectoryConfig) {
     const setHeader = (
       req:
         | UnaryRequest<AnyMessage, AnyMessage>
@@ -322,6 +322,6 @@ function handleError(error: unknown, method: string) {
   }
 }
 
-export const ds = (config: Config): Directory => {
+export const ds = (config: DirectoryConfig): Directory => {
   return new Directory(config);
 };
