@@ -3,7 +3,7 @@ import jwt_decode, { JwtPayload } from "jwt-decode";
 
 import identityContext from "../../model/identityContext";
 
-const SubIdentityMapper = (req: Request) => {
+const SubIdentityMapper = async (req: Request) => {
   try {
     // decode the JWT to make sure it's valid
     if (req.headers && req.headers.authorization) {

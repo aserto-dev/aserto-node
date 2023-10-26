@@ -29,12 +29,12 @@ import buildDecisionTreeOptions from "./model/decisionTreeOptions";
 import buildPolicyContext from "./model/policyContext";
 import { ResourceContext } from "./model/resourceContext";
 
-interface AuthorizerConfig {
+type AuthorizerConfig = {
   authorizerServiceUrl?: string;
   tenantId?: string;
   authorizerApiKey?: string;
   authorizerCertFile?: string;
-}
+};
 export class Authorizer {
   client: AuthorizerClient;
   metadata: Metadata;

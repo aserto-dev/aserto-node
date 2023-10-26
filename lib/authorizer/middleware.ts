@@ -40,15 +40,15 @@ export type CheckOptions = {
 
 export type ResourceMapper =
   | ResourceContext
-  | ((req: Request) => Promise<ResourceContext>);
+  | ((req?: Request) => Promise<ResourceContext>);
 
-export type IdentityMapper = (req: Request) => Promise<IdentityContext>;
-export type PolicyMapper = (req: Request) => Promise<PolicyContext>;
+export type IdentityMapper = (req?: Request) => Promise<IdentityContext>;
+export type PolicyMapper = (req?: Request) => Promise<PolicyContext>;
 
 type ObjectMapper = (
-  req: Request
+  req?: Request
 ) => Promise<{ objectId: string; objectType: string }>;
-type StringMapper = (req: Request) => Promise<string>;
+type StringMapper = (req?: Request) => Promise<string>;
 
 export class Middleware {
   client: Authorizer;

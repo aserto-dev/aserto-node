@@ -3,7 +3,7 @@ import jwt_decode from "jwt-decode";
 
 import identityContext from "../../model/identityContext";
 
-const JWTIdentityMapper = (req: Request) => {
+const JWTIdentityMapper = async (req: Request) => {
   try {
     // decode the JWT to make sure it's valid
     if (req.headers && req.headers.authorization) {

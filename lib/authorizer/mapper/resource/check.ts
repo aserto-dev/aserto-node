@@ -6,7 +6,7 @@ import { CheckResourceContext } from "../../model/resourceContext";
 export default async (
   options: CheckOptions,
   req: Request
-): Promise<CheckResourceContext> => {
+): Promise<Promise<CheckResourceContext>> => {
   const [objectId, objectType] = await object(options, req);
   const rel = await relation(options, req);
   return {
