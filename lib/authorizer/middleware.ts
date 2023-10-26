@@ -96,7 +96,9 @@ export class Middleware {
       const callAuthorizer = async () => {
         const policyCtx = this.policyMapper
           ? await this.policyMapper(req)
-          : policyContext(`${this.policy.root}.check`, ["allowed"]);
+          : policyContext(`${this.policy.root}.check`, [
+              this.policy.decission || "allowed",
+            ]);
 
         let resourceContext: ResourceContext = await checkResourceMapper(
           options,
@@ -130,7 +132,7 @@ export class Middleware {
   }
 
   // Standard REST Authorization Middleware
-  Is() {
+  Authz() {
     return async (req: Request, res: Response, next: NextFunction) => {
       const error = errorHandler(next, true);
 

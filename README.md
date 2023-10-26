@@ -176,7 +176,7 @@ type PolicyMapper = (req?: Request) => Promise<PolicyContext>;
 #### Methods
 
 ```ts
-function Is()
+function Authz()
 function Check(options: CheckOptions)
 ```
 
@@ -203,9 +203,9 @@ const restMw = new Middleware({
   },
 })
 
-app.get("/todos", checkJwt, restMw.Is(), server.list.bind(server));
-app.post("/todos", checkJwt, restMw.Is(), server.create.bind(server));
-app.put("/todos/:id", checkJwt, restMw.Is(), server.update.bind(server));
+app.get("/todos", checkJwt, restMw.Authz(), server.list.bind(server));
+app.post("/todos", checkJwt, restMw.Authz(), server.create.bind(server));
+app.put("/todos/:id", checkJwt, restMw.Authz(), server.update.bind(server));
 
 
 // Check
@@ -760,7 +760,7 @@ For example, passing in `policyRoot/GET/api/users/:id` will resolve to a policy 
 
 By default, `is` follows the same behavior as `jwtAuthz` in that resource map will be `req.params`. For example, if the route path is `/api/users/:id`, the resource will be `{ 'id': 'value-of-id' }`.
 
-Passing in the `resourceMap` parameter into the `is()` function will override this behavior.
+Passing in the `resourceMap` parameter into the `Authz()` function will override this behavior.
 
 The provided value can be either an object or a function that takes an http request and returns an object.
 
