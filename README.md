@@ -245,6 +245,14 @@ const restMw = new Middleware({
   identityMapper: SubIdentityMapper,
 })
 
+// use the jwt type sub from a custom header
+import { JWTIdentityMapper } from "@aserto/aserto-node";
+
+const restMw = new Middleware({
+  client: authClient,
+  policy: policy,
+  identityMapper: JWTIdentityMapper("my-header");,
+})
 ```
 
 The whole identity resolution can be overwritten by providing a custom function.

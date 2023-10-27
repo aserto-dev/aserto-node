@@ -2,27 +2,27 @@ import { Request } from "express";
 import jwt_decode from "jwt-decode";
 import { IdentityContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/identity_context_pb";
 
+import { IdentityMapper } from "../../middleware";
 import identityContext from "../../model/identityContext";
 
-const JWTIdentityMapper = async (req: Request): Promise<IdentityContext> => {
-  return new Promise((resolve, reject) => {
-    try {
+const JWTIdentityMapper = (
+  header: string = "Authorization"
+): IdentityMapper => {
+  return async (req: Request): Promise<IdentityContext> => {
+    const authHeader = req.header(header);
+    if (authHeader) {
       // decode the JWT to make sure it's valid
-      if (req.headers && req.headers.authorization) {
-        jwt_decode(req.headers.authorization);
-        const bearer = req.headers.authorization.split(" ")[1];
-        if (bearer) {
-          resolve(identityContext(bearer, "IDENTITY_TYPE_JWT"));
-        } else {
-          reject("Missing token");
-        }
+      jwt_decode(authHeader);
+      const bearer = authHeader.split(" ")[1];
+      if (bearer && bearer !== "") {
+        return identityContext(bearer, "IDENTITY_TYPE_JWT");
       } else {
-        reject("Missing authorization header");
+        throw new Error("Missing token");
       }
-    } catch (error) {
-      reject(`Invalid JWT token: ${(error as Error).message}`);
+    } else {
+      throw new Error(`Missing ${header} header`);
     }
-  });
+  };
 };
 
 export default JWTIdentityMapper;

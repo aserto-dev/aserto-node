@@ -42,7 +42,7 @@ export type ResourceMapper =
   | ResourceContext
   | ((req?: Request) => Promise<ResourceContext>);
 
-export type IdentityMapper = (req?: Request) => Promise<IdentityContext>;
+export type IdentityMapper = (req: Request) => Promise<IdentityContext>;
 export type PolicyMapper = (req?: Request) => Promise<PolicyContext>;
 
 type ObjectMapper = (
@@ -83,9 +83,8 @@ export class Middleware {
   }
 
   private async identityContext(req: Request): Promise<IdentityContext> {
-    return this.identityMapper
-      ? this.identityMapper(req)
-      : JWTIdentityMapper(req);
+    const idMapper = this.identityMapper || JWTIdentityMapper();
+    return idMapper(req);
   }
 
   // Check Middleware
