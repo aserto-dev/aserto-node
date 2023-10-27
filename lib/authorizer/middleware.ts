@@ -33,7 +33,6 @@ export type CheckOptions = {
   };
   subject?: {
     type?: string;
-    mapper?: IdentityMapper;
   };
 };
 
