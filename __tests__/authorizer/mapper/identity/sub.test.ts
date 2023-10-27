@@ -1,9 +1,12 @@
+import { InvalidTokenError } from "jwt-decode";
 import nJwt from "njwt";
 import httpMocks from "node-mocks-http";
 
 import SubIdentityMapper from "../../../../lib/authorizer/mapper/identity/sub";
 import identityContext from "../../../../lib/authorizer/model/identityContext";
 describe("SubIdentityMapper", () => {
+  const subMapper = SubIdentityMapper();
+
   it("throws an error if the JWT token is invalid", async () => {
     const req = httpMocks.createRequest({
       headers: {
@@ -11,7 +14,11 @@ describe("SubIdentityMapper", () => {
       },
     });
 
-    await expect(SubIdentityMapper(req)).rejects.toMatch(/Invalid JWT token/);
+    await expect(subMapper(req)).rejects.toEqual(
+      new InvalidTokenError(
+        "Invalid token specified: Cannot read properties of undefined (reading 'replace')"
+      )
+    );
   });
 
   it("throws an error if the token is missing in the authorization header", async () => {
@@ -21,14 +28,18 @@ describe("SubIdentityMapper", () => {
       },
     });
 
-    await expect(SubIdentityMapper(req)).rejects.toMatch(/Invalid JWT token/);
+    await expect(subMapper(req)).rejects.toEqual(
+      new InvalidTokenError(
+        "Invalid token specified: Cannot read properties of undefined (reading 'replace')"
+      )
+    );
   });
 
   it("throws an error if the authorization header is missing", async () => {
     const req = httpMocks.createRequest({});
 
-    await expect(SubIdentityMapper(req)).rejects.toEqual(
-      "Missing authorization header"
+    await expect(subMapper(req)).rejects.toEqual(
+      new Error("Missing Authorization header")
     );
   });
 
@@ -40,7 +51,7 @@ describe("SubIdentityMapper", () => {
       },
     });
 
-    const result = await SubIdentityMapper(req);
+    const result = await subMapper(req);
 
     expect(result).toEqual(identityContext("test", "IDENTITY_TYPE_SUB"));
   });
