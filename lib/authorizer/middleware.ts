@@ -22,15 +22,14 @@ type Policy = {
 };
 
 export type CheckOptions = {
-  object?: {
-    id?: string;
-    type?: string;
-    idMapper?: StringMapper;
-    mapper?: ObjectMapper;
-  };
+  object?:
+    | {
+        id?: string | StringMapper;
+        type?: string;
+      }
+    | ObjectMapper;
   relation?: {
-    name?: string;
-    mapper?: StringMapper;
+    name?: string | StringMapper;
   };
   subject?: {
     type?: string;

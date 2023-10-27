@@ -21,30 +21,28 @@ const relation = async (
   options: CheckOptions,
   req: Request
 ): Promise<string> => {
-  let name = options.relation?.name;
-  if (options.relation?.mapper) {
-    name = await options.relation.mapper(req);
+  const relation = options.relation?.name;
+  if (typeof relation === "function") {
+    return await relation(req);
   }
 
-  return name || "";
+  return relation || "";
 };
 
 const object = async (
   options: CheckOptions,
   req: Request
 ): Promise<[string, string]> => {
-  let objectId = options.object?.id;
-  let objectType = options.object?.type;
-
-  if (options.object?.idMapper) {
-    objectId = await options.object.idMapper(req);
+  const object = options.object;
+  if (typeof object === "function") {
+    const obj = await object(req);
+    return [obj.objectId, obj.objectType];
   }
 
-  if (options.object?.mapper) {
-    const obj = await options.object.mapper(req);
-    objectId = obj.objectId;
-    objectType = obj.objectType;
+  const id = object?.id;
+  if (typeof id === "function") {
+    return [await id(req), object?.type || ""];
   }
 
-  return [objectId || "", objectType || ""];
+  return [id || "", object?.type || ""];
 };
