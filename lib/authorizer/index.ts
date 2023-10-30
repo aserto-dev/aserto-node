@@ -15,6 +15,7 @@ import {
   IsResponse,
   ListPoliciesRequest,
   ListPoliciesResponse,
+  QueryOptions,
   QueryRequest,
   QueryResponse,
 } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_pb";
@@ -27,6 +28,7 @@ import {
 
 import buildDecisionTreeOptions from "./model/decisionTreeOptions";
 import buildPolicyContext from "./model/policyContext";
+import buildQueryOptions from "./model/queryOptions";
 import { ResourceContext } from "./model/resourceContext";
 
 type AuthorizerConfig = {
@@ -103,16 +105,18 @@ export class Authorizer {
   }
   async Query({
     identityContext,
+    query,
     policyInstance,
     policyContext = buildPolicyContext(),
     resourceContext = {},
-    query,
+    queryOptions = buildQueryOptions(),
   }: {
     identityContext: IdentityContext;
+    query: string;
     policyInstance?: PolicyInstance;
     policyContext?: PolicyContext;
     resourceContext?: ResourceContext;
-    query: string;
+    queryOptions?: QueryOptions;
   }): Promise<{ [key: string]: JavaScriptValue } | undefined> {
     const request = new QueryRequest();
     policyInstance && request.setPolicyInstance(policyInstance);
@@ -120,6 +124,7 @@ export class Authorizer {
     request.setPolicyContext(policyContext);
     request.setResourceContext(Struct.fromJavaScript(resourceContext));
     request.setQuery(query);
+    request.setOptions(queryOptions);
 
     return new Promise((resolve, reject) => {
       try {
