@@ -82,7 +82,10 @@ export class Middleware {
 
   private async identityContext(req: Request): Promise<IdentityContext> {
     const idMapper = this.identityMapper || JWTIdentityMapper();
-    return idMapper(req);
+    if (typeof idMapper === "function") {
+      return idMapper(req);
+    }
+    return idMapper;
   }
 
   // Check Middleware

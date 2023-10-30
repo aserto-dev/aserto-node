@@ -5,9 +5,11 @@ import ManualIdentityMapper from "./authorizer/mapper/identity/manual";
 import SubIdentityMapper from "./authorizer/mapper/identity/sub";
 import PolicyPathMapper from "./authorizer/mapper/policy/path";
 import { Middleware, ObjectIDFromVar } from "./authorizer/middleware";
+import decisionTreeOptions from "./authorizer/model/decisionTreeOptions";
 import identityContext from "./authorizer/model/identityContext";
 import policyContext from "./authorizer/model/policyContext";
 import policyInstance from "./authorizer/model/policyInstance";
+import queryOptions from "./authorizer/model/queryOptions";
 import { displayStateMap } from "./displayStateMap";
 import { Directory, DirectoryConfig, ds } from "./ds";
 import { is } from "./is";
@@ -34,4 +36,6 @@ export {
   policyContext,
   policyInstance,
   getSSLCredentials,
+  queryOptions,
+  decisionTreeOptions,
 };
