@@ -56,3 +56,6 @@ jobs:
       - run: yarn install --frozen-lockfile
       - name: tests
         run: yarn --verbose test --verbose
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
