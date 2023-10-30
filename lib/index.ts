@@ -1,6 +1,7 @@
 import { Authorizer, authz } from "./authorizer";
 import AnonymousIdentityMapper from "./authorizer/mapper/identity/anonymous";
 import JWTIdentityMapper from "./authorizer/mapper/identity/jwt";
+import ManualIdentityMapper from "./authorizer/mapper/identity/manual";
 import SubIdentityMapper from "./authorizer/mapper/identity/sub";
 import PolicyPathMapper from "./authorizer/mapper/policy/path";
 import { Middleware, ObjectIDFromVar } from "./authorizer/middleware";
@@ -24,6 +25,7 @@ export {
   SubIdentityMapper,
   JWTIdentityMapper,
   AnonymousIdentityMapper,
+  ManualIdentityMapper,
   DirectoryConfig,
   AuthzOptions,
   PolicyPathMapper,
