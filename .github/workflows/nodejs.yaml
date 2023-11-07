@@ -1,0 +1,142 @@
+name: Node.js CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+env:
+  VAULT_ADDR: https://vault.eng.aserto.com/
+
+jobs:
+  typecheck:
+    name: Run TypeScript checker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read Configuration
+        uses: hashicorp/vault-action@v2.7.3
+        id: vault
+        with:
+          url: ${{ env.VAULT_ADDR }}
+          token: ${{ secrets.VAULT_TOKEN }}
+          secrets: |
+            kv/data/github  "SSH_PRIVATE_KEY"     | SSH_PRIVATE_KEY;
+
+      - name: Setup git
+        run: |
+          mkdir -p $HOME/.ssh
+          umask 0077 && echo -e "${SSH_PRIVATE_KEY}" > $HOME/.ssh/id_rsa
+          ssh-keyscan github.com >> $HOME/.ssh/known_hosts
+          git config --global url."git@github.com:".insteadOf https://github.com/
+
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            **/node_modules
+          key: ${{ runner.os }}-yarn-cache-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-cache-
+      - run: yarn install --frozen-lockfile
+      - name: typecheck
+        run: yarn tsc
+
+  lint:
+    runs-on: ubuntu-latest
+    name: Run lint
+    steps:
+      - name: Read Configuration
+        uses: hashicorp/vault-action@v2.7.3
+        id: vault
+        with:
+          url: ${{ env.VAULT_ADDR }}
+          token: ${{ secrets.VAULT_TOKEN }}
+          secrets: |
+            kv/data/github  "SSH_PRIVATE_KEY"     | SSH_PRIVATE_KEY;
+
+      - name: Setup git
+        run: |
+          mkdir -p $HOME/.ssh
+          umask 0077 && echo -e "${SSH_PRIVATE_KEY}" > $HOME/.ssh/id_rsa
+          ssh-keyscan github.com >> $HOME/.ssh/known_hosts
+          git config --global url."git@github.com:".insteadOf https://github.com/
+
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            **/node_modules
+          key: ${{ runner.os }}-yarn-cache-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-cache-
+      - run: yarn install --frozen-lockfile
+      - name: lint
+        run: yarn lint
+
+  dead_code:
+    runs-on: ubuntu-latest
+    name: Run checks for dead code
+    steps:
+      - name: Read Configuration
+        uses: hashicorp/vault-action@v2.7.3
+        id: vault
+        with:
+          url: ${{ env.VAULT_ADDR }}
+          token: ${{ secrets.VAULT_TOKEN }}
+          secrets: |
+            kv/data/github  "SSH_PRIVATE_KEY"     | SSH_PRIVATE_KEY;
+
+      - name: Setup git
+        run: |
+          mkdir -p $HOME/.ssh
+          umask 0077 && echo -e "${SSH_PRIVATE_KEY}" > $HOME/.ssh/id_rsa
+          ssh-keyscan github.com >> $HOME/.ssh/known_hosts
+          git config --global url."git@github.com:".insteadOf https://github.com/
+
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            **/node_modules
+          key: ${{ runner.os }}-yarn-cache-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-cache-
+      - run: yarn install --frozen-lockfile
+      - name: detect unused exports
+        run: yarn detect-unused-exports
+

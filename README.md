@@ -31,7 +31,567 @@ yarn add @aserto/aserto-node
 
 > `express@^4.0.0` is a peer dependency. Make sure it is installed in your project.
 
-## Usage
+
+
+## Authorizer
+
+### Authorizer Client
+```ts
+interface Authorizer {
+  config: AuthorizerConfig,
+  channelCredentials: ChannelCredentials = credentials.createSsl()
+};
+
+type AuthorizerConfig = {
+  authorizerServiceUrl?: string;
+  tenantId?: string;
+  authorizerApiKey?: string;
+  authorizerCertFile?: string;
+};
+```
+```ts
+const authClient = new Authorizer({
+  authorizerServiceUrl: "authorizer.eng.aserto.com:8443",
+  authorizerApiKey: "my-authorizer-api-key",
+  tenantId: "my-tenant-id",
+}, credentials.createSsl());
+```
+
+- `authorizerServiceUrl`: hostname:port of authorizer service (_required_)
+- `authorizerApiKey`: API key for authorizer service (_required_ if using hosted authorizer)
+- `tenantId`: Aserto tenant ID (_required_ if using hosted authorizer)
+- `channelCredentials`: [gRPC channelCredentials](https://github.com/grpc/grpc-node/blob/master/packages/grpc-js/src/channel-credentials.ts)
+
+### Topaz
+```ts
+import { getSSLCredentials } from "@aserto/aserto-node";
+
+const ssLcredentials = getSSLCredentials()
+
+const authClient = new Authorizer({
+  authorizerServiceUrl: "localhost:8282",
+}, ssLcredentials);
+
+```
+
+### Methods
+```ts
+// Is
+await authClient
+  .Is({
+    identityContext: identityContext(
+      "morty@the-citadel.com",
+      "IDENTITY_TYPE_SUB"
+    ),
+    policyInstance: policyInstance("todo", "todo"),
+    policyContext: policyContext("todoApp.POST.todos", ["allowed"]),
+    resourceContext: {
+      ownerID: "fd1614d3-c39a-4781-b7bd-8b96f5a5100d",
+    },
+  })
+
+// Query
+await authClient
+  .Is({
+    identityContext: identityContext(
+      "morty@the-citadel.com",
+      "IDENTITY_TYPE_SUB"
+    ),
+    policyInstance: policyInstance("todo", "todo"),
+    policyContext: policyContext("todoApp.POST.todos", ["allowed"]),
+    resourceContext: {
+      ownerID: "fd1614d3-c39a-4781-b7bd-8b96f5a5100d",
+    },
+    query: "x = data",
+  })
+
+
+// DecisionTree
+await authClient
+  .DecisionTree({
+    identityContext: identityContext(
+      "morty@the-citadel.com",
+      "IDENTITY_TYPE_SUB"
+    ),
+    policyInstance: policyInstance("todo", "todo"),
+    policyContext: policyContext("todoApp.POST.todos", ["allowed"]),
+    resourceContext: {
+      ownerID: "fd1614d3-c39a-4781-b7bd-8b96f5a5100d",
+    },
+  })
+
+
+// ListPolicies
+await authClient
+  .ListPolicies({ policyInstance: policyInstance("todo", "todo") })
+```
+
+### Middleware
+
+When authorization middleware is configured and attached to a server, it examines incoming requests, extracts authorization parameters like the caller's identity, calls the Aserto authorizers, and rejects messages if their access is denied.
+
+
+```ts
+interface Middleware {
+  client: Authorizer;
+  policy: Policy;
+  resourceMapper?: ResourceMapper;
+  identityMapper?: IdentityMapper;
+  policyMapper?: PolicyMapper;
+}
+
+type Policy = {
+  root: string;
+  name?: string;
+  instanceLabel?: string;
+  decission?: string;
+  path?: string;
+};
+
+type CheckOptions = {
+  object?: {
+    id?: string;
+    type?: string;
+    idMapper?: StringMapper;
+    mapper?: ObjectMapper;
+  };
+  relation?: {
+    name?: string;
+    mapper?: StringMapper;
+  };
+  subject?: {
+    type?: string;
+    mapper?: IdentityMapper;
+  };
+};
+
+type ResourceMapper =
+  | ResourceContext
+  | ((req?: Request) => Promise<ResourceContext>);
+
+type IdentityMapper = (req?: Request) => Promise<IdentityContext>;
+type PolicyMapper = (req?: Request) => Promise<PolicyContext>;
+```
+
+#### Methods
+
+```ts
+function Authz()
+function Check(options: CheckOptions)
+```
+
+#### Examples
+```ts
+const app: express.Application = express();
+
+
+//Standard REST
+const restMw = new Middleware({
+  client: client,
+  policy: {
+    name: 'todo',
+    instanceLabel: 'todo',
+    root: 'todoApp',
+  },
+  resourceMapper: async (req: express.Request) => {
+    if (!req.params?.id) {
+      return {};
+    }
+
+    const todo = await store.get(req.params.id);
+    return { ownerID: todo.OwnerID };
+  },
+})
+
+app.get("/todos", checkJwt, restMw.Authz(), server.list.bind(server));
+app.post("/todos", checkJwt, restMw.Authz(), server.create.bind(server));
+app.put("/todos/:id", checkJwt, restMw.Authz(), server.update.bind(server));
+
+
+// Check
+const rebacMw = new Middleware({
+  client: authClient,
+  policy: {
+    name: 'policy-rebac',
+    instanceLabel: 'policy-rebac',
+    root: 'rebac',
+  }
+})
+
+// Only users that are in the `evil_genius` group are allowed to delete todos.
+app.delete("/todos/:id", checkJwt, rebacMw.Check({
+  object: {
+    type: "group",
+    id: "evil_genius"
+  },
+  relation: {
+    name: "member",
+  }
+})
+```
+
+#### Mappers
+
+##### Identity
+To determine the identity of the user, the middleware can be configured to use a JWT token or a claim using the `IdentityMapper`.
+
+```ts
+// use the identity type sub
+import { SubIdentityMapper } from "@aserto/aserto-node";
+
+const restMw = new Middleware({
+  client: authClient,
+  policy: policy,
+  identityMapper: SubIdentityMapper,
+})
+
+// use the jwt type sub from a custom header
+import { JWTIdentityMapper } from "@aserto/aserto-node";
+
+const restMw = new Middleware({
+  client: authClient,
+  policy: policy,
+  identityMapper: JWTIdentityMapper("my-header");,
+})
+```
+
+The whole identity resolution can be overwritten by providing a custom function.
+```ts
+// needs to return an IdentityContext
+import { identityContext } from "@aserto/aserto-node";
+
+const restMw = new Middleware({
+  client: authClient,
+  policy: policy,
+  identityMapper: async () => {
+    return identityContext('test', 'IDENTITY_TYPE_SUB')
+  },
+})
+```
+
+### Policy
+
+The authorization policy's ID and the decision to be evaluated are specified when creating authorization Middleware, but the policy path is often derived from the URL or method being called.
+
+By default, the policy path is derived from the URL path
+
+To provide custom logic, use a PolicyMapper. For example:
+
+```ts
+// needs to return an IdentityContext
+import { identityContext } from "@aserto/aserto-node";
+
+const restMw = new Middleware({
+  client: authClient,
+  policy: policy,
+  policyMapper: async () => {
+    return policyContext('path', ['decission'])
+  }
+})
+```
+
+#### Resource
+A resource can be any structured data that the authorization policy uses to evaluate decisions. By default, the request params are included in the ResourceContext
+
+This behavior can be overwritten by providing a custom function:
+
+```ts
+const restMw = new Middleware({
+  client: authClient,
+  policy: policy,
+  resourceMapper: async () => {
+    return { customKey: "customValue" };
+  },
+})
+```
+
+#### Mappers
+
+##### Resource
+
+```ts
+// provies a custom resource context,
+type ResourceMapper =
+  | ResourceContext
+  | ((req?: Request) => Promise<ResourceContext>);
+
+// examples
+async (req: Request) => { return { customKey: req.params.id } };
+// or just a plain resource context
+{ customKey: "customValue" }
+```
+
+##### Identity
+
+```ts
+type IdentityMapper = (req?: Request) => Promise<IdentityContext>;
+
+// You can also use the built-in policyContext function to create a identity context and pass it as the mapper response
+identityContext = (value: string, type: keyof IdentityTypeMap)
+
+IdentityTypeMap {
+  IDENTITY_TYPE_UNKNOWN: 0;
+  IDENTITY_TYPE_NONE: 1;
+  IDENTITY_TYPE_SUB: 2;
+  IDENTITY_TYPE_JWT: 3;
+}
+
+// example
+identityContext("morty@the-citadel.com", "IDENTITY_TYPE_SUB")
+```
+
+##### Policy
+
+```ts
+type PolicyMapper = (req?: Request) => Promise<PolicyContext>;
+
+
+// You can also use the built-in policyContext function to create a policy context and pass it as the mapper response
+policyContext = (policyPath: string, decisionsList: Array<string> = ["allowed"])
+
+// Example
+policyContext("todoApp.POST.todos", ["allowed"])
+```
+
+## Directory
+
+The Directory APIs can be used to get or set object instances and relation instances. They can also be used to check whether a user has a permission or relation on an object instance.
+
+### Directory Client
+
+You can initialize a directory client as follows:
+
+```typescript
+import { ds } from "@aserto/aserto-node";
+
+const directoryClient = ds({
+  url: 'localhost:9292',
+  tenantId: '1234',
+  apiKey: 'my-api-key',
+});
+
+- `url`: hostname:port of directory service (_required_)
+- `apiKey`: API key for directory service (_required_ if using hosted directory)
+- `tenantId`: Aserto tenant ID (_required_ if using hosted directory)
+- `rejectUnauthorized`: reject clients with invalid certificates. Defaults to `true`.
+```
+
+### Getting objects and relations
+
+#### 'object' function
+
+`object({ type: "type-name", key: "object-key" })`:
+
+Get an object instance with the type `type-name` and the key `object-key`. For example:
+
+```typescript
+const user = await directoryClient.object({ type: 'user', key: 'euang@acmecorp.com' });
+```
+
+#### 'relation' function
+
+```typescript
+  relation({
+    subject: {
+      type: 'subject-type',
+    },
+    object: {
+      type: 'object-type',
+      key: 'object-key'
+    },
+    relation: {
+      name: 'relation-name',
+      objectType: 'object-type'
+    }
+  })
+```
+
+Get an array of relations of a certain type for an object instance. For example:
+
+```typescript
+const identity = 'euang@acmecorp.com';
+const relations = await directoryClient.relation(
+  {
+    subject: {
+      type: 'user',
+    },
+    object: {
+      type: 'identity',
+      key: identity
+    },
+    relation: {
+      name: 'identifier',
+      objectType: 'identity'
+    }
+  }
+);
+```
+
+### Setting objects and relations
+
+#### 'setObject' function
+
+`setObject({ object: $Object })`:
+
+Create an object instance with the specified fields. For example:
+
+```typescript
+const user = directoryClient.setObject(
+  {
+    object: {
+      type: "user",
+      key: "test-object",
+      properties: {
+        displayName: "test object"
+      }
+    }
+  }
+);
+```
+
+#### 'setRelation' function
+
+`setRelation({ subject: ObjectIdentifier, relation: String, object: ObjectIdentifier })`:
+
+Create a relation with a specified name between two objects. For example:
+
+```typescript
+const relation = await directoryClient.setRelation(
+  {
+    subject: {
+      key: 'subjectKey',
+      type: 'subjectType',
+    },
+    relation: 'relationName',
+    object: {
+      type: 'objectType',
+      key: 'objectKey',
+    },
+  }
+);
+```
+
+#### 'deleteObject' function
+
+`deleteObject({ type: "type-name", key: "object-key" })`:
+
+Deletes an object instance with the specified type and key. For example:
+
+```typescript
+await directoryClient.deleteObject({ type: 'user', key: 'euang@acmecorp.com' });
+```
+
+
+#### 'deleteRelation' function
+
+`deleteRelation({ subject: ObjectIdentifier, relation: RelationIdentifier, object: ObjectIdentifier })`:
+
+Delete a relation:
+
+```typescript
+await directoryClient.deleteRelation(
+  {
+    subject: {
+      key: 'subjectKey',
+      type: 'subjectType',
+    },
+    relation: {
+      name: 'relationName',
+      objectType: 'objectType',
+    },
+    object: {
+      type: 'objectType',
+      key: 'objectKey',
+    },
+  }
+);
+```
+
+### Checking permissions and relations
+
+You can evaluate graph queries over the directory, to determine whether a subject (e.g. user) has a permission or a relation to an object instance.
+
+#### 'checkPermission' function
+
+`checkPermission({ subject: ObjectIdentifier, permission: PermissionIdentifier, object: ObjectIdentifier })`:
+
+Check that an `user` object with the key `euang@acmecorp.com` has the `read` permission in the `admin` group:
+
+```typescript
+const check = await directoryClient.checkPermission(
+  {
+    subject: {
+      key: 'euang@acmecorp.com',
+      type: 'user',
+    },
+    permission: {
+      name: 'read',
+    },
+    object: {
+      type: 'group',
+      key: 'admin',
+    },
+  }
+);
+```
+
+#### 'checkRelation' function
+
+`checkRelation({ subject: ObjectIdentifier, relation: RelationIdentifier, object: ObjectIdentifier })`:
+
+Check that `euang@acmecorp.com` has an `identifier` relation to an object with key `euang@acmecorp.com` and type `identity`:
+
+```typescript
+const check = directoryClient.checkRelation(
+  {
+    subject: {
+      key: 'euang@acmecorp.com',
+      type: 'user',
+    },
+    relation: {
+       name: "identifier",
+       objectType: "identity"
+      },
+    object: {
+      type: 'identity',
+      key: 'euang@acmecorp.com',
+    },
+  }
+);
+```
+
+### Example
+
+```typescript
+const identity = 'euang@acmecorp.com';
+const relation = await directoryClient.relation(
+  {
+    subject: {
+      type: 'user',
+    },
+    object: {
+      type: 'identity',
+      key: identity
+    },
+    relation: {
+      name: 'identifier',
+      objectType: 'identity'
+    }
+  }
+);
+
+if (!relation || relation.length === 0) {
+  throw new Error(`No relations found for identity ${identity}`, )
+};
+
+const user = await directoryClient.object(relation[0].subject);
+```
+
+Check [Directory Interface](https://github.com/aserto-dev/aserto-node/blob/main/lib/index.d.ts#L94-L120) for more.
+
+
+
+## Deprecated Methods
 
 > Note: the `authorizerServiceUrl` option that is used throughout is no longer a URL, but the option name is retained for backward-compatibility. It is now expected to be a hostname that exposes a gRPC binding. Any "https://" prefix is stripped out of the value provided.
 
@@ -208,7 +768,7 @@ For example, passing in `policyRoot/GET/api/users/:id` will resolve to a policy 
 
 By default, `is` follows the same behavior as `jwtAuthz` in that resource map will be `req.params`. For example, if the route path is `/api/users/:id`, the resource will be `{ 'id': 'value-of-id' }`.
 
-Passing in the `resourceMap` parameter into the `is()` function will override this behavior.
+Passing in the `resourceMap` parameter into the `Authz()` function will override this behavior.
 
 The provided value can be either an object or a function that takes an http request and returns an object.
 
@@ -226,241 +786,6 @@ Furthermore, when packaging a policy for deployment (e.g. in a Docker container)
 
 Alternately, to ignore TLS certificate validation when creating a TLS connection to the authorizer, you can set the `disableTlsValidation` option to `true` and avoid TLS certificate validation. This option is **not recommended for production**.
 
-## Directory
-
-The Directory APIs can be used to get or set object instances and relation instances. They can also be used to check whether a user has a permission or relation on an object instance.
-
-### Directory Client
-
-You can initialize a directory client as follows:
-
-```typescript
-import { ds } from "@aserto/aserto-node";
-
-const directoryClient = ds({
-  url: 'localhost:9292',
-  tenantId: '1234',
-  apiKey: 'my-api-key',
-});
-
-- `url`: hostname:port of directory service (_required_)
-- `apiKey`: API key for directory service (_required_ if using hosted directory)
-- `tenantId`: Aserto tenant ID (_required_ if using hosted directory)
-- `rejectUnauthorized`: reject clients with invalid certificates. Defaults to `true`.
-```
-
-### Getting objects and relations
-
-#### 'object' function
-
-`object({ type: "type-name", key: "object-key" })`:
-
-Get an object instance with the type `type-name` and the key `object-key`. For example:
-
-```typescript
-const user = await directoryClient.object({ type: 'user', key: 'euang@acmecorp.com' });
-```
-
-#### 'relation' function
-
-```typescript
-  relation({
-    subject: {
-      type: 'subject-type',
-    },
-    object: {
-      type: 'object-type',
-      key: 'object-key'
-    },
-    relation: {
-      name: 'relation-name',
-      objectType: 'object-type'
-    }
-  })
-```
-
-Get an array of relations of a certain type for an object instance. For example:
-
-```typescript
-const identity = 'euang@acmecorp.com';
-const relations = await directoryClient.relation(
-  {
-    subject: {
-      type: 'user',
-    },
-    object: {
-      type: 'identity',
-      key: identity
-    },
-    relation: {
-      name: 'identifier',
-      objectType: 'identity'
-    }
-  }
-);
-```
-
-### Setting objects and relations
-
-#### 'setObject' function
-
-`setObject({ object: $Object })`:
-
-Create an object instance with the specified fields. For example:
-
-```typescript
-user = directoryClient.setObject(
-  {
-    object: {
-      type: "user",
-      key: "test-object",
-      properties: {
-        displayName: "test object"
-      }
-    }
-  }
-);
-```
-
-#### 'setRelation' function
-
-`setRelation({ subject: ObjectIdentifier, relation: String, object: ObjectIdentifier })`:
-
-Create a relation with a specified name between two objects. For example:
-
-```typescript
-const relation = await directoryClient.setRelation(
-  {
-    subject: {
-      key: 'subjectKey',
-      type: 'subjectType',
-    },
-    relation: 'relationName',
-    object: {
-      type: 'objectType',
-      key: 'objectKey',
-    },
-  }
-);
-```
-
-#### 'deleteObject' function
-
-`deleteObject({ type: "type-name", key: "object-key" })`:
-
-Deletes an object instance with the specified type and key. For example:
-
-```typescript
-await directoryClient.deleteObject({ type: 'user', key: 'euang@acmecorp.com' });
-```
-
-
-#### 'deleteRelation' function
-
-`deleteRelation({ subject: ObjectIdentifier, relation: RelationIdentifier, object: ObjectIdentifier })`:
-
-Delete a relation:
-
-```typescript
-await directoryClient.deleteRelation(
-  {
-    subject: {
-      key: 'subjectKey',
-      type: 'subjectType',
-    },
-    relation: {
-      name: 'relationName',
-      objectType: 'objectType',
-    },
-    object: {
-      type: 'objectType',
-      key: 'objectKey',
-    },
-  }
-);
-```
-
-### Checking permissions and relations
-
-You can evaluate graph queries over the directory, to determine whether a subject (e.g. user) has a permission or a relation to an object instance.
-
-#### 'checkPermission' function
-
-`checkPermission({ subject: ObjectIdentifier, permission: PermissionIdentifier, object: ObjectIdentifier })`:
-
-Check that an `user` object with the key `euang@acmecorp.com` has the `read` permission in the `admin` group:
-
-```typescript
-const check = await directoryClient.checkPermission(
-  {
-    subject: {
-      key: 'euang@acmecorp.com',
-      type: 'user',
-    },
-    permission: {
-      name: 'read',
-    },
-    object: {
-      type: 'group',
-      key: 'admin',
-    },
-  }
-);
-```
-
-#### 'checkRelation' function
-
-`checkRelation({ subject: ObjectIdentifier, relation: RelationIdentifier, object: ObjectIdentifier })`:
-
-Check that `euang@acmecorp.com` has an `identifier` relation to an object with key `euang@acmecorp.com` and type `identity`:
-
-```typescript
-const check = directoryClient.checkRelation(
-  {
-    subject: {
-      key: 'euang@acmecorp.com',
-      type: 'user',
-    },
-    relation: {
-       name: "identifier",
-       objectType: "identity"
-      },
-    object: {
-      type: 'identity',
-      key: 'euang@acmecorp.com',
-    },
-  }
-);
-```
-
-### Example
-
-```typescript
-const identity = 'euang@acmecorp.com';
-const relation = await directoryClient.relation(
-  {
-    subject: {
-      type: 'user',
-    },
-    object: {
-      type: 'identity',
-      key: identity
-    },
-    relation: {
-      name: 'identifier',
-      objectType: 'identity'
-    }
-  }
-);
-
-if (!relation || relation.length === 0) {
-  throw new Error(`No relations found for identity ${identity}`, )
-};
-
-const user = await directoryClient.object(relation[0].subject);
-```
-
-Check [Directory Interface](https://github.com/aserto-dev/aserto-node/blob/main/lib/index.d.ts#L94-L120) for more.
 
 ## Issue Reporting
 

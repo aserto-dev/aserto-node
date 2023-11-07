@@ -1,7 +1,7 @@
 // process parameters
 import express from "express";
 
-import { ResourceMapper } from "./index.d";
+import { ResourceMapper } from "./authorizer/middleware";
 
 export const processParams = async (
   req: express.Request,

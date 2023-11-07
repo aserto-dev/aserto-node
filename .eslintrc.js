@@ -24,11 +24,12 @@ module.exports = {
         fixToUnknown: true,
       },
     ],
-    "no-restricted-globals": [
-      "error",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
       {
-        name: "history",
-        message: "Use `useHistory` from `src/services/HistoryProvider` instead",
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
       },
     ],
   },
