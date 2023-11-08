@@ -40,6 +40,7 @@ describe("should succeed", () => {
       authorizerServiceUrl: "localhost:8282",
       identityHeader: "Authorization",
       authorizerCertCAFile: process.env.CA_FILE!,
+      failWithError: true,
     };
 
     const next = jest.fn() as NextFunction;

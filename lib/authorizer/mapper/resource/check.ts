@@ -10,7 +10,7 @@ export default async (
   const [objectId, objectType] = await object(options, req);
   const rel = await relation(options, req);
   return {
-    object_key: objectId,
+    object_id: objectId,
     object_type: objectType,
     relation: rel,
     subject_type: options.subject?.type || "user",

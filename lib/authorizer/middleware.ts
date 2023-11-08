@@ -51,6 +51,7 @@ type StringMapper = (req?: Request) => Promise<string>;
 export class Middleware {
   client: Authorizer;
   policy: Policy;
+  failWithError: boolean;
   resourceMapper?: ResourceMapper;
   identityMapper?: IdentityMapper;
   policyMapper?: PolicyMapper;
@@ -60,18 +61,21 @@ export class Middleware {
     resourceMapper,
     identityMapper,
     policyMapper,
+    failWithError,
   }: {
     client: Authorizer;
     policy: Policy;
     resourceMapper?: ResourceMapper;
     identityMapper?: IdentityMapper;
     policyMapper?: PolicyMapper;
+    failWithError?: boolean;
   }) {
     this.client = client;
     this.policy = policy;
     this.resourceMapper = resourceMapper;
     this.identityMapper = identityMapper;
     this.policyMapper = policyMapper;
+    this.failWithError = failWithError || false;
   }
 
   private policyInstance(): PolicyInstance | undefined {
@@ -91,7 +95,7 @@ export class Middleware {
   // Check Middleware
   Check(options: CheckOptions) {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const error = errorHandler(next, true);
+      const error = errorHandler(next, this.failWithError);
 
       const callAuthorizer = async () => {
         const policyCtx = this.policyMapper
@@ -134,7 +138,7 @@ export class Middleware {
   // Standard REST Authorization Middleware
   Authz() {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const error = errorHandler(next, true);
+      const error = errorHandler(next, this.failWithError);
 
       const callAuthorizer = async () => {
         const policyCtx = this.policyMapper
