@@ -5,6 +5,8 @@ import {
   Relation,
   RelationIdentifier,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v2/common_pb";
+import { Exporter } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v2/exporter_connect";
+import { Importer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v2/importer_connect";
 import { Reader } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v2/reader_connect";
 import {
   CheckPermissionRequest as CheckPermissionRequest$,
@@ -40,10 +42,20 @@ import {
   Struct,
 } from "@bufbuild/protobuf";
 
+type ServiceConfig = {
+  url?: string;
+  tenantId?: string;
+  apiKey?: string;
+};
+
 export interface DirectoryConfig {
   url?: string;
   tenantId?: string;
   apiKey?: string;
+  reader?: ServiceConfig;
+  writer?: ServiceConfig;
+  importer?: ServiceConfig;
+  exporter?: ServiceConfig;
   rejectUnauthorized?: boolean;
 }
 
@@ -89,6 +101,8 @@ type CheckRelationRequest = PartialExcept<
 export class Directory {
   ReaderClient: PromiseClient<typeof Reader>;
   WriterClient: PromiseClient<typeof Writer>;
+  ImporterClient: PromiseClient<typeof Importer>;
+  ExporterClient: PromiseClient<typeof Exporter>;
 
   constructor(config: DirectoryConfig) {
     const setHeader = (
@@ -101,29 +115,97 @@ export class Directory {
       req.header.get(key) === null && req.header.set(key, value);
     };
 
-    const headers: Interceptor = (next) => async (req) => {
+    const baseServiceHeaders: Interceptor = (next) => async (req) => {
       config.apiKey &&
         setHeader(req, "authorization", `basic ${config.apiKey}`);
       config.tenantId && setHeader(req, "aserto-tenant-id", config.tenantId);
       return await next(req);
     };
 
-    const url = config.url ?? "directory.prod.aserto.com:8443";
+    const createHeadersInterceptor = (
+      serviceApiKey?: string,
+      serviceTenantId?: string
+    ) => {
+      if (
+        serviceApiKey === config.apiKey &&
+        serviceTenantId === config.tenantId
+      ) {
+        return baseServiceHeaders;
+      }
+
+      const apiKey = serviceApiKey || config.apiKey;
+      const tenantId = serviceTenantId || config.tenantId;
+      const headers: Interceptor = (next) => async (req) => {
+        apiKey && setHeader(req, "authorization", `basic ${apiKey}`);
+        tenantId && setHeader(req, "aserto-tenant-id", tenantId);
+        return await next(req);
+      };
+      return headers;
+    };
+
+    const createTransport = (
+      serviceUrl: string,
+      apikey?: string,
+      tenantId?: string
+    ) => {
+      if (
+        serviceUrl !== baseServiceUrl ||
+        apikey !== config.apiKey ||
+        tenantId !== config.tenantId
+      ) {
+        return createGrpcTransport({
+          httpVersion: "2",
+          baseUrl: `https://${serviceUrl}`,
+          interceptors: [createHeadersInterceptor(apikey, tenantId)],
+          nodeOptions: { rejectUnauthorized },
+        });
+      }
+      return baseGrpcTansport;
+    };
+
+    const baseServiceUrl = config.url ?? "directory.prod.aserto.com:8443";
+    const readerServiceUrl = config.reader?.url || baseServiceUrl;
+    const writerServiceUrl = config.writer?.url || baseServiceUrl;
+    const importerServiceUrl = config.importer?.url || baseServiceUrl;
+    const exporterServiceUrl = config.exporter?.url || baseServiceUrl;
 
     let rejectUnauthorized = true;
     if (config.rejectUnauthorized !== undefined) {
       rejectUnauthorized = config.rejectUnauthorized;
     }
 
-    const grpcTansport = createGrpcTransport({
+    const baseGrpcTansport = createGrpcTransport({
       httpVersion: "2",
-      baseUrl: `https://${url}`,
-      interceptors: [headers],
+      baseUrl: `https://${baseServiceUrl}`,
+      interceptors: [baseServiceHeaders],
       nodeOptions: { rejectUnauthorized },
     });
 
-    this.ReaderClient = createPromiseClient(Reader, grpcTansport);
-    this.WriterClient = createPromiseClient(Writer, grpcTansport);
+    const readerGrpcTansport = createTransport(
+      readerServiceUrl,
+      config.reader?.apiKey,
+      config.reader?.tenantId
+    );
+    const writerGrpcTansport = createTransport(
+      writerServiceUrl,
+      config.writer?.apiKey,
+      config.writer?.tenantId
+    );
+    const importerGrpcTansport = createTransport(
+      importerServiceUrl,
+      config.importer?.apiKey,
+      config.importer?.tenantId
+    );
+    const exporterGrpcTransport = createTransport(
+      exporterServiceUrl,
+      config.exporter?.apiKey,
+      config.exporter?.tenantId
+    );
+
+    this.ReaderClient = createPromiseClient(Reader, readerGrpcTansport);
+    this.WriterClient = createPromiseClient(Writer, writerGrpcTansport);
+    this.ImporterClient = createPromiseClient(Importer, importerGrpcTansport);
+    this.ExporterClient = createPromiseClient(Exporter, exporterGrpcTransport);
   }
 
   async checkPermission(params: CheckPermissionRequest) {

@@ -404,6 +404,25 @@ The Directory APIs can be used to get or set object instances and relation insta
 
 ### Directory Client
 
+```ts
+type ServiceConfig = {
+  url?: string;
+  tenantId?: string;
+  apiKey?: string;
+};
+
+export interface DirectoryConfig {
+  url?: string;
+  tenantId?: string;
+  apiKey?: string;
+  reader?: ServiceConfig;
+  writer?: ServiceConfig;
+  importer?: ServiceConfig;
+  exporter?: ServiceConfig;
+  rejectUnauthorized?: boolean;
+}
+```
+
 You can initialize a directory client as follows:
 
 ```typescript
@@ -419,6 +438,25 @@ const directoryClient = ds({
 - `apiKey`: API key for directory service (_required_ if using hosted directory)
 - `tenantId`: Aserto tenant ID (_required_ if using hosted directory)
 - `rejectUnauthorized`: reject clients with invalid certificates. Defaults to `true`.
+- `reader`: ServiceConfig for the reader client(optional)
+- `writer`: ServiceConfig for the writer client(option)
+- `importer`: ServiceConfig for the importer client(option)
+- `exporter`: ServiceConfig for the importer client(option)
+```
+
+#### Example
+Define a writer client that uses the same credentials but connects to localhost:9393. All other services will have the default configration
+```ts
+import { ds } from "@aserto/aserto-node";
+
+const directoryClient = ds({
+  url: 'localhost:9292',
+  tenantId: '1234',
+  apiKey: 'my-api-key',
+  writer: {
+    url: 'localhost:9393'
+  }
+});
 ```
 
 ### Getting objects and relations
