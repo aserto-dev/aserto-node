@@ -66,12 +66,44 @@ const authClient = new Authorizer({
 ```ts
 import { getSSLCredentials } from "@aserto/aserto-node";
 
-const ssLcredentials = getSSLCredentials()
+const ssLcredentials = getSSLCredentials(`${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`)
 
 const authClient = new Authorizer({
   authorizerServiceUrl: "localhost:8282",
 }, ssLcredentials);
+```
 
+#### Example:
+```ts
+import {
+  Authorizer,
+  getSSLCredentials,
+  identityContext,
+  policyContext,
+  policyInstance,
+} from "@aserto/aserto-node";
+
+const authClient = new Authorizer(
+  {
+    authorizerServiceUrl: "localhost:8282",
+  },
+  getSSLCredentials(`${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`)
+);
+
+authClient
+  .Is({
+    identityContext: identityContext(
+      "rick@the-citadel.com",
+      "IDENTITY_TYPE_SUB"
+    ),
+    policyInstance: policyInstance("rebac", "rebac"),
+    policyContext: policyContext("rebac.check", ["allowed"]),
+    resourceContext: {
+      object_type: "group",
+      object_id: "evil_genius",
+      relation: "member",
+    },
+  })
 ```
 
 ### Methods
@@ -130,6 +162,7 @@ await authClient
 
 When authorization middleware is configured and attached to a server, it examines incoming requests, extracts authorization parameters like the caller's identity, calls the Aserto authorizers, and rejects messages if their access is denied.
 
+`failWithError`: When set to `true`, will forward errors to `next` instead of ending the response directly.
 
 ```ts
 interface Middleware {
@@ -138,6 +171,7 @@ interface Middleware {
   resourceMapper?: ResourceMapper;
   identityMapper?: IdentityMapper;
   policyMapper?: PolicyMapper;
+  failWithError?: boolean;
 }
 
 type Policy = {
@@ -252,6 +286,17 @@ const restMw = new Middleware({
   client: authClient,
   policy: policy,
   identityMapper: JWTIdentityMapper("my-header");,
+})
+```
+
+```ts
+// use the manual identity type
+import { ManualIdentityMapper } from "@aserto/aserto-node";
+
+const restMw = new Middleware({
+  client: authClient,
+  policy: policy,
+  identityMapper: ManualIdentityMapper("my-identity");,
 })
 ```
 

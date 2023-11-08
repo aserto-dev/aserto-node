@@ -98,7 +98,11 @@ describe("Middleware", () => {
 
       jest.spyOn(Authorizer.prototype, "Is").mockResolvedValue(false);
 
-      const middleware = new Middleware({ client, policy });
+      const middleware = new Middleware({
+        client,
+        policy,
+        failWithError: true,
+      });
 
       const next = jest.fn() as NextFunction;
       const res = httpMocks.createResponse();
@@ -150,7 +154,11 @@ describe("Middleware", () => {
         .spyOn(Authorizer.prototype, "Is")
         .mockRejectedValue("Authorizer service unavailable");
 
-      const middleware = new Middleware({ client, policy });
+      const middleware = new Middleware({
+        client,
+        policy,
+        failWithError: true,
+      });
 
       const next = jest.fn() as NextFunction;
       const res = httpMocks.createResponse();
@@ -226,7 +234,11 @@ describe("Middleware", () => {
 
       jest.spyOn(Authorizer.prototype, "Is").mockResolvedValue(false);
 
-      const middleware = new Middleware({ client, policy });
+      const middleware = new Middleware({
+        client,
+        policy,
+        failWithError: true,
+      });
 
       const next = jest.fn() as NextFunction;
       const res = httpMocks.createResponse();
@@ -266,7 +278,11 @@ describe("Middleware", () => {
         .spyOn(Authorizer.prototype, "Is")
         .mockRejectedValue("Authorizer service unavailable");
 
-      const middleware = new Middleware({ client, policy });
+      const middleware = new Middleware({
+        client,
+        policy,
+        failWithError: true,
+      });
 
       const next = jest.fn() as NextFunction;
       const res = httpMocks.createResponse();

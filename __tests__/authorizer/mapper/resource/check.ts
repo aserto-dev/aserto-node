@@ -23,7 +23,7 @@ describe("checkResourceMapper", () => {
     const result = await checkResourceMapper(options, req);
 
     expect(result).toEqual({
-      object_key: "objectId",
+      object_id: "objectId",
       object_type: "objectType",
       relation: "relationName",
       subject_type: "subjectType",
@@ -38,7 +38,7 @@ describe("checkResourceMapper", () => {
     const result = await checkResourceMapper(options, req);
 
     expect(result).toEqual({
-      object_key: "",
+      object_id: "",
       object_type: "",
       relation: "",
       subject_type: "user",
@@ -61,14 +61,14 @@ describe("checkResourceMapper", () => {
     const result = await checkResourceMapper(options, req);
 
     expect(result).toEqual({
-      object_key: "objectId",
+      object_id: "objectId",
       object_type: "objectType",
       relation: "",
       subject_type: "subjectType",
     });
   });
 
-  it("returns a CheckResourceContext object with an empty object_key and object_type when object is not provided", async () => {
+  it("returns a CheckResourceContext object with an empty object_id and object_type when object is not provided", async () => {
     const options: CheckOptions = {
       relation: {
         name: "relationName",
@@ -83,14 +83,14 @@ describe("checkResourceMapper", () => {
     const result = await checkResourceMapper(options, req);
 
     expect(result).toEqual({
-      object_key: "",
+      object_id: "",
       object_type: "",
       relation: "relationName",
       subject_type: "subjectType",
     });
   });
 
-  it("returns a CheckResourceContext object with an empty object_key and object_type when object.id is not provided", async () => {
+  it("returns a CheckResourceContext object with an empty object_id and object_type when object.id is not provided", async () => {
     const options: CheckOptions = {
       object: {
         type: "objectType",
@@ -108,7 +108,7 @@ describe("checkResourceMapper", () => {
     const result = await checkResourceMapper(options, req);
 
     expect(result).toEqual({
-      object_key: "",
+      object_id: "",
       object_type: "objectType",
       relation: "relationName",
       subject_type: "subjectType",
@@ -133,7 +133,7 @@ describe("checkResourceMapper", () => {
     const result = await checkResourceMapper(options, req);
 
     expect(result).toEqual({
-      object_key: "objectId",
+      object_id: "objectId",
       object_type: "",
       relation: "relationName",
       subject_type: "subjectType",
@@ -163,7 +163,7 @@ describe("checkResourceMapper", () => {
     const result = await checkResourceMapper(options, req);
 
     expect(result).toEqual({
-      object_key: "objectId",
+      object_id: "objectId",
       object_type: "objectType",
       relation: "relationName",
       subject_type: "subjectType",
@@ -194,7 +194,7 @@ describe("checkResourceMapper", () => {
     const result = await checkResourceMapper(options, req);
 
     expect(result).toEqual({
-      object_key: "objectId",
+      object_id: "objectId",
       object_type: "objectType",
       relation: "relationName",
       subject_type: "subjectType",
