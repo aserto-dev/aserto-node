@@ -290,7 +290,7 @@ const restMw = new Middleware({
 ```
 
 ```ts
-// use the manual type sub from a custom header
+// use the manual identity type
 import { ManualIdentityMapper } from "@aserto/aserto-node";
 
 const restMw = new Middleware({
