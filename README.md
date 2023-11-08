@@ -445,7 +445,7 @@ const directoryClient = ds({
 ```
 
 #### Example
-Define a writer client that uses the same credentials but connects to localhost:9393. All other services will have the default configration
+Define a writer client that uses the same credentials but connects to localhost:9393. All other services will have the default configuration
 ```ts
 import { ds } from "@aserto/aserto-node";
 
