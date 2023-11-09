@@ -150,8 +150,8 @@ export class Directory {
     ) => {
       if (
         serviceUrl !== baseServiceUrl ||
-        apikey !== config.apiKey ||
-        tenantId !== config.tenantId
+        apikey !== baseApiKey ||
+        tenantId !== baseTenantId
       ) {
         return createGrpcTransport({
           httpVersion: "2",
@@ -164,10 +164,24 @@ export class Directory {
     };
 
     const baseServiceUrl = config.url ?? "directory.prod.aserto.com:8443";
+    const baseApiKey = config.apiKey;
+    const baseTenantId = config.tenantId;
+
     const readerServiceUrl = config.reader?.url || baseServiceUrl;
+    const readerApiKey = config.reader?.apiKey || baseApiKey;
+    const readerTenantId = config.reader?.tenantId || baseTenantId;
+
     const writerServiceUrl = config.writer?.url || baseServiceUrl;
+    const writerApiKey = config.writer?.apiKey || baseApiKey;
+    const writerTenantId = config.writer?.tenantId || baseTenantId;
+
     const importerServiceUrl = config.importer?.url || baseServiceUrl;
+    const importerApiKey = config.importer?.apiKey || baseApiKey;
+    const importerTenantId = config.importer?.tenantId || baseTenantId;
+
     const exporterServiceUrl = config.exporter?.url || baseServiceUrl;
+    const exporterApiKey = config.exporter?.apiKey || baseApiKey;
+    const exporterTenantId = config.exporter?.tenantId || baseTenantId;
 
     let rejectUnauthorized = true;
     if (config.rejectUnauthorized !== undefined) {
@@ -183,23 +197,23 @@ export class Directory {
 
     const readerGrpcTansport = createTransport(
       readerServiceUrl,
-      config.reader?.apiKey,
-      config.reader?.tenantId
+      readerApiKey,
+      readerTenantId
     );
     const writerGrpcTansport = createTransport(
       writerServiceUrl,
-      config.writer?.apiKey,
-      config.writer?.tenantId
+      writerApiKey,
+      writerTenantId
     );
     const importerGrpcTansport = createTransport(
       importerServiceUrl,
-      config.importer?.apiKey,
-      config.importer?.tenantId
+      importerApiKey,
+      importerTenantId
     );
     const exporterGrpcTransport = createTransport(
       exporterServiceUrl,
-      config.exporter?.apiKey,
-      config.exporter?.tenantId
+      exporterApiKey,
+      exporterTenantId
     );
 
     this.ReaderClient = createPromiseClient(Reader, readerGrpcTansport);
