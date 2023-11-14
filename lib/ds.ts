@@ -24,21 +24,23 @@ import {
   SetRelationRequest as SetRelationRequest$,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v2/writer_pb";
 import {
-  ConnectError,
-  createPromiseClient,
-  Interceptor,
-  PromiseClient,
-  StreamRequest,
-  UnaryRequest,
-} from "@bufbuild/connect";
-import { createGrpcTransport } from "@bufbuild/connect-node";
-import {
   AnyMessage,
   JsonValue,
   PartialMessage,
   PlainMessage,
   Struct,
 } from "@bufbuild/protobuf";
+import {
+  ConnectError,
+  createPromiseClient,
+  Interceptor,
+  PromiseClient,
+  StreamRequest,
+  UnaryRequest,
+} from "@connectrpc/connect";
+import { createGrpcTransport } from "@connectrpc/connect-node";
+
+import { NestedOmit, PartialExcept } from "./util/types";
 
 export interface DirectoryConfig {
   url?: string;
@@ -46,26 +48,6 @@ export interface DirectoryConfig {
   apiKey?: string;
   rejectUnauthorized?: boolean;
 }
-
-// https://stackoverflow.com/a/72810677
-// Extend existing types to make specific fields optional.
-type NestedKeys<T extends string, U extends string[]> = {
-  [K in keyof U]: U[K] extends `${T}.${infer V}` ? V : never;
-};
-type PartialExcept<T, U extends string[]> = {
-  [K in keyof T as K extends U[number] ? K : never]?: T[K];
-} & {
-  [K in keyof T as K extends U[number] ? never : K]: K extends string
-    ? PartialExcept<T[K], NestedKeys<K, U>>
-    : T[K];
-};
-
-type NestedOmit<T, K extends PropertyKey> = {
-  [P in keyof T as P extends K ? never : P]: NestedOmit<
-    T[P],
-    K extends `${Exclude<P, symbol>}.${infer R}` ? R : never
-  >;
-};
 
 type SetRelationRequest = PartialExcept<PlainMessage<Relation>, ["hash"]>;
 

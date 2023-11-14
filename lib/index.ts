@@ -10,6 +10,8 @@ import identityContext from "./authorizer/model/identityContext";
 import policyContext from "./authorizer/model/policyContext";
 import policyInstance from "./authorizer/model/policyInstance";
 import queryOptions from "./authorizer/model/queryOptions";
+import { DirectoryServiceV3, DirectoryV3 } from "./directory/v3";
+import { DirectoryV3Config } from "./directory/v3/types";
 import { displayStateMap } from "./displayStateMap";
 import { Directory, DirectoryConfig, ds } from "./ds";
 import { is } from "./is";
@@ -38,4 +40,7 @@ export {
   getSSLCredentials,
   queryOptions,
   decisionTreeOptions,
+  DirectoryServiceV3,
+  DirectoryV3,
+  DirectoryV3Config,
 };
