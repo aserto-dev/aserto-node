@@ -20,7 +20,7 @@ type ServiceConfig = {
   apiKey?: string;
 };
 
-export interface DirectoryV3Config {
+export type DirectoryV3Config = {
   url?: string;
   tenantId?: string;
   apiKey?: string;
@@ -30,7 +30,7 @@ export interface DirectoryV3Config {
   exporter?: ServiceConfig;
   model?: ServiceConfig;
   rejectUnauthorized?: boolean;
-}
+};
 
 export type GetObjectRequest = PartialExcept<
   PlainMessage<GetObjectRequest$>,
