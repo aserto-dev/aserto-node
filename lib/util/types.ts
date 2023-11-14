@@ -1,6 +1,6 @@
 // https://stackoverflow.com/a/72810677
 // Extend existing types to make specific fields optional.
-export type NestedKeys<T extends string, U extends string[]> = {
+type NestedKeys<T extends string, U extends string[]> = {
   [K in keyof U]: U[K] extends `${T}.${infer V}` ? V : never;
 };
 export type PartialExcept<T, U extends string[]> = {
