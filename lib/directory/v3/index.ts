@@ -369,7 +369,8 @@ export class DirectoryV3 {
         throw new Error("No response from directory service");
       }
 
-      return response;
+      const data = await readAsyncIterable(response);
+      return data;
     } catch (error) {
       handleError(error, "export");
     }
