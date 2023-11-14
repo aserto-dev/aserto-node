@@ -3,6 +3,7 @@ import {
   CheckRelationRequest as CheckRelationRequest$,
   GetObjectRequest as GetObjectRequest$,
   GetRelationRequest as GetRelationRequest$,
+  GetRelationsRequest as GetRelationsRequest$,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_pb";
 import {
   DeleteObjectRequest as DeleteObjectRequest$,
@@ -40,6 +41,11 @@ export type GetObjectRequest = PartialExcept<
 export type GetRelationRequest = PartialExcept<
   PlainMessage<GetRelationRequest$>,
   ["subjectRelation", "withObjects"]
+>;
+
+export type GetRelationsRequest = PartialExcept<
+  PlainMessage<GetRelationsRequest$>,
+  ["subjectRelation", "withObjects", "page.token"]
 >;
 
 export type SetObjectRequest = PartialExcept<

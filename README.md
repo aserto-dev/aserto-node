@@ -607,16 +607,19 @@ const relation = await directoryClient.relation(
   {
     subjectType: 'user',
     objectType: 'identity',
-    objectId: identity
+    objectId: identity,
     relation: 'identifier',
+    subjectId: 'euang@acmecorp.com'
   }
 );
 
-if (!relation || relation.length === 0) {
+if (!relation) {
   throw new Error(`No relations found for identity ${identity}`, )
 };
 
-const user = await directoryClient.object(relation[0].subject);
+const user = await directoryClient.object(
+  { objectId: relation.subjectId, objectType: relation.subjectType }
+);
 ```
 
 ### Manifest

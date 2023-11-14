@@ -15,7 +15,6 @@ import { Reader } from "@aserto/node-directory/src/gen/cjs/aserto/directory/read
 import {
   GetGraphRequest,
   GetObjectManyRequest,
-  GetRelationsRequest,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_pb";
 import { Writer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_connect";
 import { SetObjectRequest as SetObjectRequest$ } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
@@ -43,6 +42,7 @@ import {
   DirectoryV3Config,
   GetObjectRequest,
   GetRelationRequest,
+  GetRelationsRequest,
   SetObjectRequest,
   SetRelationRequest,
 } from "./types";
@@ -323,7 +323,7 @@ export class DirectoryV3 {
     }
   }
 
-  async relations(params: PlainMessage<GetRelationsRequest>) {
+  async relations(params: GetRelationsRequest) {
     try {
       const response = await this.ReaderClient.getRelations(params);
       if (!response) {
