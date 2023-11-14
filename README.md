@@ -1,4 +1,8 @@
 # aserto-node
+[![npm version](https://badge.fury.io/js/@aserto%2Faserto-node.svg)](https://badge.fury.io/js/@aserto%2Faserto-node)
+[![codecov](https://codecov.io/github/aserto-dev/aserto-node/graph/badge.svg?token=xMt1L6Hd2D)](https://codecov.io/github/aserto-dev/aserto-node)
+[![Tests](https://github.com/aserto-dev/aserto-node/actions/workflows/tests.yaml/badge.svg?branch=main)](https://github.com/aserto-dev/aserto-node/actions/workflows/tests.yaml)
+[<img src="https://img.shields.io/badge/slack-@asertocommunity-yellow.svg?logo=slack">](https://www.aserto.com/slack)
 
 Aserto authorization middleware for the node Express server, based on
 Auth0's [express-jwt-authz](https://github.com/auth0/express-jwt-authz)
