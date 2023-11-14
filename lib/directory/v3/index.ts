@@ -5,8 +5,10 @@ import { Importer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/im
 import { ImportRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
 import { Model } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_connect";
 import {
+  Body,
   DeleteManifestRequest,
   GetManifestRequest,
+  Metadata,
   SetManifestRequest,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
 import { Reader } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_connect";
@@ -373,22 +375,46 @@ export class DirectoryV3 {
     }
   }
 
-  async getManifest(params?: PartialMessage<GetManifestRequest>) {
+  async getManifest(params?: PlainMessage<GetManifestRequest>) {
     try {
       const response = this.ModelClient.getManifest(params!);
       if (!response) {
         throw new Error("No response from directory service");
       }
 
-      return response;
+      const data = (await readAsyncIterable(response))
+        .map((el) => el.msg)
+        .map((el) => {
+          return {
+            [el.case as string]: el.value,
+          };
+        });
+
+      const body = new TextDecoder().decode((data[1]?.body as Body)?.data);
+      const metadata = data[0]?.metadata as Metadata;
+      return {
+        body,
+        updatedAt: metadata?.updatedAt,
+        etag: metadata?.etag,
+      };
     } catch (error) {
       handleError(error, "getManifest");
     }
   }
 
-  async setManifest(params: AsyncIterable<PartialMessage<SetManifestRequest>>) {
+  async setManifest(params: { body: string }) {
     try {
-      const response = this.ModelClient.setManifest(params);
+      const response = await this.ModelClient.setManifest(
+        createAsyncIterable([
+          new SetManifestRequest({
+            msg: {
+              case: "body",
+              value: { data: new TextEncoder().encode(params.body) },
+            },
+          }),
+        ])
+      );
+
       if (!response) {
         throw new Error("No response from directory service");
       }
@@ -411,6 +437,24 @@ export class DirectoryV3 {
       handleError(error, "setManifest");
     }
   }
+}
+
+/**
+ * Read an asynchronous iterable into an array.
+ */
+async function readAsyncIterable<T>(gen: AsyncIterable<T>): Promise<T[]> {
+  const out: T[] = [];
+  for await (const x of gen) {
+    out.push(x);
+  }
+  return out;
+}
+
+/**
+ * Create an asynchronous iterable from an array.
+ */
+async function* createAsyncIterable<T>(items: T[]): AsyncIterable<T> {
+  yield* items;
 }
 
 function handleError(error: unknown, method: string) {
