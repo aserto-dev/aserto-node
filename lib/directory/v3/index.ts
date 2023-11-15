@@ -184,9 +184,6 @@ export class DirectoryV3 {
   async checkPermission(params: CheckPermissionRequest) {
     try {
       const response = await this.ReaderClient.checkPermission(params);
-      if (!response) {
-        throw new Error("No response from directory service");
-      }
 
       return response.check;
     } catch (error) {
@@ -197,9 +194,6 @@ export class DirectoryV3 {
   async checkRelation(params: CheckRelationRequest) {
     try {
       const response = await this.ReaderClient.checkRelation(params);
-      if (!response) {
-        throw new Error("No response from directory service");
-      }
 
       return response.check;
     } catch (error) {
@@ -210,9 +204,6 @@ export class DirectoryV3 {
   async object(params: GetObjectRequest) {
     try {
       const response = await this.ReaderClient.getObject(params);
-      if (!response) {
-        throw new Error("No response from directory service");
-      }
 
       return response.result;
     } catch (error) {
@@ -225,9 +216,6 @@ export class DirectoryV3 {
   }) {
     try {
       const response = await this.ReaderClient.getObjects(params);
-      if (!response) {
-        throw new Error("No response from directory service");
-      }
 
       return response;
     } catch (error) {
@@ -238,9 +226,6 @@ export class DirectoryV3 {
   async objectMany(params: PlainMessage<GetObjectManyRequest>) {
     try {
       const response = await this.ReaderClient.getObjectMany(params);
-      if (!response) {
-        throw new Error("No response from directory service");
-      }
 
       return response.results;
     } catch (error) {
@@ -259,9 +244,6 @@ export class DirectoryV3 {
       });
 
       const response = await this.WriterClient.setObject(newParams);
-      if (!response) {
-        throw new Error("No response from directory service");
-      }
 
       return response.result;
     } catch (error) {
@@ -272,9 +254,6 @@ export class DirectoryV3 {
   async deleteObject(params: DeleteObjectRequest) {
     try {
       const response = await this.WriterClient.deleteObject(params);
-      if (!response) {
-        throw new Error("No response from directory service");
-      }
 
       return response.result;
     } catch (error) {
@@ -285,9 +264,6 @@ export class DirectoryV3 {
   async relation(params: GetRelationRequest) {
     try {
       const response = await this.ReaderClient.getRelation(params);
-      if (!response) {
-        throw new Error("No response from directory service");
-      }
 
       return response;
     } catch (error) {
@@ -298,9 +274,6 @@ export class DirectoryV3 {
   async setRelation(params: SetRelationRequest) {
     try {
       const response = await this.WriterClient.setRelation(params);
-      if (!response) {
-        throw new Error("No response from directory service");
-      }
 
       return response.result;
     } catch (error) {
@@ -311,9 +284,6 @@ export class DirectoryV3 {
   async deleteRelation(params: DeleteRelationRequest) {
     try {
       const response = await this.WriterClient.deleteRelation(params);
-      if (!response) {
-        throw new Error("No response from directory service");
-      }
 
       return response.result;
     } catch (error) {
@@ -324,9 +294,6 @@ export class DirectoryV3 {
   async relations(params: GetRelationsRequest) {
     try {
       const response = await this.ReaderClient.getRelations(params);
-      if (!response) {
-        throw new Error("No response from directory service");
-      }
 
       return response;
     } catch (error) {
@@ -337,9 +304,6 @@ export class DirectoryV3 {
   async graph(params: GetGraphRequest) {
     try {
       const response = await this.ReaderClient.getGraph(params);
-      if (!response) {
-        throw new Error("No response from directory service");
-      }
 
       return response;
     } catch (error) {
@@ -350,9 +314,6 @@ export class DirectoryV3 {
   async import(params: AsyncIterable<PartialMessage<ImportRequest>>) {
     try {
       const response = this.ImporterClient.import(params);
-      if (!response) {
-        throw new Error("No response from directory service");
-      }
 
       return response;
     } catch (error) {
@@ -363,9 +324,6 @@ export class DirectoryV3 {
   async export(params: PlainMessage<ExportRequest>) {
     try {
       const response = this.ExporterClient.export(params);
-      if (!response) {
-        throw new Error("No response from directory service");
-      }
 
       const data = await readAsyncIterable(response);
       return data;
@@ -377,9 +335,6 @@ export class DirectoryV3 {
   async getManifest(params?: PlainMessage<GetManifestRequest>) {
     try {
       const response = this.ModelClient.getManifest(params!);
-      if (!response) {
-        throw new Error("No response from directory service");
-      }
 
       const data = (await readAsyncIterable(response))
         .map((el) => el.msg)
@@ -414,10 +369,6 @@ export class DirectoryV3 {
         ])
       );
 
-      if (!response) {
-        throw new Error("No response from directory service");
-      }
-
       return response;
     } catch (error) {
       handleError(error, "setManifest");
@@ -427,9 +378,6 @@ export class DirectoryV3 {
   async deleteManifest(params?: PlainMessage<DeleteManifestRequest>) {
     try {
       const response = this.ModelClient.deleteManifest(params!);
-      if (!response) {
-        throw new Error("No response from directory service");
-      }
 
       return response;
     } catch (error) {
