@@ -22,6 +22,7 @@ import {
   SetRelationResponse,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
 import { Struct } from "@bufbuild/protobuf";
+import { ConnectError } from "@connectrpc/connect";
 import { createAsyncIterable } from "@connectrpc/connect/protocol";
 
 import { DirectoryServiceV3, DirectoryV3 } from "../../../lib/index";
@@ -40,6 +41,83 @@ describe("DirectoryV3", () => {
       tenantId: "tenantId",
       apiKey: "apiKey",
     };
+    const directory = DirectoryServiceV3(config);
+
+    expect(directory).toBeInstanceOf(DirectoryV3);
+    expect(directory.ReaderClient).toBeDefined();
+    expect(directory.WriterClient).toBeDefined();
+    expect(directory.ImporterClient).toBeDefined();
+    expect(directory.ExporterClient).toBeDefined();
+    expect(directory.ModelClient).toBeDefined();
+  });
+
+  it("handles multiple service configs", () => {
+    const config = {
+      url: "directory.prod.aserto.com:8443",
+      tenantId: "tenantId",
+      apiKey: "apiKey",
+      reader: {
+        url: "readerUrl",
+        apiKey: "readerApiKey",
+        tenantId: "readerTenantId",
+      },
+      writer: {
+        url: "writerUrl",
+        apiKey: "writerApiKey",
+        tenantId: "writerTenantId",
+      },
+      importer: {
+        url: "importerUrl",
+        apiKey: "importerApiKey",
+        tenantId: "importerTenantId",
+      },
+      exporter: {
+        url: "exporterUrl",
+        apiKey: "exporterApiKey",
+        tenantId: "exporterTenantId",
+      },
+      model: {
+        url: "modelUrl",
+        apiKey: "modelApiKey",
+        tenantId: "modelTenantId",
+      },
+      rejectUnauthorized: true,
+    };
+
+    const directory = DirectoryServiceV3(config);
+
+    expect(directory).toBeInstanceOf(DirectoryV3);
+    expect(directory.ReaderClient).toBeDefined();
+    expect(directory.WriterClient).toBeDefined();
+    expect(directory.ImporterClient).toBeDefined();
+    expect(directory.ExporterClient).toBeDefined();
+    expect(directory.ModelClient).toBeDefined();
+  });
+
+  it("handles same config for multiple services", () => {
+    const config = {
+      url: "directory.prod.aserto.com:8443",
+      tenantId: "tenantId",
+      apiKey: "apiKey",
+      reader: {
+        url: "readerUrl",
+        apiKey: "readerApiKey",
+        tenantId: "readerTenantId",
+      },
+      importer: {
+        url: "readerUrl",
+        apiKey: "readerApiKey",
+      },
+      exporter: {
+        url: "exporterUrl",
+        tenantId: "exporterTenantId",
+      },
+      model: {
+        apiKey: "modelApiKey",
+        tenantId: "modelTenantId",
+      },
+    };
+
     const directory = DirectoryServiceV3(config);
 
     expect(directory).toBeInstanceOf(DirectoryV3);
@@ -90,6 +168,25 @@ describe("DirectoryV3", () => {
       };
       await expect(directory.checkPermission(params)).rejects.toThrow(
         "Directory service error"
+      );
+
+      mockCheckPermission.mockReset();
+    });
+
+    it("handles ConnectError", async () => {
+      const mockCheckPermission = jest
+        .spyOn(directory.ReaderClient, "checkPermission")
+        .mockRejectedValue(new ConnectError("connect error", 5));
+
+      const params = {
+        subjectId: "euang@acmecorp.com",
+        subjectType: "user",
+        permission: "read",
+        objectType: "group",
+        objectId: "admin",
+      };
+      await expect(directory.checkPermission(params)).rejects.toThrow(
+        '"checkPermission" failed with code: 5, message: [not_found] connect error'
       );
 
       mockCheckPermission.mockReset();
@@ -623,18 +720,18 @@ describe("DirectoryV3", () => {
 
   describe("deleteManifest", () => {
     it("deletes a Manifest", async () => {
-      const deleteManifest = jest
+      const mockDeleteManifest = jest
         .spyOn(directory.ModelClient, "deleteManifest")
         .mockResolvedValue(new DeleteManifestResponse());
 
       const result = await directory.deleteManifest();
       expect(result).toEqual({});
 
-      deleteManifest.mockReset();
+      mockDeleteManifest.mockReset();
     });
 
     it("handles errors returned by the directory service", async () => {
-      const deleteManifest = jest
+      const mockDeleteManifest = jest
         .spyOn(directory.ModelClient, "deleteManifest")
         .mockRejectedValue(new Error("Directory service error"));
 
@@ -642,7 +739,7 @@ describe("DirectoryV3", () => {
         "Directory service error"
       );
 
-      deleteManifest.mockReset();
+      mockDeleteManifest.mockReset();
     });
   });
 

@@ -381,7 +381,7 @@ export class DirectoryV3 {
 
       return response;
     } catch (error) {
-      handleError(error, "setManifest");
+      handleError(error, "deleteManifest");
     }
   }
 }
