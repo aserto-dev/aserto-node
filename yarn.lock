@@ -358,10 +358,15 @@
     "@bufbuild/connect" "0.10.1"
     headers-polyfill "^3.1.2"
 
-"@bufbuild/connect@0.10.1", "@bufbuild/connect@^0.10.0":
+"@bufbuild/connect@0.10.1":
   version "0.10.1"
   resolved "https://registry.yarnpkg.com/@bufbuild/connect/-/connect-0.10.1.tgz#2a7bd1824e26c01567e673408ef5da0ab72c90d6"
   integrity sha512-rqdZakAdajdSnRO342K7S3gZnUPMYXF2JsUDMA4vpR34SYdWYXiL2mclUMTaUk+EfLK04ulyejNaFAc0e5o8Qw==
+
+"@bufbuild/connect@^0.13.0":
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/@bufbuild/connect/-/connect-0.13.0.tgz#97a84a2cac747c7a52d4421a3382d8d165f61c99"
+  integrity sha512-eZSMbVLyUFtXiZNORgCEvv580xKZeYQdMOWj2i/nxOcpXQcrEzTMTA7SZzWv4k4gveWCOSRoWmYDeOhfWXJv0g==
 
 "@bufbuild/protobuf@^1.2.1":
   version "1.2.1"
