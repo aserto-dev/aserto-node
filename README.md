@@ -4,16 +4,15 @@ Aserto authorization middleware for the node Express server, based on
 Auth0's [express-jwt-authz](https://github.com/auth0/express-jwt-authz)
 package.
 
-This package provides four capabilities:
+This package provides multiple capabilities:
 
-1. `jwtAuthz`: middleware that sits on a route, and validates a request to authorize access to that route.
-2. `displayStateMap`: middleware that adds an endpoint for returning the display state map for a service, based on its authorization policy.
-3. `is`: a function that can be called to make a decision about a user's access to a resource based on a policy.
-4. `ds`: an object containing the `object` and `relation` functions, which can be called to retrieve an object or relation, respectively, from the directory.
-
-The first three capabilities call out to an authorizer service, which must be configured as part of the `options` map passed in.
-
-The fourth calls out to a directory service.
+1. `Middleware` - `Authz` and `Check` middlewares that sits on a route, and validates a request to authorize access to that route.
+2. `Authorizer` - Authorizer Client that provides functions to faclitate comunication with an authorizer v2 service.
+3. `DirectoryServiceV3` - Directory Client that provides functions to faclitate comunication with an directory v3 service.
+4. `jwtAuthz`: middleware that sits on a route, and validates a request to authorize access to that route.
+5. `displayStateMap`: middleware that adds an endpoint for returning the display state map for a service, based on its authorization policy.
+6. `is`: a function that can be called to make a decision about a user's access to a resource based on a policy.
+7. `ds`: an object containing the `object` and `relation` functions, which can be called to retrieve an object or relation, respectively, from the directory.
 
 ## Installation
 
@@ -30,8 +29,6 @@ yarn add @aserto/aserto-node
 ```
 
 > `express@^4.0.0` is a peer dependency. Make sure it is installed in your project.
-
-
 
 ## Authorizer
 
