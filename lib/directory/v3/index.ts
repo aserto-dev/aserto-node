@@ -12,10 +12,7 @@ import {
   SetManifestRequest,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
 import { Reader } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_connect";
-import {
-  GetGraphRequest,
-  GetObjectManyRequest,
-} from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_pb";
+import { GetObjectManyRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_pb";
 import { Writer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_connect";
 import { SetObjectRequest as SetObjectRequest$ } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
 import {
@@ -40,6 +37,7 @@ import {
   DeleteObjectRequest,
   DeleteRelationRequest,
   DirectoryV3Config,
+  GetGraphRequest,
   GetObjectRequest,
   GetRelationRequest,
   GetRelationsRequest,
@@ -336,14 +334,14 @@ export class DirectoryV3 {
     }
   }
 
-  async graph(params: PlainMessage<GetGraphRequest>) {
+  async graph(params: GetGraphRequest) {
     try {
       const response = await this.ReaderClient.getGraph(params);
       if (!response) {
         throw new Error("No response from directory service");
       }
 
-      return response.results;
+      return response;
     } catch (error) {
       handleError(error, "graph");
     }

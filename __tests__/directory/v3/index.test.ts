@@ -1,3 +1,5 @@
+import { ExportResponse } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
+import { ImportResponse } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
 import {
   DeleteManifestResponse,
   GetManifestResponse,
@@ -6,6 +8,8 @@ import {
 import {
   CheckPermissionResponse,
   CheckRelationResponse,
+  GetGraphResponse,
+  GetObjectManyResponse,
   GetObjectResponse,
   GetObjectsResponse,
   GetRelationResponse,
@@ -20,7 +24,7 @@ import {
 import { Struct } from "@bufbuild/protobuf";
 import { createAsyncIterable } from "@connectrpc/connect/protocol";
 
-import { DirectoryServiceV3 } from "../../../lib/index";
+import { DirectoryServiceV3, DirectoryV3 } from "../../../lib/index";
 
 describe("DirectoryV3", () => {
   const config = {
@@ -29,6 +33,22 @@ describe("DirectoryV3", () => {
     apiKey: "apiKey",
   };
   const directory = DirectoryServiceV3(config);
+
+  it("creates an instance of DirectoryV3 with valid config", () => {
+    const config = {
+      url: "example.com",
+      tenantId: "tenantId",
+      apiKey: "apiKey",
+    };
+    const directory = DirectoryServiceV3(config);
+
+    expect(directory).toBeInstanceOf(DirectoryV3);
+    expect(directory.ReaderClient).toBeDefined();
+    expect(directory.WriterClient).toBeDefined();
+    expect(directory.ImporterClient).toBeDefined();
+    expect(directory.ExporterClient).toBeDefined();
+    expect(directory.ModelClient).toBeDefined();
+  });
 
   describe("checkPermission", () => {
     it("calls checkPermission with valid params", async () => {
@@ -237,6 +257,71 @@ describe("DirectoryV3", () => {
       );
 
       mockSetObject.mockReset();
+    });
+  });
+
+  describe("objectMany", () => {
+    it("returns the expected object data when calling objectMany with valid params", async () => {
+      const mockGetObjectMany = jest
+        .spyOn(directory.ReaderClient, "getObjectMany")
+        .mockResolvedValue(new GetObjectManyResponse());
+
+      const params = { param: [{ objectType: "user", objectId: "123" }] };
+      const result = await directory.objectMany(params);
+
+      expect(result).toEqual([]);
+
+      mockGetObjectMany.mockReset();
+    });
+
+    it("handles errors returned by the directory service", async () => {
+      const mockGetObjectMany = jest
+        .spyOn(directory.ReaderClient, "getObjectMany")
+        .mockRejectedValue(new Error("Directory service error"));
+
+      const params = { param: [{ objectType: "user", objectId: "123" }] };
+      await expect(directory.objectMany(params)).rejects.toThrow(
+        "Directory service error"
+      );
+
+      mockGetObjectMany.mockReset();
+    });
+  });
+
+  describe("graph", () => {
+    it("calls graph with valid params and return expected response", async () => {
+      const mockGetGraph = jest
+        .spyOn(directory.ReaderClient, "getGraph")
+        .mockResolvedValue(new GetGraphResponse());
+
+      const params = {
+        anchorType: "user",
+        anchorId: "1234",
+        objectType: "user",
+      };
+      const result = await directory.graph(params);
+
+      expect(mockGetGraph).toHaveBeenCalledWith(params);
+      expect(result).toEqual({ results: [] });
+
+      mockGetGraph.mockReset();
+    });
+
+    it("handles errors returned by the directory service", async () => {
+      const mockGetGraph = jest
+        .spyOn(directory.ReaderClient, "getGraph")
+        .mockRejectedValue(new Error("Directory service error"));
+
+      const params = {
+        anchorType: "user",
+        anchorId: "1234",
+        objectType: "user",
+      };
+      await expect(directory.graph(params)).rejects.toThrow(
+        "Directory service error"
+      );
+
+      mockGetGraph.mockReset();
     });
   });
 
@@ -558,6 +643,66 @@ describe("DirectoryV3", () => {
       );
 
       deleteManifest.mockReset();
+    });
+  });
+
+  describe("import", () => {
+    it("calls import with valid params and return expected response", async () => {
+      const mockImport = jest
+        .spyOn(directory.ImporterClient, "import")
+        .mockReturnValue(createAsyncIterable([new ImportResponse({})]));
+
+      const params = createAsyncIterable([]);
+      await directory.import(params);
+
+      expect(mockImport).toHaveBeenCalledWith(params);
+
+      mockImport.mockReset();
+    });
+
+    it("handles errors returned by the directory service", async () => {
+      const mockImport = jest
+        .spyOn(directory.ImporterClient, "import")
+        .mockImplementation(() => {
+          throw new Error("Directory service error");
+        });
+
+      await expect(directory.import(createAsyncIterable([]))).rejects.toThrow(
+        "Directory service error"
+      );
+
+      mockImport.mockReset();
+    });
+  });
+
+  describe("export", () => {
+    it("calls export with valid params and return expected response", async () => {
+      const mockExport = jest
+        .spyOn(directory.ExporterClient, "export")
+        .mockReturnValue(createAsyncIterable([new ExportResponse()]));
+
+      const params = { options: 1 };
+      await directory.export(params);
+
+      expect(mockExport).toHaveBeenCalledWith(params);
+
+      mockExport.mockReset();
+    });
+
+    it("handles errors returned by the directory service", async () => {
+      const mockExport = jest
+        .spyOn(directory.ExporterClient, "export")
+        .mockImplementation(() => {
+          throw new Error("Directory service error");
+        });
+
+      const params = { options: 1 };
+
+      await expect(directory.export(params)).rejects.toThrow(
+        "Directory service error"
+      );
+
+      mockExport.mockReset();
     });
   });
 });
