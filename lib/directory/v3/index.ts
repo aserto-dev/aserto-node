@@ -344,7 +344,16 @@ export class DirectoryV3 {
           };
         });
 
-      const body = new TextDecoder().decode((data[1]?.body as Body)?.data);
+      const bodyData = data
+        .map((el) => {
+          return el["body"];
+        })
+        .filter((el) => el !== undefined)
+        .map((el) => {
+          return (el as Body)?.data;
+        });
+
+      const body = new TextDecoder().decode(mergeUint8Arrays(...bodyData));
       const metadata = data[0]?.metadata as Metadata;
       return {
         body,
@@ -412,6 +421,18 @@ function handleError(error: unknown, method: string) {
   } else {
     throw error;
   }
+}
+
+function mergeUint8Arrays(...arrays: Uint8Array[]): Uint8Array {
+  const totalSize = arrays.reduce((acc, e) => acc + e.length, 0);
+  const merged = new Uint8Array(totalSize);
+
+  arrays.forEach((array, i, arrays) => {
+    const offset = arrays.slice(0, i).reduce((acc, e) => acc + e.length, 0);
+    merged.set(array, offset);
+  });
+
+  return merged;
 }
 
 export const DirectoryServiceV3 = (config: DirectoryV3Config): DirectoryV3 => {
