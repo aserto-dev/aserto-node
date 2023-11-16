@@ -6,13 +6,14 @@ package.
 
 This package provides multiple capabilities:
 
-1. `Middleware` - `Authz` and `Check` middlewares that sits on a route, and validates a request to authorize access to that route.
-2. `Authorizer` - Authorizer Client that provides functions to faclitate comunication with an authorizer v2 service.
-3. `DirectoryServiceV3` - Directory Client that provides functions to faclitate comunication with an directory v3 service.
-4. `jwtAuthz`: middleware that sits on a route, and validates a request to authorize access to that route.
-5. `displayStateMap`: middleware that adds an endpoint for returning the display state map for a service, based on its authorization policy.
-6. `is`: a function that can be called to make a decision about a user's access to a resource based on a policy.
-7. `ds`: an object containing the `object` and `relation` functions, which can be called to retrieve an object or relation, respectively, from the directory.
+1. `Middleware` - Provides 2 implementations: `Authz` and `Check` middlewares that sits on a route, and validates a request to authorize access to that route.
+2. `Authorizer` - Authorizer Client that provides functions to faclitate comunication with an Authorizer v2 service.
+3. `DirectoryServiceV3` - Directory Client that provides functions to faclitate comunication with an Directory v3 service.
+4. `DirectoryServiceV2` - Directory Client that provides functions to faclitate comunication with an Directory v2 service.
+5. `jwtAuthz`(deprecated): middleware that sits on a route, and validates a request to authorize access to that route.
+6. `displayStateMap`: middleware that adds an endpoint for returning the display state map for a service, based on its authorization policy.
+7. `is`: a function that can be called to make a decision about a user's access to a resource based on a policy.
+8. `ds`(deprecated): an object containing the `object` and `relation` functions, which can be called to retrieve an object or relation, respectively, from the directory.
 
 ## Installation
 
@@ -446,7 +447,7 @@ const directoryClient = DirectoryServiceV3({
 #### Example
 Define a writer client that uses the same credentials but connects to localhost:9393. All other services will have the default configuration
 ```ts
-import { DirectoryServiceV3ds } from "@aserto/aserto-node";
+import { DirectoryServiceV3 } from "@aserto/aserto-node";
 
 const directoryClient = DirectoryServiceV3({
   url: 'localhost:9292',

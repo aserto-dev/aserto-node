@@ -42,7 +42,8 @@ import {
 } from "@connectrpc/connect";
 import { createGrpcTransport } from "@connectrpc/connect-node";
 
-import { NestedOmit, PartialExcept } from "./util/types";
+import { log } from "../../log";
+import { NestedOmit, PartialExcept } from "../../util/types";
 
 type ServiceConfig = {
   url?: string;
@@ -401,5 +402,10 @@ function handleError(error: unknown, method: string) {
 }
 
 export const ds = (config: DirectoryConfig): Directory => {
+  log("`ds` method is deprecated, please use `DirectoryServiceV2`");
+  return new Directory(config);
+};
+
+export const DirectoryServiceV2 = (config: DirectoryConfig): Directory => {
   return new Directory(config);
 };
