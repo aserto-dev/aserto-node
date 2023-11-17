@@ -176,7 +176,7 @@ type Policy = {
   root: string;
   name?: string;
   instanceLabel?: string;
-  decission?: string;
+  decision?: string;
   path?: string;
 };
 
@@ -217,7 +217,7 @@ function Check(options: CheckOptions)
 const app: express.Application = express();
 
 
-//Standard REST
+// Standard REST
 const restMw = new Middleware({
   client: client,
   policy: {
@@ -316,7 +316,7 @@ const restMw = new Middleware({
 
 The authorization policy's ID and the decision to be evaluated are specified when creating authorization Middleware, but the policy path is often derived from the URL or method being called.
 
-By default, the policy path is derived from the URL path
+By default, the policy path is derived from the URL path.
 
 To provide custom logic, use a PolicyMapper. For example:
 
@@ -328,13 +328,13 @@ const restMw = new Middleware({
   client: authClient,
   policy: policy,
   policyMapper: async () => {
-    return policyContext('path', ['decission'])
+    return policyContext('path', ['decision'])
   }
 })
 ```
 
 #### Resource
-A resource can be any structured data that the authorization policy uses to evaluate decisions. By default, the request params are included in the ResourceContext
+A resource can be any structured data that the authorization policy uses to evaluate decisions. By default, the request params are included in the ResourceContext.
 
 This behavior can be overwritten by providing a custom function:
 
@@ -441,7 +441,7 @@ const directoryClient = DirectoryServiceV3({
 - `writer`: ServiceConfig for the writer client(option)
 - `importer`: ServiceConfig for the importer client(option)
 - `exporter`: ServiceConfig for the exporter client(option)
-- `model`: ServiceConfig for the mode; client(option)
+- `model`: ServiceConfig for the model client(option)
 ```
 
 #### Example
@@ -590,8 +590,7 @@ Check that `euang@acmecorp.com` has an `identifier` relation to an object with k
 const check = directoryClient.checkRelation({
   subjectId: 'euang@acmecorp.com',
   subjectType: 'user',
-  name: "identifier",
-  objectType: "identity",
+  name: 'identifier',
   objectType: 'identity',
   objectId: 'euang@acmecorp.com',
 });
@@ -612,7 +611,7 @@ const relation = await directoryClient.relation(
 );
 
 if (!relation) {
-  throw new Error(`No relations found for identity ${identity}`, )
+  throw new Error(`No relations found for identity ${identity}`)
 };
 
 const user = await directoryClient.object(
