@@ -10,32 +10,43 @@ import identityContext from "./authorizer/model/identityContext";
 import policyContext from "./authorizer/model/policyContext";
 import policyInstance from "./authorizer/model/policyInstance";
 import queryOptions from "./authorizer/model/queryOptions";
+import {
+  Directory,
+  DirectoryConfig,
+  DirectoryServiceV2,
+  ds,
+} from "./directory/v2";
+import { DirectoryServiceV3, DirectoryV3 } from "./directory/v3";
+import { DirectoryV3Config } from "./directory/v3/types";
 import { displayStateMap } from "./displayStateMap";
-import { Directory, DirectoryConfig, ds } from "./ds";
 import { is } from "./is";
 import { AuthzOptions, jwtAuthz } from "./jwtAuthz";
 import getSSLCredentials from "./ssl";
 export {
-  is,
-  jwtAuthz,
+  AnonymousIdentityMapper,
+  Authorizer,
+  authz,
+  AuthzOptions,
+  decisionTreeOptions,
+  Directory,
+  DirectoryConfig,
+  DirectoryServiceV2,
+  DirectoryServiceV3,
+  DirectoryV3,
+  DirectoryV3Config,
   displayStateMap,
   ds,
-  Directory,
-  Authorizer,
-  Middleware,
-  authz,
-  SubIdentityMapper,
-  JWTIdentityMapper,
-  AnonymousIdentityMapper,
-  ManualIdentityMapper,
-  DirectoryConfig,
-  AuthzOptions,
-  PolicyPathMapper,
-  ObjectIDFromVar,
+  getSSLCredentials,
   identityContext,
+  is,
+  jwtAuthz,
+  JWTIdentityMapper,
+  ManualIdentityMapper,
+  Middleware,
+  ObjectIDFromVar,
   policyContext,
   policyInstance,
-  getSSLCredentials,
+  PolicyPathMapper,
   queryOptions,
-  decisionTreeOptions,
+  SubIdentityMapper,
 };
