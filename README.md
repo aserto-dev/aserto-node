@@ -671,6 +671,50 @@ types:
 await directoryClient.deleteManifest();
 ```
 
+### Import
+
+```ts
+
+const importRequest = createAsyncIterable([
+  new ImportRequest({
+    msg: {
+      case: "object",
+      value: {
+        id: "id1",
+        type: "user",
+        properties: {},
+        displayName: "name1",
+      },
+    },
+  }),
+  new ImportRequest({
+    msg: {
+      case: "object",
+      value: {
+        id: "id2",
+        type: "user",
+        properties: {},
+        displayName: "name2",
+      },
+    },
+  }),
+  new ImportRequest({
+    msg: {
+      case: "relation",
+      value: {
+        objectId: "id1",
+        objectType: "user",
+        subjectId: "id2",
+        subjectType: "user",
+        relation: "manager",
+      },
+    },
+  }),
+]);
+
+const resp = await directoryClient.import(importRequest);
+await (readAsyncIterable(resp))
+```
 
 ## Deprecated Methods
 

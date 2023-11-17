@@ -41,7 +41,7 @@ export type GetObjectRequest = PartialExcept<
 
 export type GetRelationRequest = PartialExcept<
   PlainMessage<GetRelationRequest$>,
-  ["subjectRelation", "withObjects"]
+  ["subjectRelation", "withObjects", "subjectId"]
 >;
 
 export type GetRelationsRequest = PartialExcept<

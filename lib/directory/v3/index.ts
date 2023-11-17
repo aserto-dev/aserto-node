@@ -398,7 +398,9 @@ export class DirectoryV3 {
 /**
  * Read an asynchronous iterable into an array.
  */
-async function readAsyncIterable<T>(gen: AsyncIterable<T>): Promise<T[]> {
+export async function readAsyncIterable<T>(
+  gen: AsyncIterable<T>
+): Promise<T[]> {
   const out: T[] = [];
   for await (const x of gen) {
     out.push(x);
@@ -409,7 +411,7 @@ async function readAsyncIterable<T>(gen: AsyncIterable<T>): Promise<T[]> {
 /**
  * Create an asynchronous iterable from an array.
  */
-async function* createAsyncIterable<T>(items: T[]): AsyncIterable<T> {
+export async function* createAsyncIterable<T>(items: T[]): AsyncIterable<T> {
   yield* items;
 }
 

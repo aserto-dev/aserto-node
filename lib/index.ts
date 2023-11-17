@@ -16,7 +16,12 @@ import {
   DirectoryServiceV2,
   ds,
 } from "./directory/v2";
-import { DirectoryServiceV3, DirectoryV3 } from "./directory/v3";
+import {
+  createAsyncIterable,
+  DirectoryServiceV3,
+  DirectoryV3,
+  readAsyncIterable,
+} from "./directory/v3";
 import { DirectoryV3Config } from "./directory/v3/types";
 import { displayStateMap } from "./displayStateMap";
 import { is } from "./is";
@@ -27,6 +32,7 @@ export {
   Authorizer,
   authz,
   AuthzOptions,
+  createAsyncIterable,
   decisionTreeOptions,
   Directory,
   DirectoryConfig,
@@ -48,5 +54,7 @@ export {
   policyInstance,
   PolicyPathMapper,
   queryOptions,
+  readAsyncIterable,
   SubIdentityMapper,
+  DirectoryConfig as ServiceConfig,
 };
