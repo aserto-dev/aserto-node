@@ -11,11 +11,15 @@ const SubIdentityMapper = (
   return async (req: Request): Promise<IdentityContext> => {
     const authHeader = req.header(header);
     if (authHeader) {
-      const token: JwtPayload = jwt_decode(authHeader);
-      if (token && token.sub) {
-        return identityContext(token.sub, "IDENTITY_TYPE_SUB");
+      if (header === "Authorization") {
+        const token: JwtPayload = jwt_decode(authHeader);
+        if (token && token.sub) {
+          return identityContext(token.sub, "IDENTITY_TYPE_SUB");
+        } else {
+          throw new Error("Missing token");
+        }
       } else {
-        throw new Error("Missing token");
+        return identityContext(authHeader, "IDENTITY_TYPE_SUB");
       }
     } else {
       throw new Error(`Missing ${header} header`);
