@@ -116,7 +116,7 @@ const displayStateMap = (
 
     try {
       const result = await callAuthorizer();
-      res.status(200).send(result);
+      res.status(200).send(result.path);
     } catch (err) {
       error(res, err as string);
     }
