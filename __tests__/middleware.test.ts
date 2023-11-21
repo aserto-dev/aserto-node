@@ -112,7 +112,7 @@ describe("Middleware", () => {
       expect(next).toBeCalledWith({
         statusCode: 403,
         error: "Forbidden",
-        message: `aserto-node: Forbidden by policy examplePolicy`,
+        message: `aserto-node: Forbidden by policy examplePolicy.check`,
       });
     });
 
@@ -248,7 +248,7 @@ describe("Middleware", () => {
       expect(next).toBeCalledWith({
         statusCode: 403,
         error: "Forbidden",
-        message: `aserto-node: Forbidden by policy examplePolicy`,
+        message: `aserto-node: Forbidden by policy examplePolicy.GET.todos`,
       });
     });
 
