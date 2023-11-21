@@ -117,18 +117,21 @@ export class Middleware {
           resourceContext = { ...resourceContext, ...this.resourceMapper };
         }
 
-        return this.client.Is({
-          identityContext: await this.identityContext(req),
-          policyContext: policyCtx,
-          policyInstance: this.policyInstance(),
-          resourceContext: resourceContext,
-        });
+        return [
+          await this.client.Is({
+            identityContext: await this.identityContext(req),
+            policyContext: policyCtx,
+            policyInstance: this.policyInstance(),
+            resourceContext: resourceContext,
+          }),
+          policyCtx.getPath(),
+        ];
       };
       try {
-        const allowed = await callAuthorizer();
+        const [allowed, policyPath] = await callAuthorizer();
         return allowed
           ? next()
-          : error(res, `Forbidden by policy ${this.policy.root}`);
+          : error(res, `Forbidden by policy ${policyPath}`);
       } catch (err) {
         error(res, err as string);
       }
@@ -151,18 +154,21 @@ export class Middleware {
             : this.resourceMapper
           : ResourceParamsMapper(req);
 
-        return this.client.Is({
-          identityContext: await this.identityContext(req),
-          policyContext: policyCtx,
-          policyInstance: this.policyInstance(),
-          resourceContext: resourceContext,
-        });
+        return [
+          await this.client.Is({
+            identityContext: await this.identityContext(req),
+            policyContext: policyCtx,
+            policyInstance: this.policyInstance(),
+            resourceContext: resourceContext,
+          }),
+          policyCtx.getPath(),
+        ];
       };
       try {
-        const allowed = await callAuthorizer();
+        const [allowed, policyPath] = await callAuthorizer();
         return allowed
           ? next()
-          : error(res, `Forbidden by policy ${this.policy.root}`);
+          : error(res, `Forbidden by policy ${policyPath}`);
       } catch (err) {
         error(res, err as string);
       }

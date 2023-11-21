@@ -55,4 +55,16 @@ describe("SubIdentityMapper", () => {
 
     expect(result).toEqual(identityContext("test", "IDENTITY_TYPE_SUB"));
   });
+
+  it("returns an identity context from a custom header", async () => {
+    const req = httpMocks.createRequest({
+      headers: {
+        identity: `my-id`,
+      },
+    });
+    const customSubMapper = SubIdentityMapper("identity");
+    const result = await customSubMapper(req);
+
+    expect(result).toEqual(identityContext("my-id", "IDENTITY_TYPE_SUB"));
+  });
 });
