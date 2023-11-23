@@ -12,7 +12,12 @@ import {
   SetObjectRequest as SetObjectRequest$,
   SetRelationRequest as SetRelationRequest$,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
-import { JsonValue, PlainMessage, Struct } from "@bufbuild/protobuf";
+import {
+  JsonValue,
+  PartialMessage,
+  PlainMessage,
+  Struct,
+} from "@bufbuild/protobuf";
 
 import { NestedOmit, PartialExcept } from "../../util/types";
 
@@ -44,16 +49,13 @@ export type GetRelationRequest = PartialExcept<
   ["subjectRelation", "withObjects", "subjectId"]
 >;
 
-export type GetRelationsRequest = PartialExcept<
-  PlainMessage<GetRelationsRequest$>,
-  ["subjectRelation", "withObjects", "page.token"]
->;
+export type GetRelationsRequest = PartialMessage<GetRelationsRequest$>;
 
 export type SetObjectRequest = PartialExcept<
   NestedOmit<PlainMessage<SetObjectRequest$>, "object.properties"> & {
     object?: { properties?: { [key: string]: JsonValue } | Struct };
   },
-  ["object.etag"]
+  ["object.etag", "object.displayName"]
 >;
 
 export type DeleteObjectRequest = PartialExcept<

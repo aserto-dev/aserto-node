@@ -149,7 +149,7 @@ describe("DirectoryV3", () => {
         params
       );
 
-      expect(result).toBe(true);
+      expect(result?.check).toBe(true);
 
       mockCheckPermission.mockReset();
     });
@@ -211,7 +211,7 @@ describe("DirectoryV3", () => {
       const result = await directory.checkRelation(params);
 
       expect(directory.ReaderClient.checkRelation).toHaveBeenCalledWith(params);
-      expect(result).toBe(true);
+      expect(result?.check).toBe(true);
 
       mockCheckRelation.mockReset();
     });
@@ -778,10 +778,9 @@ describe("DirectoryV3", () => {
         .spyOn(directory.ExporterClient, "export")
         .mockReturnValue(createAsyncIterable([new ExportResponse()]));
 
-      const params = { options: 1 };
-      await directory.export(params);
+      await directory.export({ options: "all" });
 
-      expect(mockExport).toHaveBeenCalledWith(params);
+      expect(mockExport).toHaveBeenCalledWith({ options: 24 });
 
       mockExport.mockReset();
     });
@@ -793,9 +792,7 @@ describe("DirectoryV3", () => {
           throw new Error("Directory service error");
         });
 
-      const params = { options: 1 };
-
-      await expect(directory.export(params)).rejects.toThrow(
+      await expect(directory.export({ options: "all" })).rejects.toThrow(
         "Directory service error"
       );
 

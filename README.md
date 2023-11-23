@@ -508,7 +508,7 @@ const relations = await directoryClient.relation({
 Create an object instance with the specified fields. For example:
 
 ```typescript
-const user = directoryClient.setObject(
+const user = await directoryClient.setObject(
   {
     object: {
       type: "user",
@@ -662,6 +662,8 @@ types:
     relations:
       ### display_name: group#member ###
       member: user
+    permissions:
+      read: member
 `);
 ```
 
