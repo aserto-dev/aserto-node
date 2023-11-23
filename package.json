@@ -15,7 +15,7 @@
     "lint": "eslint lib --max-warnings=0",
     "prepublishOnly": "NODE_ENV=production yarn build",
     "push": "scripts/publish.sh",
-    "test": "jest test --coverage"
+    "test": "jest test --coverage --verbose"
   },
   "files": [
     "lib",
