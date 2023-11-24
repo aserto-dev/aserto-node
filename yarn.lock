@@ -395,15 +395,15 @@
   resolved "https://registry.yarnpkg.com/@fastify/busboy/-/busboy-2.1.0.tgz#0709e9f4cb252351c609c6e6d8d6779a8d25edff"
   integrity sha512-+KpH+QxZU7O4675t3mnkQKcZZg56u+K/Ct2K+N2AZYNVK8kyeo/bI18tI8aPm3tvNNRyTWfj6s5tnGNlcbQRsA==
 
-"@grpc/grpc-js@1.8.21":
-  version "1.8.21"
-  resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.8.21.tgz#d282b122c71227859bf6c5866f4c40f4a2696513"
-  integrity sha512-KeyQeZpxeEBSqFVTi3q2K7PiPXmgBfECc4updA1ejCLjYmoAlvvM3ZMp5ztTDUCUQmoY3CpDxvchjO1+rFkoHg==
+"@grpc/grpc-js@1.9.9":
+  version "1.9.9"
+  resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.9.9.tgz#ce3a05439b1c957ec64c2ecdc6f1e4f54e8af797"
+  integrity sha512-vQ1qwi/Kiyprt+uhb1+rHMpyk4CVRMTGNUGGPRGS7pLNfWkdCHrGEnT6T3/JyC2VZgoOX/X1KwdoU0WYQAeYcQ==
   dependencies:
-    "@grpc/proto-loader" "^0.7.0"
+    "@grpc/proto-loader" "^0.7.8"
     "@types/node" ">=12.12.47"
 
-"@grpc/proto-loader@^0.7.0":
+"@grpc/proto-loader@^0.7.8":
   version "0.7.10"
   resolved "https://registry.yarnpkg.com/@grpc/proto-loader/-/proto-loader-0.7.10.tgz#6bf26742b1b54d0a473067743da5d3189d06d720"
   integrity sha512-CAqDfoaQ8ykFd9zqBDn4k6iWT9loLAlc2ETmDFS9JCD70gDcnA4L3AFEo2iV7KyAtAAHFW9ftq1Fz+Vsgq80RQ==
