@@ -1,9 +1,15 @@
 {
   "cSpell.words": [
+    "apikey",
+    "aserto",
+    "bufbuild",
+    "codecov",
     "connectrpc",
+    "displaystatemap",
     "keyof",
     "morty",
     "njwt",
+    "protobuf",
     "rebac",
     "Rego",
     "Struct",

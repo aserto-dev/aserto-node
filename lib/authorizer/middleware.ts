@@ -17,7 +17,7 @@ type Policy = {
   root: string;
   name?: string;
   instanceLabel?: string;
-  decission?: string;
+  decision?: string;
   path?: string;
 };
 
@@ -101,7 +101,7 @@ export class Middleware {
         const policyCtx = this.policyMapper
           ? await this.policyMapper(req)
           : policyContext(`${this.policy.root}.check`, [
-              this.policy.decission || "allowed",
+              this.policy.decision || "allowed",
             ]);
 
         let resourceContext: ResourceContext = await checkResourceMapper(
