@@ -8,7 +8,7 @@ import {
   PolicyMapper,
   ResourceMapper,
 } from "./authorizer/middleware";
-import decissionTreeOptions from "./authorizer/model/decisionTreeOptions";
+import decisionTreeOptions from "./authorizer/model/decisionTreeOptions";
 import policyContext from "./authorizer/model/policyContext";
 import policyInstance from "./authorizer/model/policyInstance";
 import { errorHandler } from "./errorHandler";
@@ -103,7 +103,7 @@ const displayStateMap = (
           ? policyInstance(instanceName as string, instanceLabel as string)
           : undefined;
 
-      const decisionTreeOpt = decissionTreeOptions("PATH_SEPARATOR_SLASH");
+      const decisionTreeOpt = decisionTreeOptions("PATH_SEPARATOR_SLASH");
 
       return client.DecisionTree({
         identityContext: identityCtx,

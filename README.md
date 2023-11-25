@@ -11,9 +11,9 @@ package.
 This package provides multiple capabilities:
 
 1. `Middleware` - Provides 2 implementations: `Authz` and `Check` middlewares that sits on a route, and validates a request to authorize access to that route.
-2. `Authorizer` - Authorizer Client that provides functions to facilitate comunication with an Authorizer v2 service.
-3. `DirectoryServiceV3` - Directory Client that provides functions to facilitate comunication with an Directory v3 service.
-4. `DirectoryServiceV2` - Directory Client that provides functions to facilitate comunication with an Directory v2 service.
+2. `Authorizer` - Authorizer Client that provides functions to facilitate communication with an Authorizer v2 service.
+3. `DirectoryServiceV3` - Directory Client that provides functions to facilitate communication with an Directory v3 service.
+4. `DirectoryServiceV2` - Directory Client that provides functions to facilitate communication with an Directory v2 service.
 5. `jwtAuthz`(deprecated): middleware that sits on a route, and validates a request to authorize access to that route.
 6. `displayStateMap`: middleware that adds an endpoint for returning the display state map for a service, based on its authorization policy.
 7. `is`: a function that can be called to make a decision about a user's access to a resource based on a policy.
@@ -68,11 +68,11 @@ const authClient = new Authorizer({
 ```ts
 import { getSSLCredentials } from "@aserto/aserto-node";
 
-const ssLcredentials = getSSLCredentials(`${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`)
+const sslCredentials = getSSLCredentials(`${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`)
 
 const authClient = new Authorizer({
   authorizerServiceUrl: "localhost:8282",
-}, ssLcredentials);
+}, sslCredentials);
 ```
 
 #### Example:
@@ -357,7 +357,7 @@ const restMw = new Middleware({
 ##### Resource
 
 ```ts
-// provies a custom resource context,
+// provides a custom resource context,
 type ResourceMapper =
   | ResourceContext
   | ((req?: Request) => Promise<ResourceContext>);

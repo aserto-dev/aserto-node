@@ -143,7 +143,7 @@ export class Directory {
           nodeOptions: { rejectUnauthorized },
         });
       }
-      return baseGrpcTansport;
+      return baseGrpcTransport;
     };
 
     const baseServiceUrl = config.url ?? "directory.prod.aserto.com:8443";
@@ -171,24 +171,24 @@ export class Directory {
       rejectUnauthorized = config.rejectUnauthorized;
     }
 
-    const baseGrpcTansport = createGrpcTransport({
+    const baseGrpcTransport = createGrpcTransport({
       httpVersion: "2",
       baseUrl: `https://${baseServiceUrl}`,
       interceptors: [baseServiceHeaders],
       nodeOptions: { rejectUnauthorized },
     });
 
-    const readerGrpcTansport = createTransport(
+    const readerGrpcTransport = createTransport(
       readerServiceUrl,
       readerApiKey,
       readerTenantId
     );
-    const writerGrpcTansport = createTransport(
+    const writerGrpcTransport = createTransport(
       writerServiceUrl,
       writerApiKey,
       writerTenantId
     );
-    const importerGrpcTansport = createTransport(
+    const importerGrpcTransport = createTransport(
       importerServiceUrl,
       importerApiKey,
       importerTenantId
@@ -199,9 +199,9 @@ export class Directory {
       exporterTenantId
     );
 
-    this.ReaderClient = createPromiseClient(Reader, readerGrpcTansport);
-    this.WriterClient = createPromiseClient(Writer, writerGrpcTansport);
-    this.ImporterClient = createPromiseClient(Importer, importerGrpcTansport);
+    this.ReaderClient = createPromiseClient(Reader, readerGrpcTransport);
+    this.WriterClient = createPromiseClient(Writer, writerGrpcTransport);
+    this.ImporterClient = createPromiseClient(Importer, importerGrpcTransport);
     this.ExporterClient = createPromiseClient(Exporter, exporterGrpcTransport);
   }
 
