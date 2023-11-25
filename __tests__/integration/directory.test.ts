@@ -1,5 +1,9 @@
-import { createAsyncIterable, DirectoryServiceV3 } from "../../lib";
-import { Topaz } from "../topaz";
+import {
+  createAsyncIterable,
+  DirectoryServiceV3,
+  readAsyncIterable,
+} from "../../lib";
+import { Topaz, TOPAZ_TIMEOUT } from "../topaz";
 
 describe("DirectoryV3", () => {
   const config = {
@@ -11,7 +15,7 @@ describe("DirectoryV3", () => {
 
   beforeAll(async () => {
     await topaz.start();
-  }, 30000);
+  }, TOPAZ_TIMEOUT);
 
   afterAll(async () => {
     await topaz.stop();
@@ -302,10 +306,13 @@ types:
   });
 
   it("imports objects and relationships", async () => {
+    const objectCase = "object" as const;
+    const relationCase = "relation" as const;
+
     const importRequest = createAsyncIterable([
       {
         msg: {
-          case: "object" as const,
+          case: objectCase,
           value: {
             id: "import-user",
             type: "user",
@@ -316,7 +323,7 @@ types:
       },
       {
         msg: {
-          case: "object" as const,
+          case: objectCase,
           value: {
             id: "import-group",
             type: "group",
@@ -327,7 +334,7 @@ types:
       },
       {
         msg: {
-          case: "relation" as const,
+          case: relationCase,
           value: {
             subjectId: "import-user",
             subjectType: "user",
@@ -338,24 +345,39 @@ types:
         },
       },
     ]);
-    await expect(directoryClient.import(importRequest)).resolves.not.toThrow();
+
+    await expect(
+      readAsyncIterable(await directoryClient.import(importRequest))
+    ).resolves.not.toThrow();
   });
 
   it("exports all", async () => {
-    expect((await directoryClient.export({ options: "all" }))?.length).toEqual(
-      3
-    );
+    expect(
+      (
+        await readAsyncIterable(
+          await directoryClient.export({ options: "all" })
+        )
+      ).length
+    ).toEqual(3);
   });
 
   it("exports objects", async () => {
     expect(
-      (await directoryClient.export({ options: "objects" }))?.length
+      (
+        await readAsyncIterable(
+          await directoryClient.export({ options: "objects" })
+        )
+      ).length
     ).toEqual(2);
   });
 
   it("exports relations", async () => {
     expect(
-      (await directoryClient.export({ options: "relations" }))?.length
+      (
+        await readAsyncIterable(
+          await directoryClient.export({ options: "relations" })
+        )
+      ).length
     ).toEqual(1);
   });
 
