@@ -45,6 +45,15 @@ import {
   SetRelationRequest,
 } from "./types";
 
+const DATA_TYPE = {
+  unknown: 0x0,
+  objects: 0x8,
+  relations: 0x10,
+  all: 0x18,
+};
+
+type DATA_TYPE_OPTIONS = "unknown" | "objects" | "relations" | "all";
+
 export class DirectoryV3 {
   ReaderClient: PromiseClient<typeof Reader>;
   WriterClient: PromiseClient<typeof Writer>;
@@ -185,7 +194,7 @@ export class DirectoryV3 {
     try {
       const response = await this.ReaderClient.checkPermission(params);
 
-      return response.check;
+      return response;
     } catch (error) {
       handleError(error, "checkPermission");
     }
@@ -195,7 +204,7 @@ export class DirectoryV3 {
     try {
       const response = await this.ReaderClient.checkRelation(params);
 
-      return response.check;
+      return response;
     } catch (error) {
       handleError(error, "checkRelation");
     }
@@ -313,22 +322,23 @@ export class DirectoryV3 {
 
   async import(params: AsyncIterable<PartialMessage<ImportRequest>>) {
     try {
-      const response = this.ImporterClient.import(params);
-
-      return response;
+      return this.ImporterClient.import(params);
     } catch (error) {
       handleError(error, "import");
+      return createAsyncIterable([]);
     }
   }
 
-  async export(params: PlainMessage<ExportRequest>) {
+  async export(params: { options: DATA_TYPE_OPTIONS }) {
     try {
-      const response = this.ExporterClient.export(params);
-
-      const data = await readAsyncIterable(response);
-      return data;
+      return this.ExporterClient.export(
+        new ExportRequest({
+          options: DATA_TYPE[params.options] || DATA_TYPE["unknown"],
+        })
+      );
     } catch (error) {
       handleError(error, "export");
+      return createAsyncIterable([]);
     }
   }
 
