@@ -441,12 +441,16 @@ types:
   });
 
   describe("Authorizer", () => {
-    const authorizerClient = new Authorizer(
-      {
-        authorizerServiceUrl: "localhost:8282",
-      },
-      getSSLCredentials(`${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`)
-    );
+    let authorizerClient: Authorizer;
+
+    beforeEach(() => {
+      authorizerClient = new Authorizer(
+        {
+          authorizerServiceUrl: "localhost:8282",
+        },
+        getSSLCredentials(`${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`)
+      );
+    });
 
     describe("DecisionTree", () => {
       it("returns the correct data structure", async () => {
