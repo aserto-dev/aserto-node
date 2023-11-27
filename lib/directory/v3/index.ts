@@ -322,26 +322,23 @@ export class DirectoryV3 {
 
   async import(params: AsyncIterable<PartialMessage<ImportRequest>>) {
     try {
-      const response = this.ImporterClient.import(params);
-
-      return await readAsyncIterable(response);
+      return this.ImporterClient.import(params);
     } catch (error) {
       handleError(error, "import");
+      return createAsyncIterable([]);
     }
   }
 
   async export(params: { options: DATA_TYPE_OPTIONS }) {
     try {
-      const response = this.ExporterClient.export(
+      return this.ExporterClient.export(
         new ExportRequest({
           options: DATA_TYPE[params.options] || DATA_TYPE["unknown"],
         })
       );
-
-      const data = await readAsyncIterable(response);
-      return data;
     } catch (error) {
       handleError(error, "export");
+      return createAsyncIterable([]);
     }
   }
 

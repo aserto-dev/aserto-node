@@ -718,6 +718,14 @@ const resp = await directoryClient.import(importRequest);
 await (readAsyncIterable(resp))
 ```
 
+### Export
+
+```ts
+const response = await readAsyncIterable(
+  await directoryClient.export({ options: "all" })
+)
+```
+
 ## Deprecated Methods
 
 > Note: the `authorizerServiceUrl` option that is used throughout is no longer a URL, but the option name is retained for backward-compatibility. It is now expected to be a hostname that exposes a gRPC binding. Any "https://" prefix is stripped out of the value provided.
