@@ -31,6 +31,12 @@ import buildPolicyContext from "./model/policyContext";
 import buildQueryOptions from "./model/queryOptions";
 import { ResourceContext } from "./model/resourceContext";
 
+type Path = {
+  [key: string]: {
+    [key: string]: boolean;
+  };
+};
+
 type AuthorizerConfig = {
   authorizerServiceUrl?: string;
   tenantId?: string;
@@ -167,11 +173,7 @@ export class Authorizer {
     resourceContext?: ResourceContext;
     decisionTreeOptions?: DecisionTreeOptions;
   }): Promise<{
-    path:
-      | {
-          [key: string]: JavaScriptValue;
-        }
-      | undefined;
+    path: Path;
     pathRoot: string;
   }> {
     const request = new DecisionTreeRequest();
@@ -200,7 +202,7 @@ export class Authorizer {
             }
 
             const result = {
-              path: response.getPath()?.toJavaScript(),
+              path: response.getPath()?.toJavaScript() as Path,
               pathRoot: response.getPathRoot(),
             };
             resolve(result);
