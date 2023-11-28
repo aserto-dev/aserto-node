@@ -3,6 +3,7 @@ import {
   Authorizer,
   createAsyncIterable,
   DirectoryServiceV3,
+  DirectoryV3,
   getSSLCredentials,
   policyInstance,
   readAsyncIterable,
@@ -12,13 +13,14 @@ import { Topaz, TOPAZ_TIMEOUT } from "../topaz";
 describe("Integration", () => {
   const config = {
     url: "localhost:9292",
-    rejectUnauthorized: false,
+    caFile: `${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`,
   };
-  const directoryClient = DirectoryServiceV3(config);
-  const topaz = new Topaz(directoryClient);
+  let directoryClient: DirectoryV3;
+  const topaz = new Topaz();
 
   beforeAll(async () => {
     await topaz.start();
+    directoryClient = DirectoryServiceV3(config);
   }, TOPAZ_TIMEOUT);
 
   afterAll(async () => {

@@ -1,3 +1,4 @@
+import * as fs from "fs";
 import { ExportResponse } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
 import { ImportResponse } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
 import {
@@ -24,8 +25,10 @@ import {
 import { Struct } from "@bufbuild/protobuf";
 import { ConnectError } from "@connectrpc/connect";
 import { createAsyncIterable } from "@connectrpc/connect/protocol";
+import * as connectNode from "@connectrpc/connect-node";
 
 import { DirectoryServiceV3, DirectoryV3 } from "../../../lib/index";
+jest.mock("fs");
 
 describe("DirectoryV3", () => {
   const config = {
@@ -52,14 +55,23 @@ describe("DirectoryV3", () => {
   });
 
   it("handles multiple service configs", () => {
+    const mockTransport = jest.spyOn(connectNode, "createGrpcTransport");
+    const mockFs = jest
+      .spyOn(fs, "readFileSync")
+      .mockImplementation((path: fs.PathOrFileDescriptor) => {
+        return path as string;
+      });
+
     const config = {
       url: "directory.prod.aserto.com:8443",
       tenantId: "tenantId",
       apiKey: "apiKey",
+      caFile: "caFile",
       reader: {
         url: "readerUrl",
         apiKey: "readerApiKey",
         tenantId: "readerTenantId",
+        caFile: "readerCaFile",
       },
       writer: {
         url: "writerUrl",
@@ -72,12 +84,9 @@ describe("DirectoryV3", () => {
         tenantId: "importerTenantId",
       },
       exporter: {
-        url: "exporterUrl",
-        apiKey: "exporterApiKey",
-        tenantId: "exporterTenantId",
+        caFile: "exporterCaFile",
       },
       model: {
-        url: "modelUrl",
         apiKey: "modelApiKey",
         tenantId: "modelTenantId",
       },
@@ -86,12 +95,60 @@ describe("DirectoryV3", () => {
 
     const directory = DirectoryServiceV3(config);
 
+    expect(mockTransport.mock.calls).toEqual([
+      [
+        expect.objectContaining({
+          baseUrl: "https://directory.prod.aserto.com:8443",
+          httpVersion: "2",
+          nodeOptions: { ca: "caFile", rejectUnauthorized: true },
+        }),
+      ],
+      [
+        expect.objectContaining({
+          baseUrl: "https://readerUrl",
+          httpVersion: "2",
+          nodeOptions: { ca: "readerCaFile", rejectUnauthorized: true },
+        }),
+      ],
+      [
+        expect.objectContaining({
+          baseUrl: "https://writerUrl",
+          httpVersion: "2",
+          nodeOptions: { ca: "caFile", rejectUnauthorized: true },
+        }),
+      ],
+      [
+        expect.objectContaining({
+          baseUrl: "https://importerUrl",
+          httpVersion: "2",
+          nodeOptions: { ca: "caFile", rejectUnauthorized: true },
+        }),
+      ],
+      [
+        expect.objectContaining({
+          baseUrl: "https://directory.prod.aserto.com:8443",
+          httpVersion: "2",
+          nodeOptions: { ca: "exporterCaFile", rejectUnauthorized: true },
+        }),
+      ],
+      [
+        expect.objectContaining({
+          baseUrl: "https://directory.prod.aserto.com:8443",
+          httpVersion: "2",
+          nodeOptions: { ca: "caFile", rejectUnauthorized: true },
+        }),
+      ],
+    ]);
+
     expect(directory).toBeInstanceOf(DirectoryV3);
     expect(directory.ReaderClient).toBeDefined();
     expect(directory.WriterClient).toBeDefined();
     expect(directory.ImporterClient).toBeDefined();
     expect(directory.ExporterClient).toBeDefined();
     expect(directory.ModelClient).toBeDefined();
+
+    mockTransport.mockReset();
+    mockFs.mockReset();
   });
 
   it("handles same config for multiple services", () => {

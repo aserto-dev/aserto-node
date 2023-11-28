@@ -21,22 +21,20 @@ import {
 
 import { NestedOmit, PartialExcept } from "../../util/types";
 
-type ServiceConfig = {
+export type ServiceConfig = {
   url?: string;
   tenantId?: string;
   apiKey?: string;
+  caFile?: string;
+  rejectUnauthorized?: boolean;
 };
 
-export type DirectoryV3Config = {
-  url?: string;
-  tenantId?: string;
-  apiKey?: string;
+export type DirectoryV3Config = ServiceConfig & {
   reader?: ServiceConfig;
   writer?: ServiceConfig;
   importer?: ServiceConfig;
   exporter?: ServiceConfig;
   model?: ServiceConfig;
-  rejectUnauthorized?: boolean;
 };
 
 export type GetObjectRequest = PartialExcept<

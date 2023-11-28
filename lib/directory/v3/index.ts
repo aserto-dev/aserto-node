@@ -1,3 +1,5 @@
+import { readFileSync } from "fs";
+import { ClientSessionOptions, SecureClientSessionOptions } from "http2";
 import { PaginationRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v3/common_pb";
 import { Exporter } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_connect";
 import { ExportRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
@@ -41,6 +43,7 @@ import {
   GetObjectRequest,
   GetRelationRequest,
   GetRelationsRequest,
+  ServiceConfig,
   SetObjectRequest,
   SetRelationRequest,
 } from "./types";
@@ -103,84 +106,108 @@ export class DirectoryV3 {
     const createTransport = (
       serviceUrl: string,
       apikey?: string,
-      tenantId?: string
+      tenantId?: string,
+      nodeOptions?: ClientSessionOptions | SecureClientSessionOptions
     ) => {
       if (
         serviceUrl !== baseServiceUrl ||
         apikey !== baseApiKey ||
-        tenantId !== baseTenantId
+        tenantId !== baseTenantId ||
+        nodeOptions !== baseNodeOptions
       ) {
         return createGrpcTransport({
           httpVersion: "2",
           baseUrl: `https://${serviceUrl}`,
           interceptors: [createHeadersInterceptor(apikey, tenantId)],
-          nodeOptions: { rejectUnauthorized },
+          nodeOptions: nodeOptions,
         });
       }
       return baseGrpcTransport;
     };
 
-    const baseServiceUrl = config.url ?? "directory.prod.aserto.com:8443";
-    const baseApiKey = config.apiKey;
-    const baseTenantId = config.tenantId;
-
-    const readerServiceUrl = config.reader?.url || baseServiceUrl;
-    const readerApiKey = config.reader?.apiKey || baseApiKey;
-    const readerTenantId = config.reader?.tenantId || baseTenantId;
-
-    const writerServiceUrl = config.writer?.url || baseServiceUrl;
-    const writerApiKey = config.writer?.apiKey || baseApiKey;
-    const writerTenantId = config.writer?.tenantId || baseTenantId;
-
-    const importerServiceUrl = config.importer?.url || baseServiceUrl;
-    const importerApiKey = config.importer?.apiKey || baseApiKey;
-    const importerTenantId = config.importer?.tenantId || baseTenantId;
-
-    const exporterServiceUrl = config.exporter?.url || baseServiceUrl;
-    const exporterApiKey = config.exporter?.apiKey || baseApiKey;
-    const exporterTenantId = config.exporter?.tenantId || baseTenantId;
-
-    const modelServiceUrl = config.model?.url || baseServiceUrl;
-    const modelApiKey = config.model?.apiKey || baseApiKey;
-    const modelTenantId = config.model?.tenantId || baseTenantId;
+    const createNodeOptions = (config?: ServiceConfig) => {
+      return {
+        rejectUnauthorized,
+        ca: config?.caFile ? readFileSync(config.caFile) : baseCaFile,
+      };
+    };
 
     let rejectUnauthorized = true;
     if (config.rejectUnauthorized !== undefined) {
       rejectUnauthorized = config.rejectUnauthorized;
     }
 
+    const baseServiceUrl = config.url ?? "directory.prod.aserto.com:8443";
+    const baseApiKey = config.apiKey;
+    const baseTenantId = config.tenantId;
+    const baseCaFile = !!config.caFile
+      ? readFileSync(config.caFile)
+      : undefined;
+
+    const readerServiceUrl = config.reader?.url || baseServiceUrl;
+    const readerApiKey = config.reader?.apiKey || baseApiKey;
+    const readerTenantId = config.reader?.tenantId || baseTenantId;
+    const readerNodeOptions = createNodeOptions(config.reader);
+
+    const writerServiceUrl = config.writer?.url || baseServiceUrl;
+    const writerApiKey = config.writer?.apiKey || baseApiKey;
+    const writerTenantId = config.writer?.tenantId || baseTenantId;
+    const writerNodeOptions = createNodeOptions(config.writer);
+
+    const importerServiceUrl = config.importer?.url || baseServiceUrl;
+    const importerApiKey = config.importer?.apiKey || baseApiKey;
+    const importerTenantId = config.importer?.tenantId || baseTenantId;
+    const importerNodeOptions = createNodeOptions(config.importer);
+
+    const exporterServiceUrl = config.exporter?.url || baseServiceUrl;
+    const exporterApiKey = config.exporter?.apiKey || baseApiKey;
+    const exporterTenantId = config.exporter?.tenantId || baseTenantId;
+    const exporterNodeOptions = createNodeOptions(config.exporter);
+
+    const modelServiceUrl = config.model?.url || baseServiceUrl;
+    const modelApiKey = config.model?.apiKey || baseApiKey;
+    const modelTenantId = config.model?.tenantId || baseTenantId;
+    const modelNodeOptions = createNodeOptions(config.model);
+
+    const baseNodeOptions = { rejectUnauthorized, ca: baseCaFile };
+
     const baseGrpcTransport = createGrpcTransport({
       httpVersion: "2",
       baseUrl: `https://${baseServiceUrl}`,
       interceptors: [baseServiceHeaders],
-      nodeOptions: { rejectUnauthorized },
+      nodeOptions: baseNodeOptions,
     });
 
     const readerGrpcTransport = createTransport(
       readerServiceUrl,
       readerApiKey,
-      readerTenantId
+      readerTenantId,
+      readerNodeOptions
     );
     const writerGrpcTransport = createTransport(
       writerServiceUrl,
       writerApiKey,
-      writerTenantId
+      writerTenantId,
+      writerNodeOptions
     );
     const importerGrpcTransport = createTransport(
       importerServiceUrl,
       importerApiKey,
-      importerTenantId
+      importerTenantId,
+      importerNodeOptions
     );
     const exporterGrpcTransport = createTransport(
       exporterServiceUrl,
       exporterApiKey,
-      exporterTenantId
+      exporterTenantId,
+      exporterNodeOptions
     );
 
     const modelGrpcTransport = createTransport(
       modelServiceUrl,
       modelApiKey,
-      modelTenantId
+      modelTenantId,
+      modelNodeOptions
     );
 
     this.ReaderClient = createPromiseClient(Reader, readerGrpcTransport);
