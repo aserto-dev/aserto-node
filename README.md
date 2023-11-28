@@ -411,19 +411,17 @@ type ServiceConfig = {
   url?: string;
   tenantId?: string;
   apiKey?: string;
+  caFile?: string;
+  rejectUnauthorized?: boolean;
 };
 
-type DirectoryV3Config = {
-  url?: string;
-  tenantId?: string;
-  apiKey?: string;
+export type DirectoryV3Config = ServiceConfig & {
   reader?: ServiceConfig;
   writer?: ServiceConfig;
   importer?: ServiceConfig;
   exporter?: ServiceConfig;
   model?: ServiceConfig;
-  rejectUnauthorized?: boolean;
-}
+};
 ```
 
 You can initialize a directory client as follows:
@@ -433,13 +431,13 @@ import { DirectoryServiceV3 } from "@aserto/aserto-node";
 
 const directoryClient = DirectoryServiceV3({
   url: 'localhost:9292',
-  tenantId: '1234',
-  apiKey: 'my-api-key',
+  caFile: `${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`
 });
 
 - `url`: hostname:port of directory service (_required_)
 - `apiKey`: API key for directory service (_required_ if using hosted directory)
 - `tenantId`: Aserto tenant ID (_required_ if using hosted directory)
+- `caFile`: Path to the directory CA file. (optional)
 - `rejectUnauthorized`: reject clients with invalid certificates. Defaults to `true`.
 - `reader`: ServiceConfig for the reader client(optional)
 - `writer`: ServiceConfig for the writer client(option)
