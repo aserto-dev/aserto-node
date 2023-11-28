@@ -173,6 +173,30 @@ types:
       ).toEqual({ check: true, trace: [] });
     });
 
+    it("check(relation) betwen an user and group", async () => {
+      expect(
+        await directoryClient.check({
+          subjectId: "test-user",
+          subjectType: "user",
+          relation: "member",
+          objectId: "test-group",
+          objectType: "group",
+        })
+      ).toEqual({ check: true, trace: [] });
+    });
+
+    it("check(permission) betwen an user and group", async () => {
+      expect(
+        await directoryClient.check({
+          subjectId: "test-user",
+          subjectType: "user",
+          relation: "read",
+          objectId: "test-group",
+          objectType: "group",
+        })
+      ).toEqual({ check: true, trace: [] });
+    });
+
     it("checks the relation betwen an user and group(false)", async () => {
       expect(
         await directoryClient.checkRelation({

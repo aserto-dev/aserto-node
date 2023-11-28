@@ -1,6 +1,7 @@
 import {
   CheckPermissionRequest as CheckPermissionRequest$,
   CheckRelationRequest as CheckRelationRequest$,
+  CheckRequest as CheckRequest$,
   GetGraphRequest as GetGraphRequest$,
   GetObjectRequest as GetObjectRequest$,
   GetRelationRequest as GetRelationRequest$,
@@ -78,6 +79,11 @@ export type CheckPermissionRequest = PartialExcept<
 
 export type CheckRelationRequest = PartialExcept<
   PlainMessage<CheckRelationRequest$>,
+  ["trace"]
+>;
+
+export type CheckRequest = PartialExcept<
+  PlainMessage<CheckRequest$>,
   ["trace"]
 >;
 
