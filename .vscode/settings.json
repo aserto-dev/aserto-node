@@ -6,6 +6,7 @@
     "codecov",
     "connectrpc",
     "displaystatemap",
+    "instanceof",
     "keyof",
     "morty",
     "njwt",

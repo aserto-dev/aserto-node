@@ -234,7 +234,7 @@ describe("DirectoryV3", () => {
     it("handles ConnectError", async () => {
       const mockCheckPermission = jest
         .spyOn(directory.ReaderClient, "checkPermission")
-        .mockRejectedValue(new ConnectError("connect error", 5));
+        .mockRejectedValue(new ConnectError("connect error", 1));
 
       const params = {
         subjectId: "euang@acmecorp.com",
@@ -244,7 +244,7 @@ describe("DirectoryV3", () => {
         objectId: "admin",
       };
       await expect(directory.checkPermission(params)).rejects.toThrow(
-        '"checkPermission" failed with code: 5, message: [not_found] connect error'
+        '"checkPermission" failed with code: 1, message: [canceled] connect error'
       );
 
       mockCheckPermission.mockReset();

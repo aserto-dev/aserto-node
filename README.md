@@ -471,6 +471,23 @@ Get an object instance with the type `type-name` and the id `object-id`. For exa
 
 ```typescript
 const user = await directoryClient.object({ objectType: 'user', objectId: 'euang@acmecorp.com' });
+
+// Handle a not found object
+import { NotFoundError } from  "@aserto/aserto-node"
+
+try {
+  directoryClient.object({
+    objectType: "user",
+    objectId: "euang@acmecorp.com",
+  });
+} catch (error) {
+  if (error instanceof NotFoundError) {
+    // pass trough
+  }
+
+  // throw back the original error
+  throw error;
+}
 ```
 
 #### 'relation' function
