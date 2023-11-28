@@ -36,6 +36,7 @@ import { createGrpcTransport } from "@connectrpc/connect-node";
 import {
   CheckPermissionRequest,
   CheckRelationRequest,
+  CheckRequest,
   DeleteObjectRequest,
   DeleteRelationRequest,
   DirectoryV3Config,
@@ -234,6 +235,16 @@ export class DirectoryV3 {
       return response;
     } catch (error) {
       handleError(error, "checkRelation");
+    }
+  }
+
+  async check(params: CheckRequest) {
+    try {
+      const response = await this.ReaderClient.check(params);
+
+      return response;
+    } catch (error) {
+      handleError(error, "check");
     }
   }
 

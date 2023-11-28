@@ -9,6 +9,7 @@ import {
 import {
   CheckPermissionResponse,
   CheckRelationResponse,
+  CheckResponse,
   GetGraphResponse,
   GetObjectManyResponse,
   GetObjectResponse,
@@ -290,6 +291,47 @@ describe("DirectoryV3", () => {
       );
 
       mockCheckRelation.mockReset();
+    });
+  });
+
+  describe("check", () => {
+    it("calls check with valid params", async () => {
+      const mockCheck = jest
+        .spyOn(directory.ReaderClient, "check")
+        .mockResolvedValue(new CheckResponse({ check: true, trace: [] }));
+
+      const params = {
+        subjectId: "euang@acmecorp.com",
+        subjectType: "user",
+        relation: "read",
+        objectType: "group",
+        objectId: "admin",
+      };
+      const result = await directory.check(params);
+
+      expect(directory.ReaderClient.check).toHaveBeenCalledWith(params);
+      expect(result?.check).toBe(true);
+
+      mockCheck.mockReset();
+    });
+
+    it("handles errors returned by the directory service", async () => {
+      const mockCheck = jest
+        .spyOn(directory.ReaderClient, "check")
+        .mockRejectedValue(new Error("Directory service error"));
+
+      const params = {
+        subjectId: "euang@acmecorp.com",
+        subjectType: "user",
+        relation: "read",
+        objectType: "group",
+        objectId: "admin",
+      };
+      await expect(directory.check(params)).rejects.toThrow(
+        "Directory service error"
+      );
+
+      mockCheck.mockReset();
     });
   });
 
