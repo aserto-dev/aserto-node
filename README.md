@@ -722,7 +722,7 @@ await (readAsyncIterable(resp))
 
 ```ts
 const response = await readAsyncIterable(
-  await directoryClient.export({ options: "all" })
+  await directoryClient.export({ options: "DATA" })
 )
 ```
 

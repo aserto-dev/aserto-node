@@ -395,7 +395,7 @@ types:
       expect(
         (
           await readAsyncIterable(
-            await directoryClient.export({ options: "all" })
+            await directoryClient.export({ options: "DATA" })
           )
         ).length
       ).toEqual(3);
@@ -405,7 +405,7 @@ types:
       expect(
         (
           await readAsyncIterable(
-            await directoryClient.export({ options: "objects" })
+            await directoryClient.export({ options: "DATA_OBJECTS" })
           )
         ).length
       ).toEqual(2);
@@ -415,7 +415,7 @@ types:
       expect(
         (
           await readAsyncIterable(
-            await directoryClient.export({ options: "relations" })
+            await directoryClient.export({ options: "DATA_RELATIONS" })
           )
         ).length
       ).toEqual(1);
