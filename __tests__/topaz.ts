@@ -3,7 +3,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 
-import { DirectoryV3 } from "../lib";
+import { DirectoryServiceV3 } from "../lib";
 import { log } from "../lib/log";
 
 const DB_DIR = path.join(os.homedir(), ".config/topaz/db");
@@ -13,10 +13,6 @@ export const TOPAZ_TIMEOUT =
   RETRY_OPTIONS.retries * RETRY_OPTIONS.retryIntervalMs;
 
 export class Topaz {
-  directoryClient: DirectoryV3;
-  constructor(directoryClient: DirectoryV3) {
-    this.directoryClient = directoryClient;
-  }
   async start() {
     await this.backup();
     execute(
@@ -24,7 +20,17 @@ export class Topaz {
     );
     execute("topaz start");
     await retry(
-      async () => this.directoryClient.objects({ objectType: "user" }),
+      async () =>
+        fs.readFileSync(`${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`),
+      RETRY_OPTIONS
+    );
+
+    const directoryClient = DirectoryServiceV3({
+      url: "localhost:9292",
+      caFile: `${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`,
+    });
+    await retry(
+      async () => directoryClient.objects({ objectType: "user" }),
       RETRY_OPTIONS
     );
   }
