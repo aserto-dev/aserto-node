@@ -472,7 +472,7 @@ Get an object instance with the type `type-name` and the id `object-id`. For exa
 ```typescript
 const user = await directoryClient.object({ objectType: 'user', objectId: 'euang@acmecorp.com' });
 
-// Handle a not found object
+// Handle a specific Directory Error
 import { NotFoundError } from  "@aserto/aserto-node"
 
 try {
@@ -482,10 +482,8 @@ try {
   });
 } catch (error) {
   if (error instanceof NotFoundError) {
-    // pass trough
+    // handle the case where the object was not found
   }
-
-  // throw back the original error
   throw error;
 }
 ```
