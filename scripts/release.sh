@@ -15,6 +15,6 @@ echo "commit and push changes"
 git commit -am "bumped version to $VERSION"
 git push -u origin main
 
-echo "tag and push v$VERSION"
-git tag "v$VERSION"
+echo "tag and push $VERSION"
+git tag "$VERSION"
 git push --tags
