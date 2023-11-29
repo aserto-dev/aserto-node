@@ -185,20 +185,11 @@ type Policy = {
 };
 
 type CheckOptions = {
-  object?: {
-    id?: string;
-    type?: string;
-    idMapper?: StringMapper;
-    mapper?: ObjectMapper;
-  };
-  relation?: {
-    name?: string;
-    mapper?: StringMapper;
-  };
-  subject?: {
-    type?: string;
-    mapper?: IdentityMapper;
-  };
+  object?: ObjectMapper;
+  objectId?: string | StringMapper;
+  objectType?: string | StringMapper;
+  relation?: string | StringMapper;
+  subjectType?: string;
 };
 
 type ResourceMapper =
@@ -256,14 +247,10 @@ const rebacMw = new Middleware({
 
 // Only users that are in the `evil_genius` group are allowed to delete todos.
 app.delete("/todos/:id", checkJwt, rebacMw.Check({
-  object: {
-    type: "group",
-    id: "evil_genius"
-  },
-  relation: {
-    name: "member",
-  }
-})
+  objectType: "group",
+  objectId: "evil_genius"
+  relation:  "member",
+}))
 ```
 
 #### Mappers
