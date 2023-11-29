@@ -38,7 +38,6 @@ import {
   EtagMismatchError,
   InvalidArgumentError,
   NotFoundError,
-  ServiceError,
   UnauthenticatedError,
 } from "../errors";
 import {
@@ -480,18 +479,19 @@ function handleError(error: unknown, method: string) {
         );
       }
       case Code.NotFound: {
-        throw new NotFoundError(`${method} not found`);
+        throw new NotFoundError(`${method} not found: ${error.message}`);
       }
       case Code.InvalidArgument: {
         throw new InvalidArgumentError(`${method}: ${error.message}`);
       }
       case Code.FailedPrecondition: {
-        throw new EtagMismatchError(`invalid etag in ${method} request`);
+        throw new EtagMismatchError(
+          `invalid etag in ${method} request: ${error.message}`
+        );
       }
       default: {
-        throw new ServiceError(
-          `"${method}" failed with code: ${error.code}, message: ${error.message}`
-        );
+        error.message = `"${method}" failed with code: ${error.code}, message: ${error.message}`;
+        throw error;
       }
     }
   } else {
