@@ -13,7 +13,7 @@ export default async (
     object_id: objectId,
     object_type: objectType,
     relation: rel,
-    subject_type: options.subject?.type || "user",
+    subject_type: options.subjectType || "user",
   };
 };
 
@@ -21,12 +21,9 @@ const relation = async (
   options: CheckOptions,
   req: Request
 ): Promise<string> => {
-  const relation = options.relation?.name;
-  if (typeof relation === "function") {
-    return await relation(req);
-  }
+  const relation = options.relation || "";
 
-  return relation || "";
+  return typeof relation === "function" ? await relation(req) : relation;
 };
 
 const object = async (
@@ -39,10 +36,10 @@ const object = async (
     return [obj.objectId, obj.objectType];
   }
 
-  const id = object?.id;
-  if (typeof id === "function") {
-    return [await id(req), object?.type || ""];
-  }
-
-  return [id || "", object?.type || ""];
+  const objectId = options.objectId || "";
+  const objectType = options.objectType || "";
+  return [
+    typeof objectId === "function" ? await objectId(req) : objectId,
+    typeof objectType === "function" ? await objectType(req) : objectType,
+  ];
 };

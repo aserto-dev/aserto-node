@@ -24,16 +24,10 @@ describe("Middleware", () => {
         path: "examplePath",
       };
       const options = {
-        object: {
-          id: "objectId",
-          type: "objectType",
-        },
-        relation: {
-          name: "relationName",
-        },
-        subject: {
-          type: "subjectType",
-        },
+        objectId: "objectId",
+        objectType: "objectType",
+        relation: "relationName",
+        subjectType: "subjectType",
       };
 
       const jwt = nJwt.create({}, "signingKey");
@@ -72,16 +66,10 @@ describe("Middleware", () => {
         path: "examplePath",
       };
       const options = {
-        object: {
-          id: "objectId",
-          type: "objectType",
-        },
-        relation: {
-          name: "relationName",
-        },
-        subject: {
-          type: "subjectType",
-        },
+        objectId: "objectId",
+        objectType: "objectType",
+        relation: "relationName",
+        subjectType: "subjectType",
       };
 
       const jwt = nJwt.create({}, "signingKey");
@@ -125,17 +113,12 @@ describe("Middleware", () => {
         decision: "allowed",
         path: "examplePath",
       };
+
       const options = {
-        object: {
-          id: "objectId",
-          type: "objectType",
-        },
-        relation: {
-          name: "relationName",
-        },
-        subject: {
-          type: "subjectType",
-        },
+        objectId: "objectId",
+        objectType: "objectType",
+        relation: "relationName",
+        subjectType: "subjectType",
       };
 
       const jwt = nJwt.create({}, "signingKey");

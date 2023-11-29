@@ -6,16 +6,10 @@ import { CheckOptions } from "../../../../lib/authorizer/middleware";
 describe("checkResourceMapper", () => {
   it("returns a CheckResourceContext object with the correct properties when all options are provided", async () => {
     const options: CheckOptions = {
-      object: {
-        id: "objectId",
-        type: "objectType",
-      },
-      relation: {
-        name: "relationName",
-      },
-      subject: {
-        type: "subjectType",
-      },
+      objectId: "objectId",
+      objectType: "objectType",
+      relation: "relationName",
+      subjectType: "subjectType",
     };
 
     const req = httpMocks.createRequest({});
@@ -47,13 +41,9 @@ describe("checkResourceMapper", () => {
 
   it("returns a CheckResourceContext object with an empty relation when relation is not provided", async () => {
     const options: CheckOptions = {
-      object: {
-        id: "objectId",
-        type: "objectType",
-      },
-      subject: {
-        type: "subjectType",
-      },
+      objectId: "objectId",
+      objectType: "objectType",
+      subjectType: "subjectType",
     };
 
     const req = httpMocks.createRequest({});
@@ -70,12 +60,8 @@ describe("checkResourceMapper", () => {
 
   it("returns a CheckResourceContext object with an empty object_id and object_type when object is not provided", async () => {
     const options: CheckOptions = {
-      relation: {
-        name: "relationName",
-      },
-      subject: {
-        type: "subjectType",
-      },
+      relation: "relationName",
+      subjectType: "subjectType",
     };
 
     const req = httpMocks.createRequest({});
@@ -90,17 +76,11 @@ describe("checkResourceMapper", () => {
     });
   });
 
-  it("returns a CheckResourceContext object with an empty object_id and object_type when object.id is not provided", async () => {
+  it("returns a CheckResourceContext object with an empty object_id when object.id is not provided", async () => {
     const options: CheckOptions = {
-      object: {
-        type: "objectType",
-      },
-      relation: {
-        name: "relationName",
-      },
-      subject: {
-        type: "subjectType",
-      },
+      objectType: "objectType",
+      relation: "relationName",
+      subjectType: "subjectType",
     };
 
     const req = httpMocks.createRequest({});
@@ -117,15 +97,9 @@ describe("checkResourceMapper", () => {
 
   it("returns a CheckResourceContext object with an empty object_type when object.type is not provided", async () => {
     const options: CheckOptions = {
-      object: {
-        id: "objectId",
-      },
-      relation: {
-        name: "relationName",
-      },
-      subject: {
-        type: "subjectType",
-      },
+      objectId: "objectId",
+      relation: "relationName",
+      subjectType: "subjectType",
     };
 
     const req = httpMocks.createRequest({});
@@ -142,20 +116,14 @@ describe("checkResourceMapper", () => {
 
   it("returns a CheckResourceContext object with the correct properties when all options are functions", async () => {
     const options: CheckOptions = {
-      object: {
-        id: async () => {
-          return "objectId";
-        },
-        type: "objectType",
+      objectId: async () => {
+        return "objectId";
       },
-      relation: {
-        name: async () => {
-          return "relationName";
-        },
+      objectType: "objectType",
+      relation: async () => {
+        return "relationName";
       },
-      subject: {
-        type: "subjectType",
-      },
+      subjectType: "subjectType",
     };
 
     const req = httpMocks.createRequest({});
@@ -178,15 +146,10 @@ describe("checkResourceMapper", () => {
           objectType: "objectType",
         };
       },
-
-      relation: {
-        name: async () => {
-          return "relationName";
-        },
+      relation: async () => {
+        return "relationName";
       },
-      subject: {
-        type: "subjectType",
-      },
+      subjectType: "subjectType",
     };
 
     const req = httpMocks.createRequest({});
