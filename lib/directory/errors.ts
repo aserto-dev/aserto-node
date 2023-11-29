@@ -34,7 +34,7 @@ export class EtagMismatchError extends DirectoryServiceError {}
  * "Unauthenticated" error.
  * Extends the DirectoryServiceError class.
  *
- * @class EtagMismatchError
+ * @class UnauthenticatedError
  * @extends DirectoryServiceError
  */
 export class UnauthenticatedError extends DirectoryServiceError {}
