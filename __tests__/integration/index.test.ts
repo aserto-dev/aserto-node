@@ -4,7 +4,9 @@ import {
   createAsyncIterable,
   DirectoryServiceV3,
   DirectoryV3,
+  EtagMismatchError,
   getSSLCredentials,
+  NotFoundError,
   policyInstance,
   readAsyncIterable,
 } from "../../lib";
@@ -92,6 +94,19 @@ types:
           },
         })
       ).resolves.not.toThrow();
+    });
+
+    xit("throws EtagMismatchError when setting the same object without Etag", async () => {
+      await expect(
+        directoryClient.setObject({
+          object: {
+            type: "user",
+            id: "test-user",
+            displayName: "updated",
+            etag: "updated",
+          },
+        })
+      ).rejects.toThrow(EtagMismatchError);
     });
 
     it("sets a another object", async () => {
@@ -255,7 +270,7 @@ types:
       ).resolves.not.toThrow();
     });
 
-    it("throws error when getting a delete relation", async () => {
+    it("throws NotFoundError when getting a delete relation", async () => {
       await expect(
         directoryClient.relation({
           subjectId: "test-user",
@@ -264,9 +279,7 @@ types:
           objectId: "test-group",
           objectType: "group",
         })
-      ).rejects.toThrow(
-        '"relation" failed with code: 5, message: [not_found] E20051 key not found'
-      );
+      ).rejects.toThrow(NotFoundError);
     });
 
     it("list user objects", async () => {
@@ -313,20 +326,16 @@ types:
       ).resolves.not.toThrow();
     });
 
-    it("throws error when getting a deleted user object", async () => {
+    it("throws NotFoundError when getting a deleted user object", async () => {
       await expect(
         directoryClient.object({ objectType: "user", objectId: "test-user" })
-      ).rejects.toThrow(
-        '"object" failed with code: 5, message: [not_found] E20051 key not found'
-      );
+      ).rejects.toThrow(NotFoundError);
     });
 
-    it("throws error when getting a deleted group object", async () => {
+    it("throws NotFoundError when getting a deleted group object", async () => {
       await expect(
         directoryClient.object({ objectType: "group", objectId: "test-group" })
-      ).rejects.toThrow(
-        '"object" failed with code: 5, message: [not_found] E20051 key not found'
-      );
+      ).rejects.toThrow(NotFoundError);
     });
 
     it("returns [] when  there are no objects", async () => {
@@ -432,26 +441,22 @@ types:
       ).resolves.not.toThrow();
     });
 
-    it("throws error when getting a deleted user object", async () => {
+    it("throws NotFoundError when getting a deleted user object", async () => {
       await expect(
         directoryClient.object({ objectType: "user", objectId: "import-user" })
-      ).rejects.toThrow(
-        '"object" failed with code: 5, message: [not_found] E20051 key not found'
-      );
+      ).rejects.toThrow(NotFoundError);
     });
 
-    it("throws error when getting a deleted group object", async () => {
+    it("throws NotFoundError when getting a deleted group object", async () => {
       await expect(
         directoryClient.object({
           objectType: "group",
           objectId: "import-group",
         })
-      ).rejects.toThrow(
-        '"object" failed with code: 5, message: [not_found] E20051 key not found'
-      );
+      ).rejects.toThrow(NotFoundError);
     });
 
-    it("throws error when getting a delete relation", async () => {
+    it("throws NotFoundError when getting a delete relation", async () => {
       await expect(
         directoryClient.relation({
           subjectId: "import-user",
@@ -460,9 +465,7 @@ types:
           objectId: "import-group",
           objectType: "group",
         })
-      ).rejects.toThrow(
-        '"relation" failed with code: 5, message: [not_found] E20051 key not found'
-      );
+      ).rejects.toThrow(NotFoundError);
     });
   });
 

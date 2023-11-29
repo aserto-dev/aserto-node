@@ -58,3 +58,5 @@ export {
   SubIdentityMapper,
   DirectoryConfig as ServiceConfig,
 };
+
+export * from "./directory/errors";

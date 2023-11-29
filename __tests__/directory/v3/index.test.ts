@@ -24,11 +24,18 @@ import {
   SetRelationResponse,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
 import { Struct } from "@bufbuild/protobuf";
-import { ConnectError } from "@connectrpc/connect";
+import { Code, ConnectError } from "@connectrpc/connect";
 import { createAsyncIterable } from "@connectrpc/connect/protocol";
 import * as connectNode from "@connectrpc/connect-node";
 
-import { DirectoryServiceV3, DirectoryV3 } from "../../../lib/index";
+import {
+  DirectoryServiceV3,
+  DirectoryV3,
+  EtagMismatchError,
+  InvalidArgumentError,
+  NotFoundError,
+  UnauthenticatedError,
+} from "../../../lib/index";
 jest.mock("fs");
 
 describe("DirectoryV3", () => {
@@ -234,7 +241,7 @@ describe("DirectoryV3", () => {
     it("handles ConnectError", async () => {
       const mockCheckPermission = jest
         .spyOn(directory.ReaderClient, "checkPermission")
-        .mockRejectedValue(new ConnectError("connect error", 5));
+        .mockRejectedValue(new ConnectError("connect error", Code.Canceled));
 
       const params = {
         subjectId: "euang@acmecorp.com",
@@ -243,8 +250,42 @@ describe("DirectoryV3", () => {
         objectType: "group",
         objectId: "admin",
       };
+
+      // error class
       await expect(directory.checkPermission(params)).rejects.toThrow(
-        '"checkPermission" failed with code: 5, message: [not_found] connect error'
+        ConnectError
+      );
+
+      // error message
+      await expect(directory.checkPermission(params)).rejects.toThrow(
+        '"checkPermission" failed with code: 1, message: [canceled] connect error'
+      );
+
+      mockCheckPermission.mockReset();
+    });
+
+    it("handles Unauthenticated Error", async () => {
+      const mockCheckPermission = jest
+        .spyOn(directory.ReaderClient, "checkPermission")
+        .mockRejectedValue(
+          new ConnectError("Invalid credentials", Code.Unauthenticated)
+        );
+
+      const params = {
+        subjectId: "euang@acmecorp.com",
+        subjectType: "user",
+        permission: "read",
+        objectType: "group",
+        objectId: "admin",
+      };
+
+      // error class
+      await expect(directory.checkPermission(params)).rejects.toThrow(
+        UnauthenticatedError
+      );
+      // error message
+      await expect(directory.checkPermission(params)).rejects.toThrow(
+        "Authentication failed: [unauthenticated] Invalid credentials"
       );
 
       mockCheckPermission.mockReset();
@@ -372,6 +413,23 @@ describe("DirectoryV3", () => {
 
       mockGetObject.mockReset();
     });
+
+    it("handles NotFound Error", async () => {
+      const mockGetObject = jest
+        .spyOn(directory.ReaderClient, "getObject")
+        .mockRejectedValue(new ConnectError("Not found", Code.NotFound));
+
+      const params = { objectId: "123", objectType: "user" };
+
+      // error class
+      await expect(directory.object(params)).rejects.toThrow(NotFoundError);
+      // error message
+      await expect(directory.object(params)).rejects.toThrow(
+        "object not found"
+      );
+
+      mockGetObject.mockReset();
+    });
   });
 
   describe("objects", () => {
@@ -450,6 +508,48 @@ describe("DirectoryV3", () => {
       const params = { objectType: "user" };
       await expect(directory.setObject(params)).rejects.toThrow(
         "Directory service error"
+      );
+
+      mockSetObject.mockReset();
+    });
+
+    it("handles InvalidArgument Error", async () => {
+      const mockSetObject = jest
+        .spyOn(directory.WriterClient, "setObject")
+        .mockRejectedValue(
+          new ConnectError("Invalid argument", Code.InvalidArgument)
+        );
+
+      const params = {};
+
+      // error class
+      await expect(directory.setObject(params)).rejects.toThrow(
+        InvalidArgumentError
+      );
+      // error message
+      await expect(directory.setObject(params)).rejects.toThrow(
+        "setObject: [invalid_argument] Invalid argument"
+      );
+
+      mockSetObject.mockReset();
+    });
+
+    it("handles EtagMissmatch Error", async () => {
+      const mockSetObject = jest
+        .spyOn(directory.WriterClient, "setObject")
+        .mockRejectedValue(
+          new ConnectError("Invalid argument", Code.FailedPrecondition)
+        );
+
+      const params = {};
+
+      // error class
+      await expect(directory.setObject(params)).rejects.toThrow(
+        EtagMismatchError
+      );
+      // error message
+      await expect(directory.setObject(params)).rejects.toThrow(
+        "invalid etag in setObject request"
       );
 
       mockSetObject.mockReset();

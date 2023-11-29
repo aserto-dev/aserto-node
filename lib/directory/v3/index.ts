@@ -24,6 +24,7 @@ import {
   Struct,
 } from "@bufbuild/protobuf";
 import {
+  Code,
   ConnectError,
   createPromiseClient,
   Interceptor,
@@ -33,6 +34,12 @@ import {
 } from "@connectrpc/connect";
 import { createGrpcTransport } from "@connectrpc/connect-node";
 
+import {
+  EtagMismatchError,
+  InvalidArgumentError,
+  NotFoundError,
+  UnauthenticatedError,
+} from "../errors";
 import {
   CheckPermissionRequest,
   CheckRelationRequest,
@@ -465,9 +472,28 @@ export async function* createAsyncIterable<T>(items: T[]): AsyncIterable<T> {
 
 function handleError(error: unknown, method: string) {
   if (error instanceof ConnectError) {
-    throw new Error(
-      `"${method}" failed with code: ${error.code}, message: ${error.message}`
-    );
+    switch (error.code) {
+      case Code.Unauthenticated: {
+        throw new UnauthenticatedError(
+          `Authentication failed: ${error.message}`
+        );
+      }
+      case Code.NotFound: {
+        throw new NotFoundError(`${method} not found: ${error.message}`);
+      }
+      case Code.InvalidArgument: {
+        throw new InvalidArgumentError(`${method}: ${error.message}`);
+      }
+      case Code.FailedPrecondition: {
+        throw new EtagMismatchError(
+          `invalid etag in ${method} request: ${error.message}`
+        );
+      }
+      default: {
+        error.message = `"${method}" failed with code: ${error.code}, message: ${error.message}`;
+        throw error;
+      }
+    }
   } else {
     throw error;
   }
