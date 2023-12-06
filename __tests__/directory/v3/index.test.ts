@@ -29,6 +29,14 @@ import { createAsyncIterable } from "@connectrpc/connect/protocol";
 import * as connectNode from "@connectrpc/connect-node";
 
 import {
+  nullExporterProxy,
+  nullImporterProxy,
+  nullModelProxy,
+  nullReaderProxy,
+  nullWriterProxy,
+} from "../../../lib/directory/v3/null";
+import {
+  ClientNotConfiguredError,
   DirectoryServiceV3,
   DirectoryV3,
   EtagMismatchError,
@@ -191,6 +199,251 @@ describe("DirectoryV3", () => {
     expect(directory.ImporterClient).toBeDefined();
     expect(directory.ExporterClient).toBeDefined();
     expect(directory.ModelClient).toBeDefined();
+  });
+
+  describe("Reader", () => {
+    it("inherits base config", () => {
+      const mockTransport = jest.spyOn(connectNode, "createGrpcTransport");
+      const mockFs = jest
+        .spyOn(fs, "readFileSync")
+        .mockImplementation((path: fs.PathOrFileDescriptor) => {
+          return path as string;
+        });
+
+      const directory = DirectoryServiceV3({
+        tenantId: "tenantId",
+        apiKey: "apiKey",
+      });
+
+      expect(directory).toBeInstanceOf(DirectoryV3);
+      expect(directory.ReaderClient).toBeDefined();
+
+      mockFs.mockReset();
+      mockTransport.mockReset();
+    });
+
+    it("allows to be  configured individually", () => {
+      const mockTransport = jest.spyOn(connectNode, "createGrpcTransport");
+      const mockFs = jest
+        .spyOn(fs, "readFileSync")
+        .mockImplementation((path: fs.PathOrFileDescriptor) => {
+          return path as string;
+        });
+
+      const directory = DirectoryServiceV3({
+        reader: {
+          tenantId: "tenantId",
+          apiKey: "apiKey",
+        },
+      });
+
+      expect(directory).toBeInstanceOf(DirectoryV3);
+      expect(directory.ReaderClient).toBeDefined();
+      expect(mockTransport.mock.calls).toEqual([
+        [
+          expect.objectContaining({
+            baseUrl: "https://directory.prod.aserto.com:8443",
+            httpVersion: "2",
+            nodeOptions: { rejectUnauthorized: true },
+          }),
+        ],
+      ]);
+      mockFs.mockReset();
+      mockTransport.mockReset();
+    });
+
+    it("overwrites base config", () => {
+      const mockTransport = jest.spyOn(connectNode, "createGrpcTransport");
+      const mockFs = jest
+        .spyOn(fs, "readFileSync")
+        .mockImplementation((path: fs.PathOrFileDescriptor) => {
+          return path as string;
+        });
+
+      const directory = DirectoryServiceV3({
+        reader: {
+          url: "readerurl",
+          tenantId: "tenantId",
+          apiKey: "apiKey",
+        },
+      });
+
+      expect(directory).toBeInstanceOf(DirectoryV3);
+      expect(directory.ReaderClient).toBeDefined();
+      expect(mockTransport.mock.calls).toEqual([
+        [
+          expect.objectContaining({
+            baseUrl: "https://readerurl",
+            httpVersion: "2",
+            nodeOptions: { rejectUnauthorized: true },
+          }),
+        ],
+      ]);
+      mockFs.mockReset();
+    });
+
+    describe("when config is missing", () => {
+      const directory = DirectoryServiceV3({
+        writer: {
+          tenantId: "tenantId",
+          apiKey: "apiKey",
+        },
+      });
+
+      it("is defined as a proxy", () => {
+        expect(directory.ReaderClient).toBe(nullReaderProxy);
+      });
+
+      it("throws ClientNotConfigured Error when called", async () => {
+        await expect(directory.objects({ objectType: "" })).rejects.toThrow(
+          ClientNotConfiguredError
+        );
+
+        await expect(directory.objects({ objectType: "" })).rejects.toThrow(
+          `Cannot call 'getObjects', 'Reader' is not configured.`
+        );
+      });
+    });
+  });
+
+  describe("Writer", () => {
+    it("inherits base config", () => {
+      const directory = DirectoryServiceV3({
+        tenantId: "tenantId",
+        apiKey: "apiKey",
+      });
+
+      expect(directory).toBeInstanceOf(DirectoryV3);
+      expect(directory.WriterClient).toBeDefined();
+    });
+
+    describe("when config is missing", () => {
+      const directory = DirectoryServiceV3({
+        reader: {
+          tenantId: "tenantId",
+          apiKey: "apiKey",
+        },
+      });
+
+      it("is defined as a proxy", () => {
+        expect(directory.WriterClient).toBe(nullWriterProxy);
+      });
+
+      it("throws ClientNotConfigured Error when called", async () => {
+        await expect(directory.setObject({})).rejects.toThrow(
+          ClientNotConfiguredError
+        );
+
+        await expect(directory.setObject({})).rejects.toThrow(
+          `Cannot call 'setObject', 'Writer' is not configured.`
+        );
+      });
+    });
+  });
+
+  describe("Importer", () => {
+    it("inherits base config", () => {
+      const directory = DirectoryServiceV3({
+        tenantId: "tenantId",
+        apiKey: "apiKey",
+      });
+
+      expect(directory).toBeInstanceOf(DirectoryV3);
+      expect(directory.ImporterClient).toBeDefined();
+    });
+
+    describe("when config is missing", () => {
+      const directory = DirectoryServiceV3({
+        reader: {
+          tenantId: "tenantId",
+          apiKey: "apiKey",
+        },
+      });
+
+      it("is defined as a proxy", () => {
+        expect(directory.ImporterClient).toBe(nullImporterProxy);
+      });
+
+      it("throws ClientNotConfigured Error when called", async () => {
+        await expect(directory.import(createAsyncIterable([]))).rejects.toThrow(
+          ClientNotConfiguredError
+        );
+
+        await expect(directory.import(createAsyncIterable([]))).rejects.toThrow(
+          `Cannot call 'import', 'Importer' is not configured.`
+        );
+      });
+    });
+  });
+
+  describe("Exporter", () => {
+    it("inherits base config", () => {
+      const directory = DirectoryServiceV3({
+        tenantId: "tenantId",
+        apiKey: "apiKey",
+      });
+
+      expect(directory).toBeInstanceOf(DirectoryV3);
+      expect(directory.ExporterClient).toBeDefined();
+    });
+
+    describe("when config is missing", () => {
+      const directory = DirectoryServiceV3({
+        reader: {
+          tenantId: "tenantId",
+          apiKey: "apiKey",
+        },
+      });
+
+      it("is defined as a proxy", () => {
+        expect(directory.ExporterClient).toBe(nullExporterProxy);
+      });
+
+      it("throws ClientNotConfigured Error when called", async () => {
+        await expect(directory.export({ options: "all" })).rejects.toThrow(
+          ClientNotConfiguredError
+        );
+
+        await expect(directory.export({ options: "all" })).rejects.toThrow(
+          `Cannot call 'export', 'Exporter' is not configured.`
+        );
+      });
+    });
+  });
+
+  describe("Model", () => {
+    it("inherits base config", () => {
+      const directory = DirectoryServiceV3({
+        tenantId: "tenantId",
+        apiKey: "apiKey",
+      });
+
+      expect(directory).toBeInstanceOf(DirectoryV3);
+      expect(directory.ModelClient).toBeDefined();
+    });
+
+    describe("when config is missing", () => {
+      const directory = DirectoryServiceV3({
+        reader: {
+          tenantId: "tenantId",
+          apiKey: "apiKey",
+        },
+      });
+
+      it("is defined as a proxy", () => {
+        expect(directory.ModelClient).toBe(nullModelProxy);
+      });
+
+      it("throws ClientNotConfigured Error when called", async () => {
+        await expect(directory.deleteManifest()).rejects.toThrow(
+          ClientNotConfiguredError
+        );
+
+        await expect(directory.deleteManifest()).rejects.toThrow(
+          `Cannot call 'deleteManifest', 'Model' is not configured.`
+        );
+      });
+    });
   });
 
   describe("checkPermission", () => {
@@ -505,7 +758,15 @@ describe("DirectoryV3", () => {
         .spyOn(directory.WriterClient, "setObject")
         .mockRejectedValue(new Error("Directory service error"));
 
-      const params = { objectType: "user" };
+      const params = {
+        object: {
+          type: "user",
+          id: "test-user",
+          properties: {
+            displayName: "test user",
+          },
+        },
+      };
       await expect(directory.setObject(params)).rejects.toThrow(
         "Directory service error"
       );
@@ -520,7 +781,15 @@ describe("DirectoryV3", () => {
           new ConnectError("Invalid argument", Code.InvalidArgument)
         );
 
-      const params = {};
+      const params = {
+        object: {
+          type: "user",
+          id: "test-user",
+          properties: {
+            displayName: "test user",
+          },
+        },
+      };
 
       // error class
       await expect(directory.setObject(params)).rejects.toThrow(
@@ -541,7 +810,15 @@ describe("DirectoryV3", () => {
           new ConnectError("Invalid argument", Code.FailedPrecondition)
         );
 
-      const params = {};
+      const params = {
+        object: {
+          type: "user",
+          id: "test-user",
+          properties: {
+            displayName: "test user",
+          },
+        },
+      };
 
       // error class
       await expect(directory.setObject(params)).rejects.toThrow(
