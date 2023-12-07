@@ -398,11 +398,11 @@ describe("DirectoryV3", () => {
       });
 
       it("throws ClientNotConfigured Error when called", async () => {
-        await expect(directory.export({ options: "all" })).rejects.toThrow(
+        await expect(directory.export({ options: "DATA" })).rejects.toThrow(
           ConfigError
         );
 
-        await expect(directory.export({ options: "all" })).rejects.toThrow(
+        await expect(directory.export({ options: "DATA" })).rejects.toThrow(
           `Cannot call 'export', 'Exporter' is not configured.`
         );
       });
