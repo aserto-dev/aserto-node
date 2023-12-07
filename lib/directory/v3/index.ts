@@ -1,5 +1,4 @@
 import { readFileSync } from "fs";
-import { ClientSessionOptions, SecureClientSessionOptions } from "http2";
 import { PaginationRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v3/common_pb";
 import { Exporter } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_connect";
 import { ExportRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
@@ -40,6 +39,13 @@ import {
   NotFoundError,
   UnauthenticatedError,
 } from "../errors";
+import {
+  nullExporterProxy,
+  nullImporterProxy,
+  nullModelProxy,
+  nullReaderProxy,
+  nullWriterProxy,
+} from "./null";
 import {
   CheckPermissionRequest,
   CheckRelationRequest,
@@ -111,22 +117,41 @@ export class DirectoryV3 {
       return headers;
     };
 
-    const createTransport = (
-      serviceUrl: string,
-      apikey?: string,
-      tenantId?: string,
-      nodeOptions?: ClientSessionOptions | SecureClientSessionOptions
+    const validConfig = (
+      config: ServiceConfig | undefined,
+      fallback: ServiceConfig | undefined
     ) => {
+      return (
+        !!config?.url ||
+        !!fallback?.url ||
+        ((!!config?.apiKey || !!fallback?.apiKey) &&
+          (config?.tenantId || !!fallback?.tenantId))
+      );
+    };
+
+    const createTransport = (
+      config: ServiceConfig | undefined,
+      fallback: ServiceConfig | undefined
+    ) => {
+      if (!validConfig(config, fallback)) {
+        return;
+      }
+
+      const serviceUrl = config?.url || fallback?.url;
+      const apiKey = config?.apiKey || fallback?.apiKey;
+      const tenantId = config?.tenantId || fallback?.tenantId;
+      const nodeOptions = createNodeOptions(config);
+
       if (
         serviceUrl !== baseServiceUrl ||
-        apikey !== baseApiKey ||
+        apiKey !== baseApiKey ||
         tenantId !== baseTenantId ||
         nodeOptions !== baseNodeOptions
       ) {
         return createGrpcTransport({
           httpVersion: "2",
-          baseUrl: `https://${serviceUrl}`,
-          interceptors: [createHeadersInterceptor(apikey, tenantId)],
+          baseUrl: `https://${serviceUrl || "directory.prod.aserto.com:8443"}`,
+          interceptors: [createHeadersInterceptor(apiKey, tenantId)],
           nodeOptions: nodeOptions,
         });
       }
@@ -145,84 +170,48 @@ export class DirectoryV3 {
       rejectUnauthorized = config.rejectUnauthorized;
     }
 
-    const baseServiceUrl = config.url ?? "directory.prod.aserto.com:8443";
+    const baseServiceUrl = config.url;
     const baseApiKey = config.apiKey;
     const baseTenantId = config.tenantId;
     const baseCaFile = !!config.caFile
       ? readFileSync(config.caFile)
       : undefined;
 
-    const readerServiceUrl = config.reader?.url || baseServiceUrl;
-    const readerApiKey = config.reader?.apiKey || baseApiKey;
-    const readerTenantId = config.reader?.tenantId || baseTenantId;
-    const readerNodeOptions = createNodeOptions(config.reader);
-
-    const writerServiceUrl = config.writer?.url || baseServiceUrl;
-    const writerApiKey = config.writer?.apiKey || baseApiKey;
-    const writerTenantId = config.writer?.tenantId || baseTenantId;
-    const writerNodeOptions = createNodeOptions(config.writer);
-
-    const importerServiceUrl = config.importer?.url || baseServiceUrl;
-    const importerApiKey = config.importer?.apiKey || baseApiKey;
-    const importerTenantId = config.importer?.tenantId || baseTenantId;
-    const importerNodeOptions = createNodeOptions(config.importer);
-
-    const exporterServiceUrl = config.exporter?.url || baseServiceUrl;
-    const exporterApiKey = config.exporter?.apiKey || baseApiKey;
-    const exporterTenantId = config.exporter?.tenantId || baseTenantId;
-    const exporterNodeOptions = createNodeOptions(config.exporter);
-
-    const modelServiceUrl = config.model?.url || baseServiceUrl;
-    const modelApiKey = config.model?.apiKey || baseApiKey;
-    const modelTenantId = config.model?.tenantId || baseTenantId;
-    const modelNodeOptions = createNodeOptions(config.model);
-
     const baseNodeOptions = { rejectUnauthorized, ca: baseCaFile };
 
-    const baseGrpcTransport = createGrpcTransport({
-      httpVersion: "2",
-      baseUrl: `https://${baseServiceUrl}`,
-      interceptors: [baseServiceHeaders],
-      nodeOptions: baseNodeOptions,
-    });
+    const baseGrpcTransport =
+      !!config.url || (!!config.apiKey && !!config.tenantId)
+        ? createGrpcTransport({
+            httpVersion: "2",
+            baseUrl: `https://${baseServiceUrl}`,
+            interceptors: [baseServiceHeaders],
+            nodeOptions: baseNodeOptions,
+          })
+        : undefined;
 
-    const readerGrpcTransport = createTransport(
-      readerServiceUrl,
-      readerApiKey,
-      readerTenantId,
-      readerNodeOptions
-    );
-    const writerGrpcTransport = createTransport(
-      writerServiceUrl,
-      writerApiKey,
-      writerTenantId,
-      writerNodeOptions
-    );
-    const importerGrpcTransport = createTransport(
-      importerServiceUrl,
-      importerApiKey,
-      importerTenantId,
-      importerNodeOptions
-    );
-    const exporterGrpcTransport = createTransport(
-      exporterServiceUrl,
-      exporterApiKey,
-      exporterTenantId,
-      exporterNodeOptions
-    );
+    const readerGrpcTransport = createTransport(config.reader, config);
+    const writerGrpcTransport = createTransport(config.writer, config);
+    const importerGrpcTransport = createTransport(config.importer, config);
+    const exporterGrpcTransport = createTransport(config.exporter, config);
 
-    const modelGrpcTransport = createTransport(
-      modelServiceUrl,
-      modelApiKey,
-      modelTenantId,
-      modelNodeOptions
-    );
+    const modelGrpcTransport = createTransport(config.model, config);
 
-    this.ReaderClient = createPromiseClient(Reader, readerGrpcTransport);
-    this.WriterClient = createPromiseClient(Writer, writerGrpcTransport);
-    this.ImporterClient = createPromiseClient(Importer, importerGrpcTransport);
-    this.ExporterClient = createPromiseClient(Exporter, exporterGrpcTransport);
-    this.ModelClient = createPromiseClient(Model, modelGrpcTransport);
+    this.ReaderClient = !!readerGrpcTransport
+      ? createPromiseClient(Reader, readerGrpcTransport)
+      : (nullReaderProxy as unknown as PromiseClient<typeof Reader>);
+    this.WriterClient = !!writerGrpcTransport
+      ? createPromiseClient(Writer, writerGrpcTransport)
+      : (nullWriterProxy as unknown as PromiseClient<typeof Writer>);
+    this.ImporterClient = !!importerGrpcTransport
+      ? createPromiseClient(Importer, importerGrpcTransport)
+      : (nullImporterProxy as unknown as PromiseClient<typeof Importer>);
+    this.ExporterClient = !!exporterGrpcTransport
+      ? createPromiseClient(Exporter, exporterGrpcTransport)
+      : (nullExporterProxy as unknown as PromiseClient<typeof Exporter>);
+
+    this.ModelClient = !!modelGrpcTransport
+      ? createPromiseClient(Model, modelGrpcTransport)
+      : (nullModelProxy as unknown as PromiseClient<typeof Model>);
   }
 
   async checkPermission(params: CheckPermissionRequest) {
@@ -299,7 +288,7 @@ export class DirectoryV3 {
 
       const response = await this.WriterClient.setObject(newParams);
 
-      return response.result;
+      return response?.result;
     } catch (error) {
       handleError(error, "setObject");
     }
@@ -390,6 +379,9 @@ export class DirectoryV3 {
   async getManifest(params?: PlainMessage<GetManifestRequest>) {
     try {
       const response = this.ModelClient.getManifest(params!);
+      if (!response) {
+        return;
+      }
 
       const data = (await readAsyncIterable(response))
         .map((el) => el.msg)
