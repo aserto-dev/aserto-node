@@ -6,7 +6,7 @@
  * @extends Error
  */
 class DirectoryServiceError extends Error {}
-export class ClientNotConfiguredError extends DirectoryServiceError {}
+export class ConfigError extends DirectoryServiceError {}
 /**
  * Object or Relation is not found.
  * Extends the DirectoryServiceError class.

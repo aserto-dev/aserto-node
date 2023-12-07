@@ -36,7 +36,7 @@ import {
   nullWriterProxy,
 } from "../../../lib/directory/v3/null";
 import {
-  ClientNotConfiguredError,
+  ConfigError,
   DirectoryServiceV3,
   DirectoryV3,
   EtagMismatchError,
@@ -296,7 +296,7 @@ describe("DirectoryV3", () => {
 
       it("throws ClientNotConfigured Error when called", async () => {
         await expect(directory.objects({ objectType: "" })).rejects.toThrow(
-          ClientNotConfiguredError
+          ConfigError
         );
 
         await expect(directory.objects({ objectType: "" })).rejects.toThrow(
@@ -330,9 +330,7 @@ describe("DirectoryV3", () => {
       });
 
       it("throws ClientNotConfigured Error when called", async () => {
-        await expect(directory.setObject({})).rejects.toThrow(
-          ClientNotConfiguredError
-        );
+        await expect(directory.setObject({})).rejects.toThrow(ConfigError);
 
         await expect(directory.setObject({})).rejects.toThrow(
           `Cannot call 'setObject', 'Writer' is not configured.`
@@ -366,7 +364,7 @@ describe("DirectoryV3", () => {
 
       it("throws ClientNotConfigured Error when called", async () => {
         await expect(directory.import(createAsyncIterable([]))).rejects.toThrow(
-          ClientNotConfiguredError
+          ConfigError
         );
 
         await expect(directory.import(createAsyncIterable([]))).rejects.toThrow(
@@ -401,7 +399,7 @@ describe("DirectoryV3", () => {
 
       it("throws ClientNotConfigured Error when called", async () => {
         await expect(directory.export({ options: "all" })).rejects.toThrow(
-          ClientNotConfiguredError
+          ConfigError
         );
 
         await expect(directory.export({ options: "all" })).rejects.toThrow(
@@ -435,9 +433,7 @@ describe("DirectoryV3", () => {
       });
 
       it("throws ClientNotConfigured Error when called", async () => {
-        await expect(directory.deleteManifest()).rejects.toThrow(
-          ClientNotConfiguredError
-        );
+        await expect(directory.deleteManifest()).rejects.toThrow(ConfigError);
 
         await expect(directory.deleteManifest()).rejects.toThrow(
           `Cannot call 'deleteManifest', 'Model' is not configured.`
