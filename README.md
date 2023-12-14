@@ -679,6 +679,7 @@ await directoryClient.deleteManifest();
 
 const importRequest = createAsyncIterable([
   new ImportRequest({
+    opCode: 1,
     msg: {
       case: "object",
       value: {
@@ -690,6 +691,7 @@ const importRequest = createAsyncIterable([
     },
   }),
   new ImportRequest({
+    opCode: 1,
     msg: {
       case: "object",
       value: {
@@ -701,6 +703,7 @@ const importRequest = createAsyncIterable([
     },
   }),
   new ImportRequest({
+    opCode: 1,
     msg: {
       case: "relation",
       value: {
