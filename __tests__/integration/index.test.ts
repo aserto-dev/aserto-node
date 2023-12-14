@@ -351,6 +351,7 @@ types:
 
       const importRequest = createAsyncIterable([
         {
+          opCode: 1,
           msg: {
             case: objectCase,
             value: {
@@ -362,6 +363,7 @@ types:
           },
         },
         {
+          opCode: 1,
           msg: {
             case: objectCase,
             value: {
@@ -373,6 +375,7 @@ types:
           },
         },
         {
+          opCode: 1,
           msg: {
             case: relationCase,
             value: {

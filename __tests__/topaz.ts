@@ -16,7 +16,7 @@ export class Topaz {
   async start() {
     await this.backup();
     execute(
-      "topaz configure -r ghcr.io/aserto-policies/policy-todo:2.1.0 -n todo -d -s"
+      "topaz configure -r ghcr.io/aserto-policies/policy-todo:2.1.0 -n todo -d -f"
     );
     execute("topaz start");
     await retry(
