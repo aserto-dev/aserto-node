@@ -936,6 +936,13 @@ Furthermore, when packaging a policy for deployment (e.g. in a Docker container)
 
 Alternately, to ignore TLS certificate validation when creating a TLS connection to the authorizer, you can set the `disableTlsValidation` option to `true` and avoid TLS certificate validation. This option is **not recommended for production**.
 
+## Debugging
+
+aserto-node provides a couple of environment variables that can be used to print debug information:
+
+`NODE_TRACE=true` - enables trace logging for the requests.
+
+`NODE_TRACE_MESSAGE=true` - logs the request payload for gRPC requests.
 
 ## Issue Reporting
 

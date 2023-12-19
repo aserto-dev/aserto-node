@@ -22,10 +22,16 @@ import {
 import {
   ChannelCredentials,
   credentials,
+  InterceptingCall,
   Metadata,
   ServiceError,
 } from "@grpc/grpc-js";
+import {
+  InterceptorOptions,
+  NextCall,
+} from "@grpc/grpc-js/build/src/client-interceptors";
 
+import { log } from "../log";
 import buildDecisionTreeOptions from "./model/decisionTreeOptions";
 import buildPolicyContext from "./model/policyContext";
 import buildQueryOptions from "./model/queryOptions";
@@ -57,9 +63,25 @@ export class Authorizer {
     config.authorizerApiKey &&
       metadata.add("authorization", `basic ${config.authorizerApiKey}`);
     config.tenantId && metadata.add("aserto-tenant-id", config.tenantId);
-
+    const interceptors = [];
+    if (process.env.NODE_TRACE_MESSAGE) {
+      const interceptor = function (
+        options: InterceptorOptions,
+        nextCall: NextCall
+      ) {
+        return new InterceptingCall(nextCall(options), {
+          sendMessage: function (message, next) {
+            log(JSON.stringify(message.toObject()));
+            next(message);
+          },
+        });
+      };
+      interceptors.push(interceptor);
+    }
     this.metadata = metadata;
-    this.client = new AuthorizerClient(url, channelCredentials);
+    this.client = new AuthorizerClient(url, channelCredentials, {
+      interceptors: interceptors,
+    });
   }
 
   async Is({
