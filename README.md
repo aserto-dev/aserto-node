@@ -53,10 +53,10 @@ type AuthorizerConfig = {
 ```
 ```ts
 const authClient = new Authorizer({
-  authorizerServiceUrl: "authorizer.eng.aserto.com:8443",
+  authorizerServiceUrl: "authorizer.prod.aserto.com:8443",
   authorizerApiKey: "my-authorizer-api-key",
   tenantId: "my-tenant-id",
-}, credentials.createSsl());
+}, getSSLCredentials());
 ```
 
 - `authorizerServiceUrl`: hostname:port of authorizer service (_required_)
@@ -126,7 +126,7 @@ await authClient
 
 // Query
 await authClient
-  .Is({
+  .Query({
     identityContext: identityContext(
       "morty@the-citadel.com",
       "IDENTITY_TYPE_SUB"
@@ -480,23 +480,35 @@ try {
 ```typescript
   relation({
     subjectType:  'subject-type',
+    subjectId: 'subject-id',
+    relation: 'relation-name',
     objectType: 'object-type',
     objectId: 'object-id',
-    relation: 'relation-name',
   })
 ```
 
-Get an array of relations of a certain type for an object instance. For example:
+Get an relation of a certain type between as subject and an object. For example:
 
 ```typescript
 const identity = 'euang@acmecorp.com';
-const relations = await directoryClient.relation({
+const relation = await directoryClient.relation({
   subjectType: 'user',
-  objectType: 'identity',
-  objectId: identity
+  subjectId: 'euang@acmecorp.com',
   relation: 'identifier',
   objectType: 'identity'
+  objectId: identity
 });
+```
+
+#### 'relations' function
+
+```typescript
+  relations({
+    subjectType:  'subject-type',
+    relation: 'relation-name',
+    objectType: 'object-type',
+    objectId: 'object-id',
+  })
 ```
 
 ### Setting objects and relations
@@ -725,7 +737,7 @@ await (readAsyncIterable(resp))
 
 ```ts
 const response = await readAsyncIterable(
-  await directoryClient.export({ options: "all" })
+  await directoryClient.export({ options: "DATA" })
 )
 ```
 

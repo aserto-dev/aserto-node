@@ -1,7 +1,10 @@
 import { readFileSync } from "fs";
 import { PaginationRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v3/common_pb";
 import { Exporter } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_connect";
-import { ExportRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
+import {
+  ExportRequest,
+  Option,
+} from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
 import { Importer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_connect";
 import { ImportRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
 import { Model } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_connect";
@@ -62,14 +65,17 @@ import {
   SetRelationRequest,
 } from "./types";
 
-const DATA_TYPE = {
-  unknown: 0x0,
-  objects: 0x8,
-  relations: 0x10,
-  all: 0x18,
-};
-
-type DATA_TYPE_OPTIONS = "unknown" | "objects" | "relations" | "all";
+/**
+ * "UNKNOWN" - nothing selected (default initialization value)
+ *
+ * "DATA_OBJECTS" - object instances
+ *
+ * "DATA_RELATIONS" - relation instances
+ *
+ * "DATA" - all data = OPTION_DATA_OBJECTS | OPTION_DATA_RELATIONS
+ *
+ */
+type DATA_TYPE_OPTIONS = keyof typeof Option;
 
 export class DirectoryV3 {
   ReaderClient: PromiseClient<typeof Reader>;
@@ -367,7 +373,7 @@ export class DirectoryV3 {
     try {
       return this.ExporterClient.export(
         new ExportRequest({
-          options: DATA_TYPE[params.options] || DATA_TYPE["unknown"],
+          options: Option[params.options],
         })
       );
     } catch (error) {

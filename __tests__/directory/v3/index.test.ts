@@ -398,11 +398,11 @@ describe("DirectoryV3", () => {
       });
 
       it("throws ClientNotConfigured Error when called", async () => {
-        await expect(directory.export({ options: "all" })).rejects.toThrow(
+        await expect(directory.export({ options: "DATA" })).rejects.toThrow(
           ConfigError
         );
 
-        await expect(directory.export({ options: "all" })).rejects.toThrow(
+        await expect(directory.export({ options: "DATA" })).rejects.toThrow(
           `Cannot call 'export', 'Exporter' is not configured.`
         );
       });
@@ -1250,7 +1250,7 @@ describe("DirectoryV3", () => {
         .spyOn(directory.ExporterClient, "export")
         .mockReturnValue(createAsyncIterable([new ExportResponse()]));
 
-      await directory.export({ options: "all" });
+      await directory.export({ options: "DATA" });
 
       expect(mockExport).toHaveBeenCalledWith({ options: 24 });
 
@@ -1264,7 +1264,7 @@ describe("DirectoryV3", () => {
           throw new Error("Directory service error");
         });
 
-      await expect(directory.export({ options: "all" })).rejects.toThrow(
+      await expect(directory.export({ options: "DATA" })).rejects.toThrow(
         "Directory service error"
       );
 
