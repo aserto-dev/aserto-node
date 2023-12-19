@@ -927,7 +927,9 @@ Alternately, to ignore TLS certificate validation when creating a TLS connection
 ## Debugging
 
 aserto-node provides a couple of environment variables that can be used to print debug information:
+
 `NODE_TRACE=true` - enables trace logging for the requests.
+
 `NODE_TRACE_MESSAGE=true` - logs the request payload for gRPC requests.
 
 ## Issue Reporting
