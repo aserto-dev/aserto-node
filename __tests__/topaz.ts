@@ -8,7 +8,7 @@ import { log } from "../lib/log";
 
 const DB_DIR = path.join(os.homedir(), ".config/topaz/db");
 const CONFIG_DIR = path.join(os.homedir(), ".config/topaz/cfg");
-const RETRY_OPTIONS = { retries: 30, retryIntervalMs: 2000 };
+const RETRY_OPTIONS = { retries: 30, retryIntervalMs: 4000 };
 export const TOPAZ_TIMEOUT =
   RETRY_OPTIONS.retries * RETRY_OPTIONS.retryIntervalMs;
 
