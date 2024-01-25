@@ -398,6 +398,7 @@ type ServiceConfig = {
   url?: string;
   tenantId?: string;
   apiKey?: string;
+  token?: string;
   caFile?: string;
   rejectUnauthorized?: boolean;
 };
@@ -422,7 +423,8 @@ const directoryClient = DirectoryServiceV3({
 });
 
 - `url`: hostname:port of directory service (_required_)
-- `apiKey`: API key for directory service (_required_ if using hosted directory)
+- `apiKey`: API key for directory service (can be used instead of `token`)
+- `token`: an OAuth2 token to be used for authentication.(can be used instead of `apiKey`)
 - `tenantId`: Aserto tenant ID (_required_ if using hosted directory)
 - `caFile`: Path to the directory CA file. (optional)
 - `rejectUnauthorized`: reject clients with invalid certificates. Defaults to `true`.

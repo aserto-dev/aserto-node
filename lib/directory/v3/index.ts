@@ -96,6 +96,7 @@ export class DirectoryV3 {
     };
 
     const baseServiceHeaders: Interceptor = (next) => async (req) => {
+      config.token && setHeader(req, "authorization", `${config.token}`);
       config.apiKey &&
         setHeader(req, "authorization", `basic ${config.apiKey}`);
       config.tenantId && setHeader(req, "aserto-tenant-id", config.tenantId);
