@@ -1,29 +1,34 @@
-import { exec } from "child_process";
 import fs from "fs";
+import util from "node:util";
 import os from "os";
 import path from "path";
 
 import { DirectoryServiceV3 } from "../lib";
 import { log } from "../lib/log";
 
+const exec = util.promisify(require("node:child_process").exec);
+
 const DB_DIR = path.join(os.homedir(), ".config/topaz/db");
 const CONFIG_DIR = path.join(os.homedir(), ".config/topaz/cfg");
-const RETRY_OPTIONS = { retries: 30, retryIntervalMs: 2000 };
+const RETRY_OPTIONS = { retries: 30, retryIntervalMs: 4000 };
 export const TOPAZ_TIMEOUT =
   RETRY_OPTIONS.retries * RETRY_OPTIONS.retryIntervalMs;
 
 export class Topaz {
   async start() {
     await this.backup();
-    execute(
+    await execute(
       "topaz configure -r ghcr.io/aserto-policies/policy-todo:2.1.0 -n todo -d -f"
     );
-    execute("topaz start");
+    await execute("topaz start");
+    log("topaz start");
     await retry(
       async () =>
         fs.readFileSync(`${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`),
       RETRY_OPTIONS
     );
+
+    log("certificates are ready");
 
     const directoryClient = DirectoryServiceV3({
       url: "localhost:9292",
@@ -36,7 +41,7 @@ export class Topaz {
   }
 
   async stop() {
-    execute("topaz stop");
+    await execute("topaz stop");
     await this.restore();
   }
 
@@ -85,16 +90,15 @@ const retry = async <T>(
 };
 const sleep = (ms = 0) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const execute = (command: string) => {
-  exec(command, (error, stdout, stderr) => {
-    if (error) {
-      log(`error: ${error.message}`);
-      return;
-    }
-    if (stderr) {
-      log(`stderr: ${stderr}`);
-      return;
-    }
-    log(`stdout: ${stdout}`);
-  });
+const execute = async (command: string) => {
+  const { error, stdout, stderr } = await exec(command);
+  if (error) {
+    log(`error: ${error.message}`);
+    return;
+  }
+  if (stderr) {
+    log(`stderr: ${stderr}`);
+    return;
+  }
+  log(`stdout: ${stdout}`);
 };

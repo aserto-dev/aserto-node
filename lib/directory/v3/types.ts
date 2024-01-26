@@ -26,6 +26,7 @@ export type ServiceConfig = {
   url?: string;
   tenantId?: string;
   apiKey?: string;
+  token?: string;
   caFile?: string;
   rejectUnauthorized?: boolean;
 };
