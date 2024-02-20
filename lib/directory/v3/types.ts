@@ -96,6 +96,7 @@ export type GetGraphRequest = PartialExcept<
     "relation",
     "subjectType",
     "subjectId",
-    "subjectRelation"
+    "subjectRelation",
+    "explain"
   ]
 >;

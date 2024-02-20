@@ -20,7 +20,7 @@ export class Topaz {
     await execute(
       "topaz configure -r ghcr.io/aserto-policies/policy-todo:2.1.0 -n todo -d -f"
     );
-    await execute("topaz start");
+    await execute("topaz start --container-version=model-v2.3");
     log("topaz start");
     await retry(
       async () =>
