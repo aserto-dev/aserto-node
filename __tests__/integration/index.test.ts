@@ -212,28 +212,28 @@ types:
       ).toEqual({ check: true, trace: [] });
     });
 
-    it("checks the relation betwen an user and group(false)", async () => {
-      expect(
-        await directoryClient.checkRelation({
+    it("checks inexistent relation throws NotFoundError", async () => {
+      await expect(
+         directoryClient.checkRelation({
           subjectId: "test-user",
           subjectType: "user",
           relation: "owner",
           objectId: "test-group",
           objectType: "group",
         })
-      ).toEqual({ check: false, trace: [] });
+      ).rejects.toThrow(NotFoundError);
     });
 
-    it("checks the permission betwen an user and group(false)", async () => {
-      expect(
-        await directoryClient.checkPermission({
+    it("checks inexistent permission throws NotFoundError", async () => {
+      await expect(
+          directoryClient.checkPermission({
           subjectId: "test-user",
           subjectType: "user",
           permission: "write",
           objectId: "test-group",
           objectType: "group",
         })
-      ).toEqual({ check: false, trace: [] });
+      ).rejects.toThrow(NotFoundError);
     });
 
     it("lists the relations of an object", async () => {
@@ -241,7 +241,6 @@ types:
         await directoryClient.relations({
           subjectId: "test-user",
           subjectType: "user",
-          relation: "member",
         })
       ).toEqual({
         objects: {},
