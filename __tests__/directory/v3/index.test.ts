@@ -868,11 +868,12 @@ describe("DirectoryV3", () => {
         objectType: "user",
         relation: "member",
         explain: true,
+        trace: false,
       };
       const result = await directory.graph(params);
 
       expect(mockGetGraph).toHaveBeenCalledWith(params);
-      expect(result).toEqual({ results: [] });
+      expect(result).toEqual({ results: [], trace: [] });
 
       mockGetGraph.mockReset();
     });
