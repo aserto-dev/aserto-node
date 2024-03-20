@@ -71,7 +71,7 @@ const authClient = new Authorizer({
 const authClient = new Authorizer({
   authorizerServiceUrl: "localhost:8282",
   authorizerCertFile: `${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`
-}, sslCredentials);
+});
 ```
 
 #### Example:
