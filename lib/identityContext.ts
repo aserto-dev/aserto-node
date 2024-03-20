@@ -1,7 +1,8 @@
 // create identity context
 import express from "express";
-import { IdentityContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/identity_context_pb";
+import { IdentityType } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/identity_context_pb";
 
+import identityContext from "./authorizer/model/identityContext";
 import { log } from "./log";
 
 export interface IdentityContextOptions {
@@ -16,7 +17,8 @@ export default (req: express.Request, options: IdentityContextOptions) => {
   const { useAuthorizationHeader, identity, subject } = options;
 
   // construct the identity context
-  let localIdentity, type;
+  let localIdentity: string = "";
+  let type: keyof typeof IdentityType;
 
   // set the identity context
   if (useAuthorizationHeader) {
@@ -24,7 +26,7 @@ export default (req: express.Request, options: IdentityContextOptions) => {
       // decode the JWT to make sure it's valid
       const token = jwt_decode(req.headers.authorization);
       localIdentity = token && token.sub;
-      type = 2;
+      type = "SUB";
 
       // instead of fishing out the subject, just pass the JWT itself
       // TODO: create a flag for choosing one behavior over another
@@ -33,33 +35,30 @@ export default (req: express.Request, options: IdentityContextOptions) => {
         ? req.headers.authorization.replace("Bearer ", "")
         : "";
 
-      type = 3;
+      type = "JWT";
     } catch (error) {
       // TODO: resolve error type ${error.message}
       log(`Authorization header contained malformed JWT:`, "ERROR");
-      type = 1;
+      type = "NONE";
     }
   } else {
     if (subject) {
       // use the subject as the identity
       localIdentity = subject;
-      type = 2;
+      type = "SUB";
     } else {
       // fall back to anonymous context
-      type = 1;
+      type = "NONE";
     }
   }
 
   // if provided, use the identity header as the identity override
   if (identity) {
     localIdentity = identity;
-    type = 2;
+    type = "SUB";
   }
 
-  const identityContext = new IdentityContext({
-    identity: localIdentity,
-    type: type,
-  });
+  const identityCtx = identityContext(localIdentity, type);
 
-  return identityContext;
+  return identityCtx;
 };
