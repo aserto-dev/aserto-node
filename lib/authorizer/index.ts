@@ -23,7 +23,7 @@ import {
   InvalidArgumentError,
   NotFoundError,
   UnauthenticatedError,
-} from "../directory/errors";
+} from "./errors";
 
 type AuthorizerConfig = {
   authorizerServiceUrl?: string;

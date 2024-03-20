@@ -21,6 +21,7 @@ describe("Integration", () => {
   const topaz = new Topaz();
 
   beforeAll(async () => {
+    await topaz.stop();
     await topaz.start();
     directoryClient = DirectoryServiceV3(config);
   }, TOPAZ_TIMEOUT);
