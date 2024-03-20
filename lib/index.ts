@@ -9,6 +9,7 @@ import decisionTreeOptions from "./authorizer/model/decisionTreeOptions";
 import identityContext from "./authorizer/model/identityContext";
 import policyContext from "./authorizer/model/policyContext";
 import policyInstance from "./authorizer/model/policyInstance";
+import queryOptions from "./authorizer/model/queryOptions";
 import {
   Directory,
   DirectoryConfig,
@@ -33,6 +34,7 @@ export {
   createAsyncIterable,
   decisionTreeOptions,
   Directory,
+  DirectoryConfig as ServiceConfig,
   DirectoryConfig,
   DirectoryServiceV2,
   DirectoryServiceV3,
@@ -50,9 +52,9 @@ export {
   policyContext,
   policyInstance,
   PolicyPathMapper,
+  queryOptions,
   readAsyncIterable,
   SubIdentityMapper,
-  DirectoryConfig as ServiceConfig,
 };
 
 export * from "./errors";

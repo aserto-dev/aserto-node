@@ -7,7 +7,11 @@ import {
 import { Struct } from "@bufbuild/protobuf";
 import { Code, ConnectError } from "@connectrpc/connect";
 
-import { decisionTreeOptions, UnauthenticatedError } from "../../lib";
+import {
+  decisionTreeOptions,
+  queryOptions,
+  UnauthenticatedError,
+} from "../../lib";
 import { Authorizer } from "../../lib/authorizer";
 
 describe("Is", () => {
@@ -158,6 +162,38 @@ describe("Query", () => {
     });
 
     expect(result).toEqual(undefined);
+
+    mock.mockRestore();
+  });
+
+  it("accepts queryOptions", async () => {
+    const mock = jest.spyOn(authorizer.AuthClient, "query").mockResolvedValue(
+      new QueryResponse({
+        response: Struct.fromJson({ key1: "value1", key2: 2 }),
+      })
+    );
+
+    const result = await authorizer.Query({
+      query: "query",
+      input: "input",
+      options: queryOptions({
+        metrics: true,
+        trace: "FULL",
+      }),
+    });
+
+    expect(authorizer.AuthClient.query).toHaveBeenCalledWith({
+      query: "query",
+      input: "input",
+      options: queryOptions({
+        metrics: true,
+        instrument: false,
+        trace: "FULL",
+        traceSummary: false,
+      }),
+    });
+
+    expect(result).toEqual({ key1: "value1", key2: 2 });
 
     mock.mockRestore();
   });
