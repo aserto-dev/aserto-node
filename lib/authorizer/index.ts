@@ -24,6 +24,7 @@ import {
   NotFoundError,
   UnauthenticatedError,
 } from "../errors";
+import { log } from "../log";
 
 type AuthorizerConfig = {
   authorizerServiceUrl?: string;
@@ -54,6 +55,16 @@ export class Authorizer {
       return await next(req);
     };
 
+    const traceMessage: Interceptor = (next) => async (req) => {
+      log(JSON.stringify(req));
+      return await next(req);
+    };
+
+    const interceptors = [baseServiceHeaders];
+    if (process.env.NODE_TRACE_MESSAGE) {
+      interceptors.push(traceMessage);
+    }
+
     const baseServiceUrl =
       config.authorizerServiceUrl || "authorizer.prod.aserto.com:8443";
     const baseCaFile = !!config.authorizerCertFile
@@ -69,7 +80,7 @@ export class Authorizer {
     const baseGrpcTransport = createGrpcTransport({
       httpVersion: "2",
       baseUrl: `https://${baseServiceUrl}`,
-      interceptors: [baseServiceHeaders],
+      interceptors: interceptors,
       nodeOptions: baseNodeOptions,
     });
 
