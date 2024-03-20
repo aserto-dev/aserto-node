@@ -48,7 +48,9 @@ type AuthorizerConfig = {
   authorizerServiceUrl?: string;
   tenantId?: string;
   authorizerApiKey?: string;
+  token?: string;
   authorizerCertFile?: string;
+  insecure?: boolean;
 };
 ```
 ```ts
@@ -56,22 +58,19 @@ const authClient = new Authorizer({
   authorizerServiceUrl: "authorizer.prod.aserto.com:8443",
   authorizerApiKey: "my-authorizer-api-key",
   tenantId: "my-tenant-id",
-}, getSSLCredentials());
+});
 ```
 
 - `authorizerServiceUrl`: hostname:port of authorizer service (_required_)
 - `authorizerApiKey`: API key for authorizer service (_required_ if using hosted authorizer)
 - `tenantId`: Aserto tenant ID (_required_ if using hosted authorizer)
-- `channelCredentials`: [gRPC channelCredentials](https://github.com/grpc/grpc-node/blob/master/packages/grpc-js/src/channel-credentials.ts)
-
+- `authorizerCertFile`: Path to the authorizer CA file. (optional)
+- `insecure`: skip TLS verification. Defaults to `false`.
 ### Topaz
 ```ts
-import { getSSLCredentials } from "@aserto/aserto-node";
-
-const sslCredentials = getSSLCredentials(`${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`)
-
 const authClient = new Authorizer({
   authorizerServiceUrl: "localhost:8282",
+  authorizerCertFile: `${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`
 }, sslCredentials);
 ```
 
@@ -88,8 +87,8 @@ import {
 const authClient = new Authorizer(
   {
     authorizerServiceUrl: "localhost:8282",
+    authorizerCertFile: `${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`
   },
-  getSSLCredentials(`${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`)
 );
 
 authClient
