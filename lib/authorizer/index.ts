@@ -55,7 +55,7 @@ export class Authorizer {
     };
 
     const baseServiceUrl =
-      config.authorizerServiceUrl || "authorized.prod.aserto.com:8443";
+      config.authorizerServiceUrl || "authorizer.prod.aserto.com:8443";
     const baseCaFile = !!config.authorizerCertFile
       ? readFileSync(config.authorizerCertFile)
       : undefined;
