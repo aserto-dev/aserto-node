@@ -55,4 +55,4 @@ export {
   DirectoryConfig as ServiceConfig,
 };
 
-export * from "./directory/errors";
+export * from "./errors";

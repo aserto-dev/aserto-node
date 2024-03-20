@@ -7,9 +7,8 @@ import {
 import { Struct } from "@bufbuild/protobuf";
 import { Code, ConnectError } from "@connectrpc/connect";
 
-import { decisionTreeOptions } from "../../lib";
+import { decisionTreeOptions, UnauthenticatedError } from "../../lib";
 import { Authorizer } from "../../lib/authorizer";
-import { UnauthenticatedError } from "../../lib/authorizer/errors";
 
 describe("Is", () => {
   const authorizer = new Authorizer({

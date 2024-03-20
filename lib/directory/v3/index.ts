@@ -41,7 +41,7 @@ import {
   InvalidArgumentError,
   NotFoundError,
   UnauthenticatedError,
-} from "../errors";
+} from "../../errors";
 import {
   nullExporterProxy,
   nullImporterProxy,
