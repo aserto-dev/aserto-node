@@ -95,7 +95,7 @@ authClient
   .Is({
     identityContext: identityContext(
       "rick@the-citadel.com",
-      "IDENTITY_TYPE_SUB"
+      "SUB"
     ),
     policyInstance: policyInstance("rebac", "rebac"),
     policyContext: policyContext("rebac.check", ["allowed"]),
@@ -114,7 +114,7 @@ await authClient
   .Is({
     identityContext: identityContext(
       "morty@the-citadel.com",
-      "IDENTITY_TYPE_SUB"
+      "SUB"
     ),
     policyInstance: policyInstance("todo", "todo"),
     policyContext: policyContext("todoApp.POST.todos", ["allowed"]),
@@ -128,7 +128,7 @@ await authClient
   .Query({
     identityContext: identityContext(
       "morty@the-citadel.com",
-      "IDENTITY_TYPE_SUB"
+      "SUB"
     ),
     policyInstance: policyInstance("todo", "todo"),
     policyContext: policyContext("todoApp.POST.todos", ["allowed"]),
@@ -144,7 +144,7 @@ await authClient
   .DecisionTree({
     identityContext: identityContext(
       "morty@the-citadel.com",
-      "IDENTITY_TYPE_SUB"
+      "SUB"
     ),
     policyInstance: policyInstance("todo", "todo"),
     policyContext: policyContext("todoApp.POST.todos", ["allowed"]),
@@ -297,7 +297,7 @@ const restMw = new Middleware({
   client: authClient,
   policy: policy,
   identityMapper: async () => {
-    return identityContext('test', 'IDENTITY_TYPE_SUB')
+    return identityContext('test', 'SUB')
   },
 })
 ```
@@ -360,17 +360,43 @@ async (req: Request) => { return { customKey: req.params.id } };
 type IdentityMapper = (req?: Request) => Promise<IdentityContext>;
 
 // You can also use the built-in policyContext function to create a identity context and pass it as the mapper response
-identityContext = (value: string, type: keyof IdentityTypeMap)
+const identityContext = (value: string, type: keyof typeof IdentityType) => {
 
-IdentityTypeMap {
-  IDENTITY_TYPE_UNKNOWN: 0;
-  IDENTITY_TYPE_NONE: 1;
-  IDENTITY_TYPE_SUB: 2;
-  IDENTITY_TYPE_JWT: 3;
+IdentityType {
+    /**
+     * Unknown, value not set, requests will fail with identity type not set error.
+     *
+     * @generated from enum value: IDENTITY_TYPE_UNKNOWN = 0;
+     */
+    UNKNOWN = 0,
+    /**
+     * None, no explicit identity context set, equals anonymous.
+     *
+     * @generated from enum value: IDENTITY_TYPE_NONE = 1;
+     */
+    NONE = 1,
+    /**
+     * Sub(ject), identity field contains an oAUTH subject.
+     *
+     * @generated from enum value: IDENTITY_TYPE_SUB = 2;
+     */
+    SUB = 2,
+    /**
+     * JWT, identity field contains a JWT access token.
+     *
+     * @generated from enum value: IDENTITY_TYPE_JWT = 3;
+     */
+    JWT = 3,
+    /**
+     * Manual, propagates thw identity field as-is, without validation, into the input object.
+     *
+     * @generated from enum value: IDENTITY_TYPE_MANUAL = 4;
+     */
+    MANUAL = 4
 }
 
 // example
-identityContext("morty@the-citadel.com", "IDENTITY_TYPE_SUB")
+identityContext("morty@the-citadel.com", "SUB")
 ```
 
 ##### Policy
@@ -399,6 +425,7 @@ type ServiceConfig = {
   apiKey?: string;
   caFile?: string;
   rejectUnauthorized?: boolean;
+  insecure?: boolean;
 };
 
 export type DirectoryV3Config = ServiceConfig & {
@@ -425,6 +452,7 @@ const directoryClient = DirectoryServiceV3({
 - `tenantId`: Aserto tenant ID (_required_ if using hosted directory)
 - `caFile`: Path to the directory CA file. (optional)
 - `rejectUnauthorized`: reject clients with invalid certificates. Defaults to `true`.
+- `insecure`: skip TLS verification. Defaults to `false`.
 - `reader`: ServiceConfig for the reader client(optional)
 - `writer`: ServiceConfig for the writer client(option)
 - `importer`: ServiceConfig for the importer client(option)

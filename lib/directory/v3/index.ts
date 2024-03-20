@@ -177,6 +177,10 @@ export class DirectoryV3 {
       rejectUnauthorized = config.rejectUnauthorized;
     }
 
+    if (config.insecure !== undefined) {
+      rejectUnauthorized = !config.insecure;
+    }
+
     const baseServiceUrl = config.url;
     const baseApiKey = config.apiKey;
     const baseTenantId = config.tenantId;
