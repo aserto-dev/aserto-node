@@ -1,12 +1,9 @@
 // process options map
 import express from "express";
-import { credentials } from "@grpc/grpc-js";
-import { ChannelCredentials } from "@grpc/grpc-js";
 
 import { IdentityContextOptions } from "./identityContext";
 import { AuthzOptions } from "./jwtAuthz";
 import { log } from "./log";
-import getSSLCredentials from "./ssl";
 
 export default (
   options: AuthzOptions,
@@ -72,25 +69,9 @@ export default (
     disableTlsValidation = options.disableTlsValidation;
   }
 
-  // set the authorizer cert file
-  // TODO: Fix this type and default value
   let authorizerCertCAFile: string = "";
-  if (
-    options &&
-    typeof options.authorizerCertCAFile === "string" &&
-    options.authorizerCertCAFile
-  ) {
+  if (options && options.authorizerCertCAFile) {
     authorizerCertCAFile = options.authorizerCertCAFile;
-  }
-
-  let authorizerCert: ChannelCredentials;
-  if (disableTlsValidation) {
-    log("INSECURE CONNECTION");
-  }
-  if (!disableTlsValidation && authorizerCertCAFile) {
-    authorizerCert = getSSLCredentials(authorizerCertCAFile);
-  } else {
-    authorizerCert = credentials.createSsl();
   }
 
   const instanceName =
@@ -183,8 +164,9 @@ export default (
     tenantId,
     instanceName,
     instanceLabel,
+    authorizerCertCAFile,
+    disableTlsValidation,
     policyRoot: policyRoot! as string,
-    authorizerCert,
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     identityContextOptions: {
       useAuthorizationHeader,

@@ -5,8 +5,8 @@ import {
   DirectoryServiceV3,
   DirectoryV3,
   EtagMismatchError,
-  getSSLCredentials,
   NotFoundError,
+  policyContext,
   policyInstance,
   readAsyncIterable,
 } from "../../lib";
@@ -214,7 +214,7 @@ types:
 
     it("checks inexistent relation throws NotFoundError", async () => {
       await expect(
-         directoryClient.checkRelation({
+        directoryClient.checkRelation({
           subjectId: "test-user",
           subjectType: "user",
           relation: "owner",
@@ -226,7 +226,7 @@ types:
 
     it("checks inexistent permission throws NotFoundError", async () => {
       await expect(
-          directoryClient.checkPermission({
+        directoryClient.checkPermission({
           subjectId: "test-user",
           subjectType: "user",
           permission: "write",
@@ -475,12 +475,10 @@ types:
     let authorizerClient: Authorizer;
 
     beforeEach(() => {
-      authorizerClient = new Authorizer(
-        {
-          authorizerServiceUrl: "localhost:8282",
-        },
-        getSSLCredentials(`${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`)
-      );
+      authorizerClient = new Authorizer({
+        authorizerServiceUrl: "localhost:8282",
+        authorizerCertFile: `${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`,
+      });
     });
 
     describe("DecisionTree", () => {
@@ -488,6 +486,7 @@ types:
         const response = await authorizerClient.DecisionTree({
           identityContext: await AnonymousIdentityMapper(),
           policyInstance: policyInstance("todo", "todo"),
+          policyContext: policyContext(),
         });
 
         expect(response).toEqual({

@@ -1,13 +1,13 @@
 import {
   IdentityContext,
   IdentityType,
-  IdentityTypeMap,
-} from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/identity_context_pb";
+} from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/identity_context_pb";
 
-const identityContext = (value: string, type: keyof IdentityTypeMap) => {
-  const identityContext = new IdentityContext();
-  identityContext.setIdentity(value);
-  identityContext.setType(IdentityType[type]);
+const identityContext = (value: string, type: keyof typeof IdentityType) => {
+  const identityContext = new IdentityContext({
+    identity: value,
+    type: IdentityType[type],
+  });
 
   return identityContext;
 };

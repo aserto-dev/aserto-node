@@ -9,7 +9,6 @@ import decisionTreeOptions from "./authorizer/model/decisionTreeOptions";
 import identityContext from "./authorizer/model/identityContext";
 import policyContext from "./authorizer/model/policyContext";
 import policyInstance from "./authorizer/model/policyInstance";
-import queryOptions from "./authorizer/model/queryOptions";
 import {
   Directory,
   DirectoryConfig,
@@ -26,7 +25,6 @@ import { DirectoryV3Config } from "./directory/v3/types";
 import { displayStateMap } from "./displayStateMap";
 import { is } from "./is";
 import { AuthzOptions, jwtAuthz } from "./jwtAuthz";
-import getSSLCredentials from "./ssl";
 export {
   AnonymousIdentityMapper,
   Authorizer,
@@ -42,7 +40,6 @@ export {
   DirectoryV3Config,
   displayStateMap,
   ds,
-  getSSLCredentials,
   identityContext,
   is,
   jwtAuthz,
@@ -53,7 +50,6 @@ export {
   policyContext,
   policyInstance,
   PolicyPathMapper,
-  queryOptions,
   readAsyncIterable,
   SubIdentityMapper,
   DirectoryConfig as ServiceConfig,

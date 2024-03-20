@@ -42,7 +42,7 @@
   },
   "homepage": "https://github.com/aserto-dev/aserto-node#readme",
   "dependencies": {
-    "@aserto/node-authorizer": "^v0.20.7",
+    "@aserto/node-authorizer": "https://github.com/aserto-dev/node-authorizer#update_build",
     "@aserto/node-directory": "^0.31.1",
     "@bufbuild/protobuf": "^1.4.2",
     "@connectrpc/connect": "^1.1.3",

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { IdentityContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/identity_context_pb";
-import { PolicyContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_context_pb";
+import { IdentityContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/identity_context_pb";
+import { PolicyContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/policy_context_pb";
+import { Struct } from "@bufbuild/protobuf";
 
 import { Authorizer } from "./authorizer";
 import PolicyPathMapper from "./authorizer/mapper/policy/path";
@@ -56,7 +57,8 @@ const jwtAuthz = (
       instanceLabel,
       policyRoot,
       identityContextOptions,
-      authorizerCert,
+      authorizerCertCAFile,
+      disableTlsValidation,
     } = options;
 
     const error = errorHandler(next, failWithError);
@@ -70,14 +72,13 @@ const jwtAuthz = (
     );
 
     const callAuthorizer = async () => {
-      const client = new Authorizer(
-        {
-          authorizerServiceUrl: authorizerUrl,
-          tenantId: tenantId!,
-          authorizerApiKey: authorizerApiKey!,
-        },
-        authorizerCert
-      );
+      const client = new Authorizer({
+        authorizerServiceUrl: authorizerUrl,
+        tenantId: tenantId!,
+        authorizerApiKey: authorizerApiKey!,
+        authorizerCertFile: authorizerCertCAFile,
+        insecure: disableTlsValidation,
+      });
 
       const identityCtx: IdentityContext = identityMapper
         ? await identityMapper(req)
@@ -102,7 +103,7 @@ const jwtAuthz = (
         identityContext: identityCtx,
         policyContext: policyCtx,
         policyInstance: policyInst,
-        resourceContext: resourceContext,
+        resourceContext: Struct.fromJson(resourceContext),
       });
     };
 

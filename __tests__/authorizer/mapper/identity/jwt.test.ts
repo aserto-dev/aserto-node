@@ -53,9 +53,7 @@ describe("JWTIdentityMapper", () => {
 
     const result = await jwtMapper(req);
 
-    expect(result).toEqual(
-      identityContext(jwt.toString(), "IDENTITY_TYPE_JWT")
-    );
+    expect(result).toEqual(identityContext(jwt.toString(), "JWT"));
   });
 
   it("returns an identity context with valid JWT token from a custom header", async () => {
@@ -70,9 +68,7 @@ describe("JWTIdentityMapper", () => {
 
     const result = await customJwtMapper(req);
 
-    expect(result).toEqual(
-      identityContext(jwt.toString(), "IDENTITY_TYPE_JWT")
-    );
+    expect(result).toEqual(identityContext(jwt.toString(), "JWT"));
   });
 
   it("throws an error if the token is missing in a custom header", async () => {
