@@ -65,7 +65,7 @@ const authClient = new Authorizer({
 - `authorizerApiKey`: API key for authorizer service (_required_ if using hosted authorizer)
 - `tenantId`: Aserto tenant ID (_required_ if using hosted authorizer)
 - `authorizerCertFile`: Path to the authorizer CA file. (optional)
-- `insecure`: skip TLS verification. Defaults to `false`.
+- `insecure`: Skip server certificate and domain verification. (NOT SECURE!). Defaults to `false`.
 ### Topaz
 ```ts
 const authClient = new Authorizer({
@@ -452,7 +452,7 @@ const directoryClient = DirectoryServiceV3({
 - `tenantId`: Aserto tenant ID (_required_ if using hosted directory)
 - `caFile`: Path to the directory CA file. (optional)
 - `rejectUnauthorized`: reject clients with invalid certificates. Defaults to `true`.
-- `insecure`: skip TLS verification. Defaults to `false`.
+- `insecure`: Skip server certificate and domain verification. (NOT SECURE!). Defaults to `false`.
 - `reader`: ServiceConfig for the reader client(optional)
 - `writer`: ServiceConfig for the writer client(option)
 - `importer`: ServiceConfig for the importer client(option)
