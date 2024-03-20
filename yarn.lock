@@ -15,9 +15,10 @@
     "@jridgewell/gen-mapping" "^0.3.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@aserto/node-authorizer@https://github.com/aserto-dev/node-authorizer#update_build":
-  version "0.20.7"
-  resolved "https://github.com/aserto-dev/node-authorizer#85596f6a0ffdd10246ba30d1e7f0755edf60b85f"
+"@aserto/node-authorizer@^0.20.8":
+  version "0.20.8"
+  resolved "https://registry.yarnpkg.com/@aserto/node-authorizer/-/node-authorizer-0.20.8.tgz#61de9fd382f0b01a6365b017243cbff0f332252a"
+  integrity sha512-vuib/KbMle2DMBtKj2mrs1bJHAhRbdZk0u85FUFycW5avCCQULF5xZzuD6QqKkXjieBC+7GPiB/mbZlhJIBBHA==
 
 "@aserto/node-directory@^0.31.1":
   version "0.31.1"
