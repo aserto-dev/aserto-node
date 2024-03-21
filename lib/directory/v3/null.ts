@@ -6,7 +6,7 @@ import { Model } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model
 import { Reader } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_connect";
 import { Writer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_connect";
 
-import { ConfigError } from "../errors";
+import { ConfigError } from "../../errors";
 
 type Client =
   | typeof Reader

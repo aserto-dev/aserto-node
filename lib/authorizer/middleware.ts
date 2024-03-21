@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { IdentityContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/identity_context_pb";
-import { PolicyContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_context_pb";
-import { PolicyInstance } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/policy_instance_pb";
+import { IdentityContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/identity_context_pb";
+import { PolicyContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/policy_context_pb";
+import { PolicyInstance } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/policy_instance_pb";
 
 import { errorHandler } from "../errorHandler";
-import { Authorizer } from "./index";
+import { Authorizer } from ".";
 import JWTIdentityMapper from "./mapper/identity/jwt";
 import PolicyPathMapper from "./mapper/policy/path";
 import checkResourceMapper from "./mapper/resource/check";
@@ -117,7 +117,7 @@ export class Middleware {
             policyInstance: this.policyInstance(),
             resourceContext: resourceContext,
           }),
-          policyCtx.getPath(),
+          policyCtx.path,
         ];
       };
       try {
@@ -154,7 +154,7 @@ export class Middleware {
             policyInstance: this.policyInstance(),
             resourceContext: resourceContext,
           }),
-          policyCtx.getPath(),
+          policyCtx.path,
         ];
       };
       try {

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { IdentityContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/identity_context_pb";
+import { IdentityContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/identity_context_pb";
 
 import { Authorizer } from "./authorizer";
 import ResourceParamsMapper from "./authorizer/mapper/resource/params";
@@ -70,20 +70,20 @@ const displayStateMap = (
       instanceLabel,
       policyRoot,
       identityContextOptions,
-      authorizerCert,
+      authorizerCertCAFile,
+      disableTlsValidation,
     } = options;
 
     const error = errorHandler(next, failWithError);
 
     const callAuthorizer = async () => {
-      const client = new Authorizer(
-        {
-          authorizerServiceUrl: authorizerUrl,
-          tenantId: tenantId!,
-          authorizerApiKey: authorizerApiKey!,
-        },
-        authorizerCert
-      );
+      const client = new Authorizer({
+        authorizerServiceUrl: authorizerUrl,
+        tenantId: tenantId!,
+        authorizerApiKey: authorizerApiKey!,
+        authorizerCertFile: authorizerCertCAFile,
+        insecure: disableTlsValidation,
+      });
 
       const identityCtx: IdentityContext = identityMapper
         ? await identityMapper(req)
@@ -103,20 +103,20 @@ const displayStateMap = (
           ? policyInstance(instanceName as string, instanceLabel as string)
           : undefined;
 
-      const decisionTreeOpt = decisionTreeOptions("PATH_SEPARATOR_SLASH");
+      const decisionTreeOpt = decisionTreeOptions("SLASH");
 
       return client.DecisionTree({
         identityContext: identityCtx,
         policyContext: policyCtx,
         policyInstance: policyInst,
         resourceContext: resourceContext,
-        decisionTreeOptions: decisionTreeOpt,
+        options: decisionTreeOpt,
       });
     };
 
     try {
       const result = await callAuthorizer();
-      res.status(200).send(result.path);
+      res.status(200).send(result?.path);
     } catch (err) {
       error(res, err as string);
     }

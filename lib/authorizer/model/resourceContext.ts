@@ -1,8 +1,6 @@
-import { JavaScriptValue } from "google-protobuf/google/protobuf/struct_pb";
+import { JsonObject } from "@bufbuild/protobuf";
 
-export type ResourceContext = {
-  [key: string]: JavaScriptValue;
-};
+export type ResourceContext = JsonObject;
 
 export type CheckResourceContext = {
   relation: string;

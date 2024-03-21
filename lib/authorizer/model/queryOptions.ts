@@ -1,19 +1,20 @@
 import {
   QueryOptions,
   TraceLevel,
-  TraceLevelMap,
-} from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_pb";
+} from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/authorizer_pb";
+import { PartialMessage } from "@bufbuild/protobuf";
 
 const queryOptions = (
-  options?: Omit<QueryOptions.AsObject, "trace"> & {
-    trace: keyof TraceLevelMap;
+  options?: Omit<PartialMessage<QueryOptions>, "trace"> & {
+    trace: keyof typeof TraceLevel;
   }
 ) => {
-  const queryOptions = new QueryOptions();
-  queryOptions.setMetrics(!!options?.metrics);
-  queryOptions.setInstrument(!!options?.instrument);
-  queryOptions.setTrace(TraceLevel[options?.trace || "TRACE_LEVEL_OFF"]);
-  queryOptions.setTraceSummary(!!options?.traceSummary);
+  const queryOptions = new QueryOptions({
+    metrics: !!options?.metrics,
+    instrument: !!options?.instrument,
+    trace: TraceLevel[options?.trace || "OFF"],
+    traceSummary: !!options?.traceSummary,
+  });
 
   return queryOptions;
 };

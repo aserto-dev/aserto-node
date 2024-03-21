@@ -53,7 +53,7 @@ describe("SubIdentityMapper", () => {
 
     const result = await subMapper(req);
 
-    expect(result).toEqual(identityContext("test", "IDENTITY_TYPE_SUB"));
+    expect(result).toEqual(identityContext("test", "SUB"));
   });
 
   it("returns an identity context from a custom header", async () => {
@@ -65,6 +65,6 @@ describe("SubIdentityMapper", () => {
     const customSubMapper = SubIdentityMapper("identity");
     const result = await customSubMapper(req);
 
-    expect(result).toEqual(identityContext("my-id", "IDENTITY_TYPE_SUB"));
+    expect(result).toEqual(identityContext("my-id", "SUB"));
   });
 });

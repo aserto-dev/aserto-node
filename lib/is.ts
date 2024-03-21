@@ -32,7 +32,8 @@ const is = async (
     instanceLabel,
     policyRoot,
     identityContextOptions,
-    authorizerCert,
+    authorizerCertCAFile,
+    disableTlsValidation,
   } = options;
 
   // process the parameter values to extract policy and resourceContext
@@ -43,14 +44,13 @@ const is = async (
     resourceMapper
   );
 
-  const client = new Authorizer(
-    {
-      authorizerServiceUrl: authorizerUrl,
-      tenantId: tenantId!,
-      authorizerApiKey: authorizerApiKey!,
-    },
-    authorizerCert
-  );
+  const client = new Authorizer({
+    authorizerServiceUrl: authorizerUrl,
+    tenantId: tenantId!,
+    authorizerApiKey: authorizerApiKey!,
+    authorizerCertFile: authorizerCertCAFile,
+    insecure: disableTlsValidation,
+  });
 
   const policyCtx = policyContext(policy, [decision]);
 

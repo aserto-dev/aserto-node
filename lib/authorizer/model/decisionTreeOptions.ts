@@ -1,12 +1,12 @@
 import {
   DecisionTreeOptions,
   PathSeparator,
-  PathSeparatorMap,
-} from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/authorizer_pb";
+} from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/authorizer_pb";
 
-const decisionTreeOptions = (pathSeparator: keyof PathSeparatorMap) => {
-  const decisionTreeOptions = new DecisionTreeOptions();
-  decisionTreeOptions.setPathSeparator(PathSeparator[pathSeparator]);
+const decisionTreeOptions = (pathSeparator: keyof typeof PathSeparator) => {
+  const decisionTreeOptions = new DecisionTreeOptions({
+    pathSeparator: PathSeparator[pathSeparator],
+  });
 
   return decisionTreeOptions;
 };

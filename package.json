@@ -1,6 +1,6 @@
 {
   "name": "@aserto/aserto-node",
-  "description": "Authorize access to an endpoint",
+  "description": "Aserto Node SDK",
   "version": "0.31.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -13,6 +13,7 @@
     "dev:checks": "yarn lint --fix && yarn tsc && yarn detect-unused-exports && yarn test",
     "format": "prettier --write lib",
     "lint": "eslint lib --max-warnings=0",
+    "prepare": "yarn run build",
     "prepublishOnly": "NODE_ENV=production yarn build",
     "push": "scripts/publish.sh",
     "release": "scripts/release.sh",
@@ -42,21 +43,18 @@
   },
   "homepage": "https://github.com/aserto-dev/aserto-node#readme",
   "dependencies": {
-    "@aserto/node-authorizer": "^v0.20.7",
+    "@aserto/node-authorizer": "^0.20.8",
     "@aserto/node-directory": "^0.31.1",
     "@bufbuild/protobuf": "^1.4.2",
     "@connectrpc/connect": "^1.1.3",
     "@connectrpc/connect-node": "^1.1.3",
-    "@grpc/grpc-js": "1.8.21",
     "express": "^4.18.2",
-    "google-protobuf": "^3.21.2",
     "jwt-decode": "^3.1.2"
   },
   "devDependencies": {
     "@aserto/ts-linting-configs": "^2.5.0",
     "@babel/core": "^7.23.3",
     "@types/express": "^4.17.14",
-    "@types/google-protobuf": "^3.15.6",
     "@types/jest": "^29.1.2",
     "@types/node": "^20.3.1",
     "@typescript-eslint/eslint-plugin": "^6.12.0",

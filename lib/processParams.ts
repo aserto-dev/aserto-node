@@ -11,7 +11,7 @@ export const processParams = async (
 ) => {
   // if a resourceMap wasn't explicitly passed in, get it from req.params
   if (!resourceMap) {
-    resourceMap = req.params;
+    resourceMap = req.params || {};
   } else if (typeof resourceMap === "function") {
     resourceMap = await resourceMap(req);
   }

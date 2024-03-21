@@ -29,6 +29,7 @@ export type ServiceConfig = {
   token?: string;
   caFile?: string;
   rejectUnauthorized?: boolean;
+  insecure?: boolean;
 };
 
 export type DirectoryV3Config = ServiceConfig & {

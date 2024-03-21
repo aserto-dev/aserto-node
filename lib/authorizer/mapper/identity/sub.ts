@@ -1,6 +1,6 @@
 import { Request } from "express";
 import jwt_decode, { JwtPayload } from "jwt-decode";
-import { IdentityContext } from "@aserto/node-authorizer/pkg/aserto/authorizer/v2/api/identity_context_pb";
+import { IdentityContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/identity_context_pb";
 
 import { IdentityMapper } from "../../middleware";
 import identityContext from "../../model/identityContext";
@@ -14,12 +14,12 @@ const SubIdentityMapper = (
       if (header === "Authorization") {
         const token: JwtPayload = jwt_decode(authHeader);
         if (token && token.sub) {
-          return identityContext(token.sub, "IDENTITY_TYPE_SUB");
+          return identityContext(token.sub, "SUB");
         } else {
           throw new Error("Missing token");
         }
       } else {
-        return identityContext(authHeader, "IDENTITY_TYPE_SUB");
+        return identityContext(authHeader, "SUB");
       }
     } else {
       throw new Error(`Missing ${header} header`);

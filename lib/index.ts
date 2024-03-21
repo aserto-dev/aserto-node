@@ -26,7 +26,6 @@ import { DirectoryV3Config } from "./directory/v3/types";
 import { displayStateMap } from "./displayStateMap";
 import { is } from "./is";
 import { AuthzOptions, jwtAuthz } from "./jwtAuthz";
-import getSSLCredentials from "./ssl";
 export {
   AnonymousIdentityMapper,
   Authorizer,
@@ -35,6 +34,7 @@ export {
   createAsyncIterable,
   decisionTreeOptions,
   Directory,
+  DirectoryConfig as ServiceConfig,
   DirectoryConfig,
   DirectoryServiceV2,
   DirectoryServiceV3,
@@ -42,7 +42,6 @@ export {
   DirectoryV3Config,
   displayStateMap,
   ds,
-  getSSLCredentials,
   identityContext,
   is,
   jwtAuthz,
@@ -56,7 +55,6 @@ export {
   queryOptions,
   readAsyncIterable,
   SubIdentityMapper,
-  DirectoryConfig as ServiceConfig,
 };
 
-export * from "./directory/errors";
+export * from "./errors";
