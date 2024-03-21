@@ -41,7 +41,6 @@ yarn add @aserto/aserto-node
 ```ts
 interface Authorizer {
   config: AuthorizerConfig,
-  channelCredentials: ChannelCredentials = credentials.createSsl()
 };
 
 type AuthorizerConfig = {
@@ -66,6 +65,7 @@ const authClient = new Authorizer({
 - `tenantId`: Aserto tenant ID (_required_ if using hosted authorizer)
 - `authorizerCertFile`: Path to the authorizer CA file. (optional)
 - `insecure`: Skip server certificate and domain verification. (NOT SECURE!). Defaults to `false`.
+
 ### Topaz
 ```ts
 const authClient = new Authorizer({
@@ -78,7 +78,6 @@ const authClient = new Authorizer({
 ```ts
 import {
   Authorizer,
-  getSSLCredentials,
   identityContext,
   policyContext,
   policyInstance,
