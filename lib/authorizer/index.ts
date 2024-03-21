@@ -6,25 +6,15 @@ import {
   ListPoliciesRequest,
   QueryRequest,
 } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/authorizer_pb";
-import { AnyMessage } from "@bufbuild/protobuf";
 import { PlainMessage } from "@bufbuild/protobuf";
 import {
-  Code,
-  ConnectError,
   createPromiseClient,
   Interceptor,
   PromiseClient,
-  StreamRequest,
-  UnaryRequest,
 } from "@connectrpc/connect";
 import { createGrpcTransport } from "@connectrpc/connect-node";
 
-import {
-  InvalidArgumentError,
-  NotFoundError,
-  UnauthenticatedError,
-} from "../errors";
-import { log } from "../log";
+import { handleError, setHeader, traceMessage } from "../util/connect";
 
 type AuthorizerConfig = {
   authorizerServiceUrl?: string;
@@ -37,26 +27,11 @@ type AuthorizerConfig = {
 export class Authorizer {
   AuthClient: PromiseClient<typeof AuthorizerClient>;
   constructor(config: AuthorizerConfig) {
-    const setHeader = (
-      req:
-        | UnaryRequest<AnyMessage, AnyMessage>
-        | StreamRequest<AnyMessage, AnyMessage>,
-      key: string,
-      value: string
-    ) => {
-      req.header.get(key) === null && req.header.set(key, value);
-    };
-
     const baseServiceHeaders: Interceptor = (next) => async (req) => {
       config.token && setHeader(req, "authorization", `${config.token}`);
       config.authorizerApiKey &&
         setHeader(req, "authorization", `basic ${config.authorizerApiKey}`);
       config.tenantId && setHeader(req, "aserto-tenant-id", config.tenantId);
-      return await next(req);
-    };
-
-    const traceMessage: Interceptor = (next) => async (req) => {
-      log(JSON.stringify(req));
       return await next(req);
     };
 
@@ -128,31 +103,6 @@ export class Authorizer {
     } catch (error) {
       handleError(error, "ListPolicies");
     }
-  }
-}
-
-function handleError(error: unknown, method: string) {
-  if (error instanceof ConnectError) {
-    switch (error.code) {
-      case Code.Unauthenticated: {
-        throw new UnauthenticatedError(
-          `Authentication failed: ${error.message}`
-        );
-      }
-      case Code.NotFound: {
-        throw new NotFoundError(`${method} not found: ${error.message}`);
-      }
-      case Code.InvalidArgument: {
-        throw new InvalidArgumentError(`${method}: ${error.message}`);
-      }
-
-      default: {
-        error.message = `"${method}" failed with code: ${error.code}, message: ${error.message}`;
-        throw error;
-      }
-    }
-  } else {
-    throw error;
   }
 }
 

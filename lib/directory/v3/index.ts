@@ -19,29 +19,15 @@ import { Reader } from "@aserto/node-directory/src/gen/cjs/aserto/directory/read
 import { GetObjectManyRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_pb";
 import { Writer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_connect";
 import { SetObjectRequest as SetObjectRequest$ } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
+import { PartialMessage, PlainMessage, Struct } from "@bufbuild/protobuf";
 import {
-  AnyMessage,
-  PartialMessage,
-  PlainMessage,
-  Struct,
-} from "@bufbuild/protobuf";
-import {
-  Code,
-  ConnectError,
   createPromiseClient,
   Interceptor,
   PromiseClient,
-  StreamRequest,
-  UnaryRequest,
 } from "@connectrpc/connect";
 import { createGrpcTransport } from "@connectrpc/connect-node";
 
-import {
-  EtagMismatchError,
-  InvalidArgumentError,
-  NotFoundError,
-  UnauthenticatedError,
-} from "../../errors";
+import { handleError, setHeader, traceMessage } from "../../util/connect";
 import {
   nullExporterProxy,
   nullImporterProxy,
@@ -85,16 +71,6 @@ export class DirectoryV3 {
   ModelClient: PromiseClient<typeof Model>;
 
   constructor(config: DirectoryV3Config) {
-    const setHeader = (
-      req:
-        | UnaryRequest<AnyMessage, AnyMessage>
-        | StreamRequest<AnyMessage, AnyMessage>,
-      key: string,
-      value: string
-    ) => {
-      req.header.get(key) === null && req.header.set(key, value);
-    };
-
     const baseServiceHeaders: Interceptor = (next) => async (req) => {
       config.token && setHeader(req, "authorization", `${config.token}`);
       config.apiKey &&
@@ -155,10 +131,14 @@ export class DirectoryV3 {
         tenantId !== baseTenantId ||
         nodeOptions !== baseNodeOptions
       ) {
+        const interceptors = [createHeadersInterceptor(apiKey, tenantId)];
+        if (process.env.NODE_TRACE_MESSAGE) {
+          interceptors.push(traceMessage);
+        }
         return createGrpcTransport({
           httpVersion: "2",
           baseUrl: `https://${serviceUrl || "directory.prod.aserto.com:8443"}`,
-          interceptors: [createHeadersInterceptor(apiKey, tenantId)],
+          interceptors: interceptors,
           nodeOptions: nodeOptions,
         });
       }
@@ -189,13 +169,17 @@ export class DirectoryV3 {
       : undefined;
 
     const baseNodeOptions = { rejectUnauthorized, ca: baseCaFile };
+    const interceptors = [baseServiceHeaders];
+    if (process.env.NODE_TRACE_MESSAGE) {
+      interceptors.push(traceMessage);
+    }
 
     const baseGrpcTransport =
       !!config.url || (!!config.apiKey && !!config.tenantId)
         ? createGrpcTransport({
             httpVersion: "2",
             baseUrl: `https://${baseServiceUrl}`,
-            interceptors: [baseServiceHeaders],
+            interceptors: interceptors,
             nodeOptions: baseNodeOptions,
           })
         : undefined;
@@ -471,35 +455,6 @@ export async function readAsyncIterable<T>(
  */
 export async function* createAsyncIterable<T>(items: T[]): AsyncIterable<T> {
   yield* items;
-}
-
-function handleError(error: unknown, method: string) {
-  if (error instanceof ConnectError) {
-    switch (error.code) {
-      case Code.Unauthenticated: {
-        throw new UnauthenticatedError(
-          `Authentication failed: ${error.message}`
-        );
-      }
-      case Code.NotFound: {
-        throw new NotFoundError(`${method} not found: ${error.message}`);
-      }
-      case Code.InvalidArgument: {
-        throw new InvalidArgumentError(`${method}: ${error.message}`);
-      }
-      case Code.FailedPrecondition: {
-        throw new EtagMismatchError(
-          `invalid etag in ${method} request: ${error.message}`
-        );
-      }
-      default: {
-        error.message = `"${method}" failed with code: ${error.code}, message: ${error.message}`;
-        throw error;
-      }
-    }
-  } else {
-    throw error;
-  }
 }
 
 function mergeUint8Arrays(...arrays: Uint8Array[]): Uint8Array {
