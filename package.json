@@ -1,6 +1,6 @@
 {
   "name": "@aserto/aserto-node",
-  "description": "Authorize access to an endpoint",
+  "description": "Aserto Node SDK",
   "version": "0.31.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -13,6 +13,7 @@
     "dev:checks": "yarn lint --fix && yarn tsc && yarn detect-unused-exports && yarn test",
     "format": "prettier --write lib",
     "lint": "eslint lib --max-warnings=0",
+    "prepare": "yarn run build",
     "prepublishOnly": "NODE_ENV=production yarn build",
     "push": "scripts/publish.sh",
     "release": "scripts/release.sh",
