@@ -31,7 +31,6 @@ describe("Is", () => {
         path: "a.b.c",
         decisions: ["allowed"],
       },
-      indentityContext: {},
       policyInstance: {
         name: "todo",
         instanceLabel: "todo",
@@ -41,6 +40,65 @@ describe("Is", () => {
 
     expect(authorizer.AuthClient.is).toHaveBeenCalledWith(params);
 
+    expect(result).toBe(true);
+
+    mock.mockReset();
+  });
+
+  it("handles resource context", async () => {
+    const mock = jest
+      .spyOn(authorizer.AuthClient, "is")
+      .mockResolvedValue(new IsResponse({ decisions: [{ is: true }] }));
+
+    const params = {
+      policyContext: {
+        path: "a.b.c",
+        decisions: ["allowed"],
+      },
+      policyInstance: {
+        name: "todo",
+        instanceLabel: "todo",
+      },
+      resourceContext: {
+        foo: "bar",
+      },
+    };
+    const result = await authorizer.Is(params);
+
+    expect(authorizer.AuthClient.is).toHaveBeenCalledWith({
+      ...params,
+      resourceContext: Struct.fromJson(params.resourceContext),
+    });
+
+    expect(result).toBe(true);
+
+    mock.mockReset();
+  });
+
+  it("handles nested resource context", async () => {
+    const mock = jest
+      .spyOn(authorizer.AuthClient, "is")
+      .mockResolvedValue(new IsResponse({ decisions: [{ is: true }] }));
+
+    const params = {
+      policyContext: {
+        path: "a.b.c",
+        decisions: ["allowed"],
+      },
+      policyInstance: {
+        name: "todo",
+        instanceLabel: "todo",
+      },
+      resourceContext: {
+        foo: { bar: "baz" },
+      },
+    };
+    const result = await authorizer.Is(params);
+
+    expect(authorizer.AuthClient.is).toHaveBeenCalledWith({
+      ...params,
+      resourceContext: Struct.fromJson(params.resourceContext),
+    });
     expect(result).toBe(true);
 
     mock.mockReset();
@@ -56,7 +114,6 @@ describe("Is", () => {
         path: "a.b.c",
         decisions: ["allowed"],
       },
-      indentityContext: {},
       policyInstance: {
         name: "todo",
         instanceLabel: "todo",

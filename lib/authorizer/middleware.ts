@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import { IdentityContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/identity_context_pb";
 import { PolicyContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/policy_context_pb";
 import { PolicyInstance } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/policy_instance_pb";
-import { Struct } from "@bufbuild/protobuf";
 
 import { errorHandler } from "../errorHandler";
 import { Authorizer } from ".";
@@ -116,7 +115,7 @@ export class Middleware {
             identityContext: await this.identityContext(req),
             policyContext: policyCtx,
             policyInstance: this.policyInstance(),
-            resourceContext: Struct.fromJson(resourceContext),
+            resourceContext: resourceContext,
           }),
           policyCtx.path,
         ];
@@ -153,7 +152,7 @@ export class Middleware {
             identityContext: await this.identityContext(req),
             policyContext: policyCtx,
             policyInstance: this.policyInstance(),
-            resourceContext: Struct.fromJson(resourceContext),
+            resourceContext: resourceContext,
           }),
           policyCtx.path,
         ];

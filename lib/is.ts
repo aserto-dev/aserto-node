@@ -1,5 +1,4 @@
 import { Request } from "express";
-import { Struct } from "@bufbuild/protobuf";
 
 import { Authorizer } from "./authorizer";
 import { ResourceMapper } from "./authorizer/middleware";
@@ -66,7 +65,7 @@ const is = async (
     identityContext: identityCtx,
     policyContext: policyCtx,
     policyInstance: policyInst,
-    resourceContext: Struct.fromJson(resourceContext),
+    resourceContext: resourceContext,
   });
 };
 

@@ -1,12 +1,12 @@
 import { readFileSync } from "fs";
 import { Authorizer as AuthorizerClient } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/authorizer_connect";
 import {
-  DecisionTreeRequest,
-  IsRequest,
+  DecisionTreeRequest as DecisionTreeRequest$,
+  IsRequest as IsRequest$,
   ListPoliciesRequest,
-  QueryRequest,
+  QueryRequest as QueryRequest$,
 } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/authorizer_pb";
-import { PlainMessage } from "@bufbuild/protobuf";
+import { PlainMessage, Struct } from "@bufbuild/protobuf";
 import {
   createPromiseClient,
   Interceptor,
@@ -15,6 +15,7 @@ import {
 import { createGrpcTransport } from "@connectrpc/connect-node";
 
 import { handleError, setHeader, traceMessage } from "../util/connect";
+import { DecisionTreeRequest, IsRequest, QueryRequest } from "./type";
 
 type AuthorizerConfig = {
   authorizerServiceUrl?: string;
@@ -62,9 +63,15 @@ export class Authorizer {
     this.AuthClient = createPromiseClient(AuthorizerClient, baseGrpcTransport);
   }
 
-  async Is(params: PlainMessage<IsRequest>) {
+  async Is(params: IsRequest) {
     try {
-      const response = await this.AuthClient.is(params);
+      const request: IsRequest$ = new IsRequest$({
+        ...params,
+        resourceContext: params.resourceContext
+          ? Struct.fromJson(params.resourceContext)
+          : undefined,
+      });
+      const response = await this.AuthClient.is(request);
 
       const allowed = response.decisions[0]?.is;
       return !!allowed;
@@ -73,9 +80,16 @@ export class Authorizer {
     }
   }
 
-  async Query(params: PlainMessage<QueryRequest>) {
+  async Query(params: QueryRequest) {
     try {
-      const response = await this.AuthClient.query(params);
+      const request: QueryRequest$ = new QueryRequest$({
+        ...params,
+        resourceContext: params.resourceContext
+          ? Struct.fromJson(params.resourceContext)
+          : undefined,
+      });
+
+      const response = await this.AuthClient.query(request);
 
       return response.response?.toJson();
     } catch (error) {
@@ -83,9 +97,15 @@ export class Authorizer {
     }
   }
 
-  async DecisionTree(params: PlainMessage<DecisionTreeRequest>) {
+  async DecisionTree(params: DecisionTreeRequest) {
     try {
-      const response = await this.AuthClient.decisionTree(params);
+      const request: DecisionTreeRequest$ = new DecisionTreeRequest$({
+        ...params,
+        resourceContext: params.resourceContext
+          ? Struct.fromJson(params.resourceContext)
+          : undefined,
+      });
+      const response = await this.AuthClient.decisionTree(request);
 
       return {
         path: response.path?.toJson(),

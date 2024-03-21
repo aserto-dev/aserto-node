@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import { IdentityContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/identity_context_pb";
-import { Struct } from "@bufbuild/protobuf";
 
 import { Authorizer } from "./authorizer";
 import ResourceParamsMapper from "./authorizer/mapper/resource/params";
@@ -110,7 +109,7 @@ const displayStateMap = (
         identityContext: identityCtx,
         policyContext: policyCtx,
         policyInstance: policyInst,
-        resourceContext: Struct.fromJson(resourceContext),
+        resourceContext: resourceContext,
         options: decisionTreeOpt,
       });
     };
