@@ -109,6 +109,7 @@ authClient
 ### Methods
 ```ts
 // Is
+// (method) Authorizer.Is(params: IsRequest): Promise<boolean>
 await authClient
   .Is({
     identityContext: identityContext(
@@ -123,6 +124,7 @@ await authClient
   })
 
 // Query
+// (method) Authorizer.Query(params: QueryRequest): Promise<JsonObject>
 await authClient
   .Query({
     identityContext: identityContext(
@@ -139,6 +141,10 @@ await authClient
 
 
 // DecisionTree
+// (method) Authorizer.DecisionTree(params: DecisionTreeRequest): Promise<{
+//     path: Path;
+//     pathRoot: string;
+// }>
 await authClient
   .DecisionTree({
     identityContext: identityContext(
@@ -154,6 +160,7 @@ await authClient
 
 
 // ListPolicies
+// (method) Authorizer.ListPolicies(params: PlainMessage<ListPoliciesRequest>): Promise<Module[]>
 await authClient
   .ListPolicies({ policyInstance: policyInstance("todo", "todo") })
 ```

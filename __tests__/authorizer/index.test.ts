@@ -200,7 +200,7 @@ describe("Query", () => {
 
     const result = await authorizer.Query({
       query: "query",
-      input: "input",
+      input: '{"foo": "bar"}',
     });
 
     expect(result).toEqual({ key1: "value1", key2: 2 });
@@ -208,7 +208,7 @@ describe("Query", () => {
     mock.mockRestore();
   });
 
-  it("returns undefined when the response is empty", async () => {
+  it("returns empty object when the response is empty", async () => {
     const mock = jest
       .spyOn(authorizer.AuthClient, "query")
       .mockResolvedValue(new QueryResponse({}));
@@ -218,7 +218,7 @@ describe("Query", () => {
       input: "input",
     });
 
-    expect(result).toEqual(undefined);
+    expect(result).toEqual({});
 
     mock.mockRestore();
   });
@@ -275,10 +275,13 @@ describe("DecisionTree", () => {
     const result = await authorizer.DecisionTree({
       options: decisionTreeOptions("SLASH"),
     });
+
     expect(result).toEqual({
       path: { key1: "value1", key2: 2 },
       pathRoot: "root",
     });
+    expect(result.path["key1"]).toEqual("value1");
+
     mock.mockRestore();
   });
 
@@ -290,7 +293,7 @@ describe("DecisionTree", () => {
     const result = await authorizer.DecisionTree({
       options: decisionTreeOptions("SLASH"),
     });
-    expect(result).toEqual({ path: undefined, pathRoot: "" });
+    expect(result).toEqual({ path: {}, pathRoot: "" });
     mock.mockRestore();
   });
 });
