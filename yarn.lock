@@ -353,10 +353,10 @@
   dependencies:
     undici "^5.26.2"
 
-"@connectrpc/connect@^1.1.3":
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/@connectrpc/connect/-/connect-1.1.3.tgz#6099789e392bf3d4c3d831f294b1a9ff969703a1"
-  integrity sha512-AXkbsLQe2Nm7VuoN5nqp05GEb9mPa/f5oFzDqTbHME4i8TghTrlY03uefbhuAq4wjsnfDnmuxHZvn6ndlgXmbg==
+"@connectrpc/connect@^1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@connectrpc/connect/-/connect-1.4.0.tgz#4a987d6c9fc78ea61bce7d19e27b2de4d14c658f"
+  integrity sha512-vZeOkKaAjyV4+RH3+rJZIfDFJAfr+7fyYr6sLDKbYX3uuTVszhFe9/YKf5DNqrDb5cKdKVlYkGn6DTDqMitAnA==
 
 "@eslint-community/eslint-utils@^4.2.0", "@eslint-community/eslint-utils@^4.4.0":
   version "4.4.0"
@@ -785,11 +785,6 @@
     "@types/express-serve-static-core" "^4.17.33"
     "@types/qs" "*"
     "@types/serve-static" "*"
-
-"@types/google-protobuf@^3.15.6":
-  version "3.15.12"
-  resolved "https://registry.yarnpkg.com/@types/google-protobuf/-/google-protobuf-3.15.12.tgz#eb2ba0eddd65712211a2b455dc6071d665ccf49b"
-  integrity sha512-40um9QqwHjRS92qnOaDpL7RmDK15NuZYo9HihiJRbYkMQZlWnuH8AdvbMy8/o6lgLmKbDUKa+OALCltHdbOTpQ==
 
 "@types/graceful-fs@^4.1.3":
   version "4.1.9"
@@ -2325,11 +2320,6 @@ globby@^11.1.0:
     ignore "^5.2.0"
     merge2 "^1.4.1"
     slash "^3.0.0"
-
-google-protobuf@^3.21.2:
-  version "3.21.2"
-  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.21.2.tgz#4580a2bea8bbb291ee579d1fefb14d6fa3070ea4"
-  integrity sha512-3MSOYFO5U9mPGikIYCzK0SaThypfGgS6bHqrUGXG3DPHCrb+txNqeEcns1W0lkGfk0rCyNXm7xB9rMxnCiZOoA==
 
 gopd@^1.0.1:
   version "1.0.1"
