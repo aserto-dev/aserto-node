@@ -45,7 +45,7 @@
   "dependencies": {
     "@aserto/node-authorizer": "^0.20.8",
     "@aserto/node-directory": "^0.31.1",
-    "@bufbuild/protobuf": "^1.4.2",
+    "@bufbuild/protobuf": "^1.7.2",
     "@connectrpc/connect": "^1.1.3",
     "@connectrpc/connect-node": "^1.1.3",
     "express": "^4.18.2",
