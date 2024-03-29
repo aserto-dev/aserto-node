@@ -19,7 +19,12 @@ import { Reader } from "@aserto/node-directory/src/gen/cjs/aserto/directory/read
 import { GetObjectManyRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_pb";
 import { Writer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_connect";
 import { SetObjectRequest as SetObjectRequest$ } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
-import { PartialMessage, PlainMessage, Struct } from "@bufbuild/protobuf";
+import {
+  JsonObject,
+  PartialMessage,
+  PlainMessage,
+  Struct,
+} from "@bufbuild/protobuf";
 import {
   createPromiseClient,
   Interceptor,
@@ -62,6 +67,20 @@ import {
  *
  */
 type DATA_TYPE_OPTIONS = keyof typeof Option;
+
+/**
+ * Enum representing the different cases for importing data.
+ * The cases are "object" and "relation".
+ *
+ *  OBJECT = "object"
+ *
+ *  RELATION = "relation"
+ *
+ */
+export enum ImportMsgCase {
+  OBJECT = "object",
+  RELATION = "relation",
+}
 
 export class DirectoryV3 {
   ReaderClient: PromiseClient<typeof Reader>;
@@ -455,6 +474,16 @@ export async function readAsyncIterable<T>(
  */
 export async function* createAsyncIterable<T>(items: T[]): AsyncIterable<T> {
   yield* items;
+}
+
+/**
+ * Converts a JSON object to a Protobuf Struct.
+ *
+ * @param value - The JSON object to convert.
+ * @returns The converted Protobuf Struct.
+ */
+export function objectPropertiesAsStruct(value: JsonObject): Struct {
+  return Struct.fromJson(value);
 }
 
 function mergeUint8Arrays(...arrays: Uint8Array[]): Uint8Array {

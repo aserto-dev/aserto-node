@@ -1,3 +1,5 @@
+import { Opcode } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
+
 import { Authorizer, authz } from "./authorizer";
 import AnonymousIdentityMapper from "./authorizer/mapper/identity/anonymous";
 import JWTIdentityMapper from "./authorizer/mapper/identity/jwt";
@@ -20,6 +22,8 @@ import {
   createAsyncIterable,
   DirectoryServiceV3,
   DirectoryV3,
+  ImportMsgCase,
+  objectPropertiesAsStruct,
   readAsyncIterable,
 } from "./directory/v3";
 import { DirectoryV3Config } from "./directory/v3/types";
@@ -55,6 +59,9 @@ export {
   queryOptions,
   readAsyncIterable,
   SubIdentityMapper,
+  ImportMsgCase,
+  Opcode as ImportOpCode,
+  objectPropertiesAsStruct,
 };
 
 export * from "./errors";

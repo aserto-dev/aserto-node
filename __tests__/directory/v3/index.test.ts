@@ -23,7 +23,6 @@ import {
   SetObjectResponse,
   SetRelationResponse,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
-import { Struct } from "@bufbuild/protobuf";
 import { Code, ConnectError } from "@connectrpc/connect";
 import { createAsyncIterable } from "@connectrpc/connect/protocol";
 import * as connectNode from "@connectrpc/connect-node";
@@ -42,6 +41,7 @@ import {
   EtagMismatchError,
   InvalidArgumentError,
   NotFoundError,
+  objectPropertiesAsStruct,
   UnauthenticatedError,
 } from "../../../lib/index";
 jest.mock("fs");
@@ -741,9 +741,7 @@ describe("DirectoryV3", () => {
           type: "user",
           displayName: "test",
           etag: "",
-          properties: Struct.fromJsonString(
-            JSON.stringify(params.object?.properties || {})
-          ),
+          properties: objectPropertiesAsStruct(params.object?.properties || {}),
         },
       });
 

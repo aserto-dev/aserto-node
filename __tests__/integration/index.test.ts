@@ -5,7 +5,10 @@ import {
   DirectoryServiceV3,
   DirectoryV3,
   EtagMismatchError,
+  ImportMsgCase,
+  ImportOpCode,
   NotFoundError,
+  objectPropertiesAsStruct,
   policyContext,
   policyInstance,
   readAsyncIterable,
@@ -346,26 +349,23 @@ types:
     });
 
     it("imports objects and relationships", async () => {
-      const objectCase = "object" as const;
-      const relationCase = "relation" as const;
-
       const importRequest = createAsyncIterable([
         {
-          opCode: 1,
+          opCode: ImportOpCode.SET,
           msg: {
-            case: objectCase,
+            case: ImportMsgCase.OBJECT,
             value: {
               id: "import-user",
               type: "user",
-              properties: {},
+              properties: objectPropertiesAsStruct({ foo: "bar" }),
               displayName: "name1",
             },
           },
         },
         {
-          opCode: 1,
+          opCode: ImportOpCode.SET,
           msg: {
-            case: objectCase,
+            case: ImportMsgCase.OBJECT,
             value: {
               id: "import-group",
               type: "group",
@@ -375,9 +375,9 @@ types:
           },
         },
         {
-          opCode: 1,
+          opCode: ImportOpCode.SET,
           msg: {
-            case: relationCase,
+            case: ImportMsgCase.RELATION,
             value: {
               subjectId: "import-user",
               subjectType: "user",
