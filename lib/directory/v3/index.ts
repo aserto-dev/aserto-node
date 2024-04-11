@@ -29,6 +29,7 @@ import {
   createPromiseClient,
   Interceptor,
   PromiseClient,
+  Transport,
 } from "@connectrpc/connect";
 import { createGrpcTransport } from "@connectrpc/connect-node";
 
@@ -88,6 +89,10 @@ export class DirectoryV3 {
   ImporterClient: PromiseClient<typeof Importer>;
   ExporterClient: PromiseClient<typeof Exporter>;
   ModelClient: PromiseClient<typeof Model>;
+  CreateTransport: (
+    config: ServiceConfig | undefined,
+    fallback: ServiceConfig | undefined
+  ) => Transport | undefined;
 
   constructor(config: DirectoryV3Config) {
     const baseServiceHeaders: Interceptor = (next) => async (req) => {
@@ -226,6 +231,8 @@ export class DirectoryV3 {
     this.ModelClient = !!modelGrpcTransport
       ? createPromiseClient(Model, modelGrpcTransport)
       : (nullModelProxy as unknown as PromiseClient<typeof Model>);
+
+    this.CreateTransport = createTransport;
   }
 
   async checkPermission(params: CheckPermissionRequest) {
