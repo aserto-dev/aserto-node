@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { IdentityContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/identity_context_pb";
 
 import { Authorizer } from "./authorizer";
-import ResourceParamsMapper from "./authorizer/mapper/resource/params";
+import BodyResourceMapper from "./authorizer/mapper/resource/body";
 import {
   IdentityMapper,
   PolicyMapper,
@@ -96,7 +96,7 @@ const displayStateMap = (
         ? typeof resourceMapper === "function"
           ? await resourceMapper(req)
           : resourceMapper
-        : ResourceParamsMapper(req);
+        : BodyResourceMapper(req);
 
       const policyInst =
         instanceName && instanceLabel
