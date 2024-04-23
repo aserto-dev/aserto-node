@@ -8,7 +8,7 @@ import { Authorizer } from ".";
 import JWTIdentityMapper from "./mapper/identity/jwt";
 import PolicyPathMapper from "./mapper/policy/path";
 import checkResourceMapper from "./mapper/resource/check";
-import ResourceParamsMapper from "./mapper/resource/params";
+import ParamsResourceMapper from "./mapper/resource/params";
 import policyContext from "./model/policyContext";
 import policyInstance from "./model/policyInstance";
 import { ResourceContext } from "./model/resourceContext";
@@ -145,7 +145,7 @@ export class Middleware {
           ? typeof this.resourceMapper === "function"
             ? await this.resourceMapper(req)
             : this.resourceMapper
-          : ResourceParamsMapper(req);
+          : ParamsResourceMapper(req);
 
         return [
           await this.client.Is({
