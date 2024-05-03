@@ -20,10 +20,10 @@
   resolved "https://registry.yarnpkg.com/@aserto/node-authorizer/-/node-authorizer-0.20.8.tgz#61de9fd382f0b01a6365b017243cbff0f332252a"
   integrity sha512-vuib/KbMle2DMBtKj2mrs1bJHAhRbdZk0u85FUFycW5avCCQULF5xZzuD6QqKkXjieBC+7GPiB/mbZlhJIBBHA==
 
-"@aserto/node-directory@^0.31.3":
-  version "0.31.3"
-  resolved "https://registry.yarnpkg.com/@aserto/node-directory/-/node-directory-0.31.3.tgz#db88e2f08a1de06c3d12e927ef957a1f35d68621"
-  integrity sha512-xru4QQaBkdPytOKK5IQQM2d9TZW3x+QkioXJoojJUfx53DwFT694se/d48Yj24jJm9sqMixExc61NEbguP80Xg==
+"@aserto/node-directory@^0.31.4":
+  version "0.31.4"
+  resolved "https://registry.yarnpkg.com/@aserto/node-directory/-/node-directory-0.31.4.tgz#3005f91a28fc35bd6d250d2c23c3e2482b1f76d0"
+  integrity sha512-BkMWJD8XCQsIo8LmCY4bePwjw9Kw50yTkmDRI+hYpYOog6+t7YtwPVHDjmh8VzGQRRbouoYthLPhX+MdnhWUgw==
 
 "@aserto/ts-linting-configs@^2.5.0":
   version "2.7.0"
