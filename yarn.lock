@@ -15,10 +15,10 @@
     "@jridgewell/gen-mapping" "^0.3.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@aserto/node-authorizer@^0.20.8":
-  version "0.20.8"
-  resolved "https://registry.yarnpkg.com/@aserto/node-authorizer/-/node-authorizer-0.20.8.tgz#61de9fd382f0b01a6365b017243cbff0f332252a"
-  integrity sha512-vuib/KbMle2DMBtKj2mrs1bJHAhRbdZk0u85FUFycW5avCCQULF5xZzuD6QqKkXjieBC+7GPiB/mbZlhJIBBHA==
+"@aserto/node-authorizer@^0.20.9":
+  version "0.20.9"
+  resolved "https://registry.yarnpkg.com/@aserto/node-authorizer/-/node-authorizer-0.20.9.tgz#8b18ce73340bdbd5f393855a1763b08170239995"
+  integrity sha512-KNGnJ0xj8rY/T72jFTkaporscoaY5cbqDIl1msRCAculUVyXIIQk/AO2f/Aw3IwhfKzE4mnDe6YD+olWoLYWfA==
 
 "@aserto/node-directory@^0.31.3":
   version "0.31.3"
