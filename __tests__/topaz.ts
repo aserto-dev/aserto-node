@@ -16,10 +16,15 @@ export class Topaz {
     await execute(
       "topaz config new -r ghcr.io/aserto-policies/policy-todo:2.1.0 -n todo -d -f"
     );
+
+    await execute("topaz config use todo");
+
     const certsDir = await this.caCert();
 
     await retry(async () => fs.readFileSync(certsDir), RETRY_OPTIONS);
     log("certificates are ready");
+
+    await execute("topaz config info");
 
     await execute("topaz start");
     log(`topaz start with ${certsDir}`);
