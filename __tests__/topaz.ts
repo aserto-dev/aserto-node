@@ -1,15 +1,11 @@
 import fs from "fs";
 import util from "node:util";
-import os from "os";
 import path from "path";
 
 import { DirectoryServiceV3 } from "../lib";
 import { log } from "../lib/log";
 
 const exec = util.promisify(require("node:child_process").exec);
-
-const DB_DIR = path.join(os.homedir(), ".config/topaz/db");
-const CONFIG_DIR = path.join(os.homedir(), ".config/topaz/cfg");
 const RETRY_OPTIONS = { retries: 30, retryIntervalMs: 4000 };
 export const TOPAZ_TIMEOUT =
   RETRY_OPTIONS.retries * RETRY_OPTIONS.retryIntervalMs;
@@ -20,13 +16,13 @@ export class Topaz {
     await execute(
       "topaz config new -r ghcr.io/aserto-policies/policy-todo:2.1.0 -n todo -d -f"
     );
-    await execute("topaz start");
-
-    const certsDir = await this.certsDir();
-    log(`topaz start with ${certsDir}`);
+    const certsDir = await this.caCert();
 
     await retry(async () => fs.readFileSync(certsDir), RETRY_OPTIONS);
     log("certificates are ready");
+
+    await execute("topaz start");
+    log(`topaz start with ${certsDir}`);
 
     const directoryClient = DirectoryServiceV3({
       url: "localhost:9292",
@@ -43,34 +39,46 @@ export class Topaz {
     await this.restore();
   }
 
-  async certsDir() {
+  async caCert() {
     return `${(
       await execute("topaz config info | jq -r '.config.topaz_certs_dir'")
     ).replace(/(\r\n|\n|\r)/gm, "")}/grpc-ca.crt`;
   }
 
+  async dbDir() {
+    return `${(
+      await execute("topaz config info | jq -r '.config.topaz_db_dir'")
+    ).replace(/(\r\n|\n|\r)/gm, "")}`;
+  }
+
+  async configDir() {
+    return `${(
+      await execute("topaz config info | jq -r '.config.topaz_cfg_dir'")
+    ).replace(/(\r\n|\n|\r)/gm, "")}`;
+  }
+
   async backup() {
     fs.rename(
-      path.join(DB_DIR, "directory.db"),
-      path.join(DB_DIR, "directory.bak"),
+      path.join(await this.dbDir(), "directory.db"),
+      path.join(await this.dbDir(), "directory.bak"),
       () => {}
     );
     fs.rename(
-      path.join(CONFIG_DIR, "config.yaml"),
-      path.join(CONFIG_DIR, "config.bak"),
+      path.join(await this.configDir(), "todo.yaml"),
+      path.join(await this.configDir(), "todo.bak"),
       () => {}
     );
   }
 
   async restore() {
     fs.rename(
-      path.join(DB_DIR, "directory.bak"),
-      path.join(DB_DIR, "directory.db"),
+      path.join(await this.dbDir(), "directory.bak"),
+      path.join(await this.dbDir(), "directory.db"),
       () => {}
     );
     fs.rename(
-      path.join(CONFIG_DIR, "config.bak"),
-      path.join(CONFIG_DIR, "config.yaml"),
+      path.join(await this.configDir(), "todo.bak"),
+      path.join(await this.configDir(), "todo.yaml"),
       () => {}
     );
   }

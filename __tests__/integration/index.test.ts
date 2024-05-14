@@ -16,16 +16,16 @@ import {
 import { Topaz, TOPAZ_TIMEOUT } from "../topaz";
 
 describe("Integration", () => {
-  const topaz = new Topaz();
-
   let directoryClient: DirectoryV3;
+  let topaz: Topaz;
 
   beforeAll(async () => {
+    topaz = new Topaz();
     await topaz.stop();
     await topaz.start();
     const config = {
       url: "localhost:9292",
-      caFile: await topaz.certsDir(),
+      caFile: await topaz.caCert(),
     };
 
     directoryClient = DirectoryServiceV3(config);
@@ -502,7 +502,7 @@ types:
     beforeEach(async () => {
       authorizerClient = new Authorizer({
         authorizerServiceUrl: "localhost:8282",
-        authorizerCertFile: await topaz.certsDir(),
+        authorizerCertFile: await topaz.caCert(),
       });
     });
 
