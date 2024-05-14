@@ -18,21 +18,19 @@ export class Topaz {
   async start() {
     await this.backup();
     await execute(
-      "topaz configure -r ghcr.io/aserto-policies/policy-todo:2.1.0 -n todo -d -f"
+      "topaz config new -r ghcr.io/aserto-policies/policy-todo:2.1.0 -n todo -d -f"
     );
     await execute("topaz start");
-    log("topaz start");
-    await retry(
-      async () =>
-        fs.readFileSync(`${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`),
-      RETRY_OPTIONS
-    );
 
+    const certsDir = await this.certsDir();
+    log(`topaz start with ${certsDir}`);
+
+    await retry(async () => fs.readFileSync(certsDir), RETRY_OPTIONS);
     log("certificates are ready");
 
     const directoryClient = DirectoryServiceV3({
       url: "localhost:9292",
-      caFile: `${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`,
+      caFile: certsDir,
     });
     await retry(
       async () => directoryClient.objects({ objectType: "user" }),
@@ -43,6 +41,12 @@ export class Topaz {
   async stop() {
     await execute("topaz stop");
     await this.restore();
+  }
+
+  async certsDir() {
+    return `${(
+      await execute("topaz config info | jq -r '.config.topaz_certs_dir'")
+    ).replace(/(\r\n|\n|\r)/gm, "")}/grpc-ca.crt`;
   }
 
   async backup() {
@@ -101,4 +105,5 @@ const execute = async (command: string) => {
     return;
   }
   log(`stdout: ${stdout}`);
+  return stdout;
 };
