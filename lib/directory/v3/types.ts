@@ -1,3 +1,4 @@
+import { Option } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
 import {
   CheckPermissionRequest as CheckPermissionRequest$,
   CheckRelationRequest as CheckRelationRequest$,
@@ -21,6 +22,15 @@ import {
 } from "@bufbuild/protobuf";
 
 import { NestedOmit, PartialExcept } from "../../util/types";
+
+enum StatsExportOptions {
+  STATS_OBJECTS = Option.STATS | Option.DATA_OBJECTS,
+  STATS_RELATIONS = Option.STATS | Option.DATA_RELATIONS,
+  STATS_DATA = Option.STATS | Option.DATA,
+}
+
+export const ExportOptions = { ...Option, ...StatsExportOptions };
+export type ExportOptions = typeof Option & typeof StatsExportOptions;
 
 export type ServiceConfig = {
   url?: string;

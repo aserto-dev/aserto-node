@@ -1,10 +1,7 @@
 import { readFileSync } from "fs";
 import { PaginationRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v3/common_pb";
 import { Exporter } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_connect";
-import {
-  ExportRequest,
-  Option,
-} from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
+import { ExportRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
 import { Importer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_connect";
 import { ImportRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
 import { Model } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_connect";
@@ -41,6 +38,7 @@ import {
   nullReaderProxy,
   nullWriterProxy,
 } from "./null";
+import { ExportOptions } from "./types";
 import {
   CheckPermissionRequest,
   CheckRelationRequest,
@@ -66,8 +64,15 @@ import {
  *
  * "DATA" - all data = OPTION_DATA_OBJECTS | OPTION_DATA_RELATIONS
  *
+ * "STATS" - stats
+ *
+ * "STATS_OBJECTS" - objects stats = STATS | DATA_OBJECTS
+ *
+ * "STATS_RELATIONS" - relations stats = STATS | DATA_RELATIONS
+ *
+ * "STATS_DATA" - all data stats = STATS | DATA
  */
-type DATA_TYPE_OPTIONS = keyof typeof Option;
+type DATA_TYPE_OPTIONS = keyof ExportOptions;
 
 /**
  * Enum representing the different cases for importing data.
@@ -388,7 +393,7 @@ export class DirectoryV3 {
     try {
       return this.ExporterClient.export(
         new ExportRequest({
-          options: Option[params.options],
+          options: ExportOptions[params.options],
         })
       );
     } catch (error) {

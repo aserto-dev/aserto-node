@@ -16,16 +16,18 @@ import {
 import { Topaz, TOPAZ_TIMEOUT } from "../topaz";
 
 describe("Integration", () => {
-  const config = {
-    url: "localhost:9292",
-    caFile: `${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`,
-  };
   let directoryClient: DirectoryV3;
-  const topaz = new Topaz();
+  let topaz: Topaz;
 
   beforeAll(async () => {
+    topaz = new Topaz();
     await topaz.stop();
     await topaz.start();
+    const config = {
+      url: "localhost:9292",
+      caFile: await topaz.caCert(),
+    };
+
     directoryClient = DirectoryServiceV3(config);
   }, TOPAZ_TIMEOUT);
 
@@ -404,6 +406,28 @@ types:
       ).toEqual(3);
     });
 
+    it("exports stats for objects", async () => {
+      type Stats = {
+        object_types: {
+          [key: string]: {
+            _obj_count: number;
+          };
+        };
+      };
+
+      const response = await readAsyncIterable(
+        await directoryClient.export({ options: "STATS_OBJECTS" })
+      );
+      const stats: Stats = JSON.parse(
+        response?.[0]?.msg?.value?.toJsonString() || "{}"
+      );
+      const totals = Object.values(stats["object_types"] || {}).reduce(
+        (n, { _obj_count }) => n + _obj_count,
+        0
+      );
+      expect(totals).toEqual(2);
+    });
+
     it("exports objects", async () => {
       expect(
         (
@@ -475,10 +499,10 @@ types:
   describe("Authorizer", () => {
     let authorizerClient: Authorizer;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       authorizerClient = new Authorizer({
         authorizerServiceUrl: "localhost:8282",
-        authorizerCertFile: `${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`,
+        authorizerCertFile: await topaz.caCert(),
       });
     });
 
