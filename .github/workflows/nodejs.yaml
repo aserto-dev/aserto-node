@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Read Configuration
-        uses: hashicorp/vault-action@v2.7.3
+        uses: hashicorp/vault-action@v3
         id: vault
         with:
           url: ${{ env.VAULT_ADDR }}
@@ -29,17 +29,17 @@ jobs:
           git config --global url."git@github.com:".insteadOf https://github.com/
 
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v3
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
         with:
-          node-version: '16.x'
+          node-version: '20.x'
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         id: yarn-cache
         with:
           path: |
@@ -57,7 +57,7 @@ jobs:
     name: Run lint
     steps:
       - name: Read Configuration
-        uses: hashicorp/vault-action@v2.7.3
+        uses: hashicorp/vault-action@v3
         id: vault
         with:
           url: ${{ env.VAULT_ADDR }}
@@ -73,17 +73,17 @@ jobs:
           git config --global url."git@github.com:".insteadOf https://github.com/
 
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v3
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
         with:
-          node-version: '16.x'
+          node-version: '20.x'
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         id: yarn-cache
         with:
           path: |
@@ -101,7 +101,7 @@ jobs:
     name: Run checks for dead code
     steps:
       - name: Read Configuration
-        uses: hashicorp/vault-action@v2.7.3
+        uses: hashicorp/vault-action@v3
         id: vault
         with:
           url: ${{ env.VAULT_ADDR }}
@@ -117,17 +117,17 @@ jobs:
           git config --global url."git@github.com:".insteadOf https://github.com/
 
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v3
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
         with:
-          node-version: '16.x'
+          node-version: '20.x'
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         id: yarn-cache
         with:
           path: |

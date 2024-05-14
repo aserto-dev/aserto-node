@@ -21,9 +21,9 @@
   integrity sha512-vuib/KbMle2DMBtKj2mrs1bJHAhRbdZk0u85FUFycW5avCCQULF5xZzuD6QqKkXjieBC+7GPiB/mbZlhJIBBHA==
 
 "@aserto/node-directory@^0.31.3":
-  version "0.31.3"
-  resolved "https://registry.yarnpkg.com/@aserto/node-directory/-/node-directory-0.31.3.tgz#db88e2f08a1de06c3d12e927ef957a1f35d68621"
-  integrity sha512-xru4QQaBkdPytOKK5IQQM2d9TZW3x+QkioXJoojJUfx53DwFT694se/d48Yj24jJm9sqMixExc61NEbguP80Xg==
+  version "0.31.4"
+  resolved "https://registry.yarnpkg.com/@aserto/node-directory/-/node-directory-0.31.4.tgz#3005f91a28fc35bd6d250d2c23c3e2482b1f76d0"
+  integrity sha512-BkMWJD8XCQsIo8LmCY4bePwjw9Kw50yTkmDRI+hYpYOog6+t7YtwPVHDjmh8VzGQRRbouoYthLPhX+MdnhWUgw==
 
 "@aserto/ts-linting-configs@^2.5.0":
   version "2.7.0"
@@ -342,9 +342,9 @@
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
 "@bufbuild/protobuf@^1.7.2":
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/@bufbuild/protobuf/-/protobuf-1.8.0.tgz#1c8651ea34adb8019b483e09de02aeeb1cd57d79"
-  integrity sha512-qR9FwI8QKIveDnUYutvfzbC21UZJJryYrLuZGjeZ/VGz+vXelUkK+xgkOHsvPEdYEdxtgUUq4313N8QtOehJ1Q==
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/@bufbuild/protobuf/-/protobuf-1.9.0.tgz#fffac3183059a41ceef5311e07e3724d426a95c4"
+  integrity sha512-W7gp8Q/v1NlCZLsv8pQ3Y0uCu/SHgXOVFK+eUluUKWXmsb6VHkpNx0apdOWWcDbB9sJoKeP8uPrjmehJz6xETQ==
 
 "@connectrpc/connect-node@^1.4.0":
   version "1.4.0"
@@ -391,9 +391,9 @@
   integrity sha512-ut5V+D+fOoWPgGGNj83GGjnntO39xDy6DWxO0wb7Jp3DcMX0TfIqdzHF85VTQkerdyGmuuMD9AKAo5KiNlf/AQ==
 
 "@fastify/busboy@^2.0.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@fastify/busboy/-/busboy-2.1.0.tgz#0709e9f4cb252351c609c6e6d8d6779a8d25edff"
-  integrity sha512-+KpH+QxZU7O4675t3mnkQKcZZg56u+K/Ct2K+N2AZYNVK8kyeo/bI18tI8aPm3tvNNRyTWfj6s5tnGNlcbQRsA==
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@fastify/busboy/-/busboy-2.1.1.tgz#b9da6a878a371829a0502c9b6c1c143ef6663f4d"
+  integrity sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==
 
 "@humanwhocodes/config-array@^0.11.13":
   version "0.11.13"
@@ -4246,9 +4246,9 @@ undici-types@~5.26.4:
   integrity sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==
 
 undici@^5.28.3:
-  version "5.28.3"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-5.28.3.tgz#a731e0eff2c3fcfd41c1169a869062be222d1e5b"
-  integrity sha512-3ItfzbrhDlINjaP0duwnNsKpDQk3acHI3gVJ1z4fmwMK31k5G9OVIAMLSIaP6w4FaGkaAkN6zaQO9LUvZ1t7VA==
+  version "5.28.4"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-5.28.4.tgz#6b280408edb6a1a604a9b20340f45b422e373068"
+  integrity sha512-72RFADWFqKmUb2hmmvNODKL3p9hcB6Gt2DOQMis1SEBaV6a4MH8soBvzg+95CYhCKPFedut2JY9bMfrDl9D23g==
   dependencies:
     "@fastify/busboy" "^2.0.0"
 
