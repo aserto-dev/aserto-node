@@ -13,11 +13,7 @@ export const TOPAZ_TIMEOUT =
 export class Topaz {
   async start() {
     await this.backup();
-    await execute(
-      "topaz config new -r ghcr.io/aserto-policies/policy-todo:2.1.0 -n todo -d -f"
-    );
-
-    await execute("topaz config use todo");
+    await execute("topaz templates install todo -f --no-console");
 
     const certsDir = await this.caCert();
 
@@ -26,7 +22,6 @@ export class Topaz {
 
     await execute("topaz config info");
 
-    await execute("topaz start");
     log(`topaz start with ${certsDir}`);
 
     const directoryClient = DirectoryServiceV3({
