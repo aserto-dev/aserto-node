@@ -516,6 +516,9 @@ types:
 
         expect(response).toEqual({
           path: {
+            "rebac.check": {
+              allowed: false,
+            },
             "todoApp.DELETE.todos.__id": { allowed: false },
             "todoApp.GET.todos": { allowed: true },
             "todoApp.GET.users.__userID": { allowed: true },
