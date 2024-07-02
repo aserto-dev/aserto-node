@@ -70,7 +70,7 @@ const authClient = new Authorizer({
 ```ts
 const authClient = new Authorizer({
   authorizerServiceUrl: "localhost:8282",
-  authorizerCertFile: `${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`
+  authorizerCertFile: `${process.env.HOME}/.local/share/topaz/certs/grpc-ca.crt`
 });
 ```
 
@@ -86,7 +86,7 @@ import {
 const authClient = new Authorizer(
   {
     authorizerServiceUrl: "localhost:8282",
-    authorizerCertFile: `${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`
+    authorizerCertFile: `${process.env.HOME}/.local/share/topaz/certs/grpc-ca.crt`
   },
 );
 
@@ -450,7 +450,7 @@ import { DirectoryServiceV3 } from "@aserto/aserto-node";
 
 const directoryClient = DirectoryServiceV3({
   url: 'localhost:9292',
-  caFile: `${process.env.HOME}/.config/topaz/certs/grpc-ca.crt`
+  caFile: `${process.env.HOME}/.local/share/topaz/certs/grpc-ca.crt`
 });
 
 - `url`: hostname:port of directory service (_required_)
@@ -961,9 +961,9 @@ The Topaz / Aserto [authorizers](github.com/aserto-dev/topaz) exposes SSL-only e
 
 For a hosted authorizer that has a TLS certificate that is signed by a trusted Certificate Authority, this section isn't relevant because that TLS certificate will be successfully validated.
 
-In a development environment, the Aserto [one-box](github.com/aserto-dev/aserto-one) automatically creates a set of self-signed certificates and certificates of the CA (certificate authority) that signed them. It places them in a well-known location on the filesystem, defaulting to `$HOME/.config/aserto/aserto-one/certs/`. For Topaz this is `$HOME/.config/topaz/certs/`.
+In a development environment, [topaz](github.com/aserto-dev/topaz) automatically creates a set of self-signed certificates and certificates of the CA (certificate authority) that signed them. It places them in a well-known location on the filesystem, defaulting to `$HOME/.local/share/topaz/certs/` (or `$HOMEPATH\AppData\Local\topaz\certs\` on Windows).
 
-In order for the `aserto-node` package to perform the TLS handshake, it needs to verify the TLS certificate of the one-box using the certificate of the CA that signed it - which was placed in `$HOME/.config/aserto/aserto-one/certs/aserto-one-gateway-ca.crt`. Therefore, in order for this middleware to work successfully, either the `authorizerCertFile` must be set to the correct path for the CA cert file, or the `disableTlsValidation` flag must be set to `true`.
+In order for the `aserto-node` package to perform the TLS handshake, it needs to verify the TLS certificate of Topaz using the certificate of the CA that signed it - which was placed in `$HOME/.local/share/topaz/certs/grpc-ca.crt`. Therefore, in order for this middleware to work successfully, either the `authorizerCertFile` must be set to the correct path for the CA cert file, or the `disableTlsValidation` flag must be set to `true`. The same is true for the `caFile` argument of the `DirectoryClient`.
 
 Furthermore, when packaging a policy for deployment (e.g. in a Docker container) which uses `aserto-node` to communicate with an authorizer that has a self-signed TLS certificate, you must copy this CA certificate into the container as part of the Docker build (typically performed in the Dockerfile). When you do that, you'll need to override the `authorizerCertFile` option that is passed into any of the API calls defined above with the location of this cert file.
 
