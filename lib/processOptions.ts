@@ -69,10 +69,8 @@ export default (
     disableTlsValidation = options.disableTlsValidation;
   }
 
-  let authorizerCertCAFile: string = "";
-  if (options && options.authorizerCertCAFile) {
-    authorizerCertCAFile = options.authorizerCertCAFile;
-  }
+  const authorizerCertCAFile =
+    options.authorizerCertCAFile || options.caFile || "";
 
   const instanceName =
     options && typeof options.instanceName === "string" && options.instanceName;

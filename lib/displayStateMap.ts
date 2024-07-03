@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { IdentityContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/identity_context_pb";
 
+import { AuthzOptions } from ".";
 import { Authorizer } from "./authorizer";
 import BodyResourceMapper from "./authorizer/mapper/resource/body";
 import {
@@ -15,22 +16,9 @@ import { errorHandler } from "./errorHandler";
 import identityContext from "./identityContext";
 import processOptions from "./processOptions";
 
-interface DisplayStateMapOptions {
-  policyRoot: string;
-  instanceName: string;
-  instanceLabel?: string;
-  authorizerServiceUrl: string;
-  authorizerApiKey?: string;
-  tenantId?: string;
-  authorizerCertCAFile?: string;
-  disableTlsValidation?: boolean;
-  useAuthorizationHeader?: boolean;
-  identityHeader?: string;
-  failWithError?: boolean;
-  customUserKey?: string;
-  customSubjectKey?: string;
+type DisplayStateMapOptions = AuthzOptions & {
   endpointPath?: string;
-}
+};
 const displayStateMap = (
   optionsParam: DisplayStateMapOptions,
   resourceMapper?: ResourceMapper,
@@ -81,7 +69,7 @@ const displayStateMap = (
         authorizerServiceUrl: authorizerUrl,
         tenantId: tenantId!,
         authorizerApiKey: authorizerApiKey!,
-        authorizerCertFile: authorizerCertCAFile,
+        caFile: authorizerCertCAFile,
         insecure: disableTlsValidation,
       });
 

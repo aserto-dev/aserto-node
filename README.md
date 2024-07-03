@@ -48,7 +48,7 @@ type AuthorizerConfig = {
   tenantId?: string;
   authorizerApiKey?: string;
   token?: string;
-  authorizerCertFile?: string;
+  caFile?: string;
   insecure?: boolean;
 };
 ```
@@ -63,14 +63,14 @@ const authClient = new Authorizer({
 - `authorizerServiceUrl`: hostname:port of authorizer service (_required_)
 - `authorizerApiKey`: API key for authorizer service (_required_ if using hosted authorizer)
 - `tenantId`: Aserto tenant ID (_required_ if using hosted authorizer)
-- `authorizerCertFile`: Path to the authorizer CA file. (optional)
+- `caFile`: Path to the authorizer CA file. (optional)
 - `insecure`: Skip server certificate and domain verification. (NOT SECURE!). Defaults to `false`.
 
 ### Topaz
 ```ts
 const authClient = new Authorizer({
   authorizerServiceUrl: "localhost:8282",
-  authorizerCertFile: `${process.env.HOME}/.local/share/topaz/certs/grpc-ca.crt`
+  caFile: `${process.env.HOME}/.local/share/topaz/certs/grpc-ca.crt`
 });
 ```
 
@@ -86,7 +86,7 @@ import {
 const authClient = new Authorizer(
   {
     authorizerServiceUrl: "localhost:8282",
-    authorizerCertFile: `${process.env.HOME}/.local/share/topaz/certs/grpc-ca.crt`
+    caFile: `${process.env.HOME}/.local/share/topaz/certs/grpc-ca.crt`
   },
 );
 
@@ -820,7 +820,7 @@ By default, `jwtAuthz` derives the policy file name and resource key from the Ex
 - `instanceLabel`: instance label (_required_ if using hosted authorizer)
 - `authorizerApiKey`: API key for authorizer service (_required_ if using hosted authorizer)
 - `tenantId`: Aserto tenant ID (_required_ if using hosted authorizer)
-- `authorizerCertFile`: location on the filesystem of the CA certificate that signed the Aserto authorizer self-signed certificate. See the "Certificates" section for more information.
+- `caFile`: location on the filesystem of the CA certificate that signed the Aserto authorizer self-signed certificate. See the "Certificates" section for more information.
 - `disableTlsValidation`: ignore TLS certificate validation when creating a TLS connection to the authorizer. Defaults to false.
 - `failWithError`: When set to `true`, will forward errors to `next` instead of ending the response directly.
 - `useAuthorizationHeader`: When set to `true`, will forward the Authorization header to the authorizer. The authorizer will crack open the JWT and use that as the identity context. Defaults to `true`.
@@ -869,7 +869,7 @@ app.use(displayStateMap(options));
 - `instanceLabel`: instance label (_required_ if using hosted authorizer)
 - `authorizerApiKey`: API key for authorizer service (_required_ if using hosted authorizer)
 - `tenantId`: Aserto tenant ID (_required_ if using hosted authorizer)
-- `authorizerCertFile`: location on the filesystem of the CA certificate that signed the Aserto authorizer self-signed certificate. See the "Certificates" section for more information.
+- `caFile`: location on the filesystem of the CA certificate that signed the Aserto authorizer self-signed certificate. See the "Certificates" section for more information.
 - `disableTlsValidation`: ignore TLS certificate validation when creating a TLS connection to the authorizer. Defaults to false.
 - `endpointPath`: display state map endpoint path, defaults to `/__displaystatemap`.
 - `failWithError`: When set to `true`, will forward errors to `next` instead of ending the response directly. Defaults to `false`.
@@ -932,7 +932,7 @@ The Express request object.
 - `instanceLabel`: instance label (_required_ if using hosted authorizer)
 - `authorizerApiKey`: API key for authorizer service (_required_ if using hosted authorizer)
 - `tenantId`: Aserto tenant ID (_required_ if using hosted authorizer)
-- `authorizerCertFile`: location on the filesystem of the CA certificate that signed the Aserto authorizer self-signed certificate. See the "Certificates" section for more information.
+- `caFile`: location on the filesystem of the CA certificate that signed the Aserto authorizer self-signed certificate. See the "Certificates" section for more information.
 - `disableTlsValidation`: ignore TLS certificate validation when creating a TLS connection to the authorizer. Defaults to false.
 - `useAuthorizationHeader`: When set to `true`, will forward the Authorization header to the authorizer. The authorizer will crack open the JWT and use that as the identity context. Defaults to `true`.
 - `identityHeader`: the name of the header from which to extract the `identity` field to pass into the `authorize` call. This only happens if `useAuthorizationHeader` is false. Defaults to 'identity'.
@@ -963,9 +963,9 @@ For a hosted authorizer that has a TLS certificate that is signed by a trusted C
 
 In a development environment, [topaz](github.com/aserto-dev/topaz) automatically creates a set of self-signed certificates and certificates of the CA (certificate authority) that signed them. It places them in a well-known location on the filesystem, defaulting to `$HOME/.local/share/topaz/certs/` (or `$HOMEPATH\AppData\Local\topaz\certs\` on Windows).
 
-In order for the `aserto-node` package to perform the TLS handshake, it needs to verify the TLS certificate of Topaz using the certificate of the CA that signed it - which was placed in `$HOME/.local/share/topaz/certs/grpc-ca.crt`. Therefore, in order for this middleware to work successfully, either the `authorizerCertFile` must be set to the correct path for the CA cert file, or the `disableTlsValidation` flag must be set to `true`. The same is true for the `caFile` argument of the `DirectoryClient`.
+In order for the `aserto-node` package to perform the TLS handshake, it needs to verify the TLS certificate of Topaz using the certificate of the CA that signed it - which was placed in `$HOME/.local/share/topaz/certs/grpc-ca.crt`. Therefore, in order for this middleware to work successfully, either the `caFile` must be set to the correct path for the CA cert file, or the `disableTlsValidation` flag must be set to `true`. The same is true for the `caFile` argument of the `DirectoryClient`.
 
-Furthermore, when packaging a policy for deployment (e.g. in a Docker container) which uses `aserto-node` to communicate with an authorizer that has a self-signed TLS certificate, you must copy this CA certificate into the container as part of the Docker build (typically performed in the Dockerfile). When you do that, you'll need to override the `authorizerCertFile` option that is passed into any of the API calls defined above with the location of this cert file.
+Furthermore, when packaging a policy for deployment (e.g. in a Docker container) which uses `aserto-node` to communicate with an authorizer that has a self-signed TLS certificate, you must copy this CA certificate into the container as part of the Docker build (typically performed in the Dockerfile). When you do that, you'll need to override the `caFile` option that is passed into any of the API calls defined above with the location of this cert file.
 
 Alternately, to ignore TLS certificate validation when creating a TLS connection to the authorizer, you can set the `disableTlsValidation` option to `true` and avoid TLS certificate validation. This option is **not recommended for production**.
 

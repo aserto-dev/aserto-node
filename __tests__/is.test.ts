@@ -39,7 +39,7 @@ describe("should succeed", () => {
       policyId: "123",
       authorizerServiceUrl: "localhost:8282",
       identityHeader: "Authorization",
-      authorizerCertCAFile: process.env.CA_FILE!,
+      caFile: process.env.CA_FILE!,
     };
 
     const allowed = await is(decision, req, options, packageName, resourceMap);
@@ -66,7 +66,7 @@ describe("should succeed", () => {
       policyId: "123",
       authorizerServiceUrl: "localhost:8282",
       identityHeader: "Authorization",
-      authorizerCertCAFile: process.env.CA_FILE!,
+      caFile: process.env.CA_FILE!,
     };
 
     const allowed = await is(decision, req, options);
