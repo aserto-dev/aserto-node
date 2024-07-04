@@ -16,7 +16,7 @@ import identityContext from "./identityContext";
 import processOptions from "./processOptions";
 import { processParams } from "./processParams";
 
-export interface AuthzOptions {
+export type AuthzOptions = {
   policyRoot: string;
   instanceName?: string;
   instanceLabel?: string;
@@ -30,7 +30,8 @@ export interface AuthzOptions {
   failWithError?: boolean;
   customUserKey?: string;
   customSubjectKey?: string;
-}
+  caFile?: string;
+};
 
 const jwtAuthz = (
   optionsParam: AuthzOptions,
@@ -75,7 +76,7 @@ const jwtAuthz = (
         authorizerServiceUrl: authorizerUrl,
         tenantId: tenantId!,
         authorizerApiKey: authorizerApiKey!,
-        authorizerCertFile: authorizerCertCAFile,
+        caFile: authorizerCertCAFile,
         insecure: disableTlsValidation,
       });
 

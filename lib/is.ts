@@ -48,7 +48,7 @@ const is = async (
     authorizerServiceUrl: authorizerUrl,
     tenantId: tenantId!,
     authorizerApiKey: authorizerApiKey!,
-    authorizerCertFile: authorizerCertCAFile,
+    caFile: authorizerCertCAFile,
     insecure: disableTlsValidation,
   });
 

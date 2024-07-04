@@ -24,6 +24,7 @@ type AuthorizerConfig = {
   authorizerApiKey?: string;
   token?: string;
   authorizerCertFile?: string;
+  caFile?: string;
   insecure?: boolean;
 };
 
@@ -50,9 +51,8 @@ export class Authorizer {
 
     const baseServiceUrl =
       config.authorizerServiceUrl || "authorizer.prod.aserto.com:8443";
-    const baseCaFile = !!config.authorizerCertFile
-      ? readFileSync(config.authorizerCertFile)
-      : undefined;
+    const caFilePath = config.authorizerCertFile || config.caFile;
+    const baseCaFile = !!caFilePath ? readFileSync(caFilePath) : undefined;
 
     const insecure = config?.insecure || false;
     const baseNodeOptions = {

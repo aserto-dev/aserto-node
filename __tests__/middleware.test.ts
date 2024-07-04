@@ -51,7 +51,6 @@ describe("Middleware", () => {
       const response = middleware.Check(options);
 
       await response(request, res, next);
-      expect(next).toBeCalled();
 
       expect(next).toHaveBeenCalled();
     });
@@ -97,7 +96,7 @@ describe("Middleware", () => {
       const response = middleware.Check(options);
 
       await response(request, res, next);
-      expect(next).toBeCalledWith({
+      expect(next).toHaveBeenCalledWith({
         statusCode: 403,
         error: "Forbidden",
         message: `aserto-node: Forbidden by policy examplePolicy.check`,
@@ -148,7 +147,7 @@ describe("Middleware", () => {
       const response = middleware.Check(options);
 
       await response(request, res, next);
-      expect(next).toBeCalledWith({
+      expect(next).toHaveBeenCalledWith({
         statusCode: 403,
         error: "Forbidden",
         message: `aserto-node: Authorizer service unavailable`,
@@ -188,7 +187,6 @@ describe("Middleware", () => {
       const response = middleware.Authz();
 
       await response(request, res, next);
-      expect(next).toBeCalled();
 
       expect(next).toHaveBeenCalled();
     });
@@ -228,7 +226,7 @@ describe("Middleware", () => {
       const response = middleware.Authz();
 
       await response(request, res, next);
-      expect(next).toBeCalledWith({
+      expect(next).toHaveBeenCalledWith({
         statusCode: 403,
         error: "Forbidden",
         message: `aserto-node: Forbidden by policy examplePolicy.GET.todos`,
@@ -272,7 +270,7 @@ describe("Middleware", () => {
       const response = middleware.Authz();
 
       await response(request, res, next);
-      expect(next).toBeCalledWith({
+      expect(next).toHaveBeenCalledWith({
         statusCode: 403,
         error: "Forbidden",
         message: `aserto-node: Authorizer service unavailable`,

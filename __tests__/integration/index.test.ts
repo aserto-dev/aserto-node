@@ -1,9 +1,14 @@
+import express, { Express } from "express";
+import nJwt from "njwt";
+import request from "supertest";
+
 import {
   AnonymousIdentityMapper,
   Authorizer,
   createAsyncIterable,
   DirectoryServiceV3,
   DirectoryV3,
+  displayStateMap,
   EtagMismatchError,
   ImportMsgCase,
   ImportOpCode,
@@ -502,7 +507,7 @@ types:
     beforeEach(async () => {
       authorizerClient = new Authorizer({
         authorizerServiceUrl: "localhost:8282",
-        authorizerCertFile: await topaz.caCert(),
+        caFile: await topaz.caCert(),
       });
     });
 
@@ -527,6 +532,110 @@ types:
           },
           pathRoot: "",
         });
+      });
+    });
+  });
+
+  describe("DisplayStateMap", () => {
+    const app: Express = express();
+    const jwt = nJwt.create({ sub: "rick@the-citadel.com" }, "signingKey");
+
+    it("returns the correct data", async () => {
+      const options = {
+        policyRoot: "todoApp",
+        instanceLabel: "todo",
+        instanceName: "todo",
+        authorizerServiceUrl: "localhost:8282",
+        caFile: await topaz.caCert(),
+        failWithError: true,
+      };
+      app.use(
+        displayStateMap(
+          options,
+          undefined,
+          () => {
+            return AnonymousIdentityMapper();
+          },
+          () => {
+            return new Promise((resolve) => {
+              resolve(policyContext("todoApp", ["allowed"]));
+            });
+          }
+        )
+      );
+
+      const response = await request(app)
+        .get("/__displaystatemap")
+        .set("Content-type", "application/json")
+        .set("Authorization", `Bearer ${jwt}`);
+      expect(response.body).toEqual({
+        "todoApp/DELETE/todos/__id": {
+          allowed: false,
+        },
+        "todoApp/GET/todos": {
+          allowed: true,
+        },
+        "todoApp/GET/users/__userID": {
+          allowed: true,
+        },
+        "todoApp/POST/todos": {
+          allowed: false,
+        },
+        "todoApp/PUT/todos/__id": {
+          allowed: false,
+        },
+      });
+    });
+  });
+
+  describe("DisplayStateMap Legacy `authorizerCertCAFile`", () => {
+    const app: Express = express();
+    const jwt = nJwt.create({ sub: "rick@the-citadel.com" }, "signingKey");
+
+    it("returns the correct data", async () => {
+      const options = {
+        policyRoot: "todoApp",
+        instanceLabel: "todo",
+        instanceName: "todo",
+        authorizerServiceUrl: "localhost:8282",
+        authorizerCertCAFile: await topaz.caCert(),
+        failWithError: true,
+      };
+      app.use(
+        displayStateMap(
+          options,
+          undefined,
+          () => {
+            return AnonymousIdentityMapper();
+          },
+          () => {
+            return new Promise((resolve) => {
+              resolve(policyContext("todoApp", ["allowed"]));
+            });
+          }
+        )
+      );
+
+      const response = await request(app)
+        .get("/__displaystatemap")
+        .set("Content-type", "application/json")
+        .set("Authorization", `Bearer ${jwt}`);
+      expect(response.body).toEqual({
+        "todoApp/DELETE/todos/__id": {
+          allowed: false,
+        },
+        "todoApp/GET/todos": {
+          allowed: true,
+        },
+        "todoApp/GET/users/__userID": {
+          allowed: true,
+        },
+        "todoApp/POST/todos": {
+          allowed: false,
+        },
+        "todoApp/PUT/todos/__id": {
+          allowed: false,
+        },
       });
     });
   });
