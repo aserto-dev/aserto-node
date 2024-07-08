@@ -49,7 +49,7 @@ jobs:
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
       - uses: actions/cache@v4
         id: yarn-cache
         with:
@@ -59,7 +59,8 @@ jobs:
           key: ${{ runner.os }}-yarn-cache-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-cache-
-      - run: yarn install --frozen-lockfile
+
+      - run: yarn install --immutable
       - name: tests
         run: yarn --verbose test --verbose
 
