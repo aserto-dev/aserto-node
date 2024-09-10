@@ -33,12 +33,14 @@ describe("Is", () => {
       },
       policyInstance: {
         name: "todo",
-        instanceLabel: "todo",
       },
     };
     const result = await authorizer.Is(params);
 
-    expect(authorizer.AuthClient.is).toHaveBeenCalledWith(params);
+    expect(authorizer.AuthClient.is).toHaveBeenCalledWith({
+      ...params,
+      policyInstance: { ...params.policyInstance, instanceLabel: "todo" },
+    });
 
     expect(result).toBe(true);
 
@@ -57,7 +59,6 @@ describe("Is", () => {
       },
       policyInstance: {
         name: "todo",
-        instanceLabel: "todo",
       },
       resourceContext: {
         foo: "bar",
@@ -68,6 +69,7 @@ describe("Is", () => {
     expect(authorizer.AuthClient.is).toHaveBeenCalledWith({
       ...params,
       resourceContext: Struct.fromJson(params.resourceContext),
+      policyInstance: { ...params.policyInstance, instanceLabel: "todo" },
     });
 
     expect(result).toBe(true);
@@ -87,7 +89,6 @@ describe("Is", () => {
       },
       policyInstance: {
         name: "todo",
-        instanceLabel: "todo",
       },
       resourceContext: {
         foo: { bar: "baz" },
@@ -98,6 +99,7 @@ describe("Is", () => {
     expect(authorizer.AuthClient.is).toHaveBeenCalledWith({
       ...params,
       resourceContext: Struct.fromJson(params.resourceContext),
+      policyInstance: { ...params.policyInstance, instanceLabel: "todo" },
     });
     expect(result).toBe(true);
 

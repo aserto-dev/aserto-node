@@ -75,19 +75,8 @@ export default (
   const instanceName =
     options && typeof options.instanceName === "string" && options.instanceName;
 
-  const instanceLabel =
-    options &&
-    typeof options.instanceLabel === "string" &&
-    options.instanceLabel;
-
-  if (
-    ((instanceName && !instanceLabel) || (!instanceName && instanceLabel)) &&
-    res
-  ) {
-    return error(
-      res,
-      "must provide both an instance name and an instance label in option map"
-    );
+  if (!instanceName && res) {
+    return error(res, "must provide  an instance name in option map");
   }
   // set the policy root
   const policyRoot =
@@ -161,7 +150,6 @@ export default (
     authorizerApiKey,
     tenantId,
     instanceName,
-    instanceLabel,
     authorizerCertCAFile,
     disableTlsValidation,
     policyRoot: policyRoot! as string,

@@ -543,7 +543,6 @@ types:
     it("returns the correct data", async () => {
       const options = {
         policyRoot: "todoApp",
-        instanceLabel: "todo",
         instanceName: "todo",
         authorizerServiceUrl: "localhost:8282",
         caFile: await topaz.caCert(),
@@ -595,7 +594,6 @@ types:
     it("returns the correct data", async () => {
       const options = {
         policyRoot: "todoApp",
-        instanceLabel: "todo",
         instanceName: "todo",
         authorizerServiceUrl: "localhost:8282",
         authorizerCertCAFile: await topaz.caCert(),

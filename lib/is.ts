@@ -29,7 +29,6 @@ const is = async (
     authorizerApiKey,
     tenantId,
     instanceName,
-    instanceLabel,
     policyRoot,
     identityContextOptions,
     authorizerCertCAFile,
@@ -54,10 +53,7 @@ const is = async (
 
   const policyCtx = policyContext(policy, [decision]);
 
-  const policyInst =
-    instanceName && instanceLabel
-      ? policyInstance(instanceName as string, instanceLabel as string)
-      : undefined;
+  const policyInst = instanceName ? policyInstance(instanceName) : undefined;
 
   const identityCtx = identityContext(req, identityContextOptions);
 

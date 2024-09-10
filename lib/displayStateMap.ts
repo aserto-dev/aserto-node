@@ -55,7 +55,6 @@ const displayStateMap = (
       authorizerApiKey,
       tenantId,
       instanceName,
-      instanceLabel,
       policyRoot,
       identityContextOptions,
       authorizerCertCAFile,
@@ -86,10 +85,9 @@ const displayStateMap = (
           : resourceMapper
         : BodyResourceMapper(req);
 
-      const policyInst =
-        instanceName && instanceLabel
-          ? policyInstance(instanceName as string, instanceLabel as string)
-          : undefined;
+      const policyInst = instanceName
+        ? policyInstance(instanceName)
+        : undefined;
 
       const decisionTreeOpt = decisionTreeOptions("SLASH");
 
