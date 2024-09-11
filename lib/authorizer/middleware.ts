@@ -72,9 +72,7 @@ export class Middleware {
   }
 
   private policyInstance(): PolicyInstance | undefined {
-    return this.policy.name && this.policy.instanceLabel
-      ? policyInstance(this.policy.name, this.policy.instanceLabel)
-      : undefined;
+    return this.policy.name ? policyInstance(this.policy.name) : undefined;
   }
 
   private async identityContext(req: Request): Promise<IdentityContext> {

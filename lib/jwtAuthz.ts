@@ -54,7 +54,6 @@ const jwtAuthz = (
       authorizerApiKey,
       tenantId,
       instanceName,
-      instanceLabel,
       policyRoot,
       identityContextOptions,
       authorizerCertCAFile,
@@ -94,10 +93,9 @@ const jwtAuthz = (
           : PolicyPathMapper(policyRoot, req);
       }
 
-      const policyInst =
-        instanceName && instanceLabel
-          ? policyInstance(instanceName as string, instanceLabel as string)
-          : undefined;
+      const policyInst = instanceName
+        ? policyInstance(instanceName)
+        : undefined;
 
       return client.Is({
         identityContext: identityCtx,

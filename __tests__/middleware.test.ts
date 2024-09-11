@@ -19,7 +19,6 @@ describe("Middleware", () => {
       const policy = {
         root: "examplePolicy",
         name: "policyName",
-        instanceLabel: "instanceLabel",
         decision: "allowed",
         path: "examplePath",
       };
@@ -60,7 +59,6 @@ describe("Middleware", () => {
       const policy = {
         root: "examplePolicy",
         name: "policyName",
-        instanceLabel: "instanceLabel",
         decision: "allowed",
         path: "examplePath",
       };
@@ -108,7 +106,6 @@ describe("Middleware", () => {
       const policy = {
         root: "examplePolicy",
         name: "policyName",
-        instanceLabel: "instanceLabel",
         decision: "allowed",
         path: "examplePath",
       };
@@ -161,7 +158,6 @@ describe("Middleware", () => {
       const policy = {
         root: "examplePolicy",
         name: "policyName",
-        instanceLabel: "instanceLabel",
         decision: "allowed",
         path: "examplePath",
       };
@@ -196,7 +192,6 @@ describe("Middleware", () => {
       const policy = {
         root: "examplePolicy",
         name: "policyName",
-        instanceLabel: "instanceLabel",
         decision: "allowed",
         path: "examplePath",
       };
@@ -238,7 +233,6 @@ describe("Middleware", () => {
       const policy = {
         root: "examplePolicy",
         name: "policyName",
-        instanceLabel: "instanceLabel",
         decision: "allowed",
         path: "examplePath",
       };

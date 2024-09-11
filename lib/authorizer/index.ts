@@ -16,6 +16,7 @@ import {
 import { createGrpcTransport } from "@connectrpc/connect-node";
 
 import { handleError, setHeader, traceMessage } from "../util/connect";
+import policyInstance from "./model/policyInstance";
 import { DecisionTreeRequest, IsRequest, QueryRequest } from "./type";
 
 type AuthorizerConfig = {
@@ -77,6 +78,9 @@ export class Authorizer {
         resourceContext: params.resourceContext
           ? Struct.fromJson(params.resourceContext)
           : undefined,
+        policyInstance:
+          params.policyInstance &&
+          policyInstance(params.policyInstance.name || ""),
       });
       const response = await this.AuthClient.is(request);
 
@@ -95,6 +99,9 @@ export class Authorizer {
         resourceContext: params.resourceContext
           ? Struct.fromJson(params.resourceContext)
           : undefined,
+        policyInstance:
+          params.policyInstance &&
+          policyInstance(params.policyInstance.name || ""),
       });
 
       const response = await this.AuthClient.query(request);
@@ -119,6 +126,9 @@ export class Authorizer {
         resourceContext: params.resourceContext
           ? Struct.fromJson(params.resourceContext)
           : undefined,
+        policyInstance:
+          params.policyInstance &&
+          policyInstance(params.policyInstance.name || ""),
       });
       const response = await this.AuthClient.decisionTree(request);
 

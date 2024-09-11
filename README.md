@@ -184,7 +184,6 @@ interface Middleware {
 type Policy = {
   root: string;
   name?: string;
-  instanceLabel?: string;
   decision?: string;
   path?: string;
 };
@@ -222,7 +221,6 @@ const restMw = new Middleware({
   client: client,
   policy: {
     name: 'todo',
-    instanceLabel: 'todo',
     root: 'todoApp',
   },
   resourceMapper: async (req: express.Request) => {
@@ -245,7 +243,6 @@ const rebacMw = new Middleware({
   client: authClient,
   policy: {
     name: 'policy-rebac',
-    instanceLabel: 'policy-rebac',
     root: 'rebac',
   }
 })
@@ -792,7 +789,6 @@ const options = {
   authorizerServiceUrl: 'localhost:8282', // required - must pass a valid host:port
   policyRoot: 'mycars', // required - must be a string representing the policy root (the first component of the policy module name)
   instanceName: 'instance-name', // optional (required only for a hosted authorizer)
-  instanceLabel: 'instance-label' // optional (required only for a hosted authorizer)
 };
 
 app.get('/users/:id',
@@ -817,7 +813,6 @@ By default, `jwtAuthz` derives the policy file name and resource key from the Ex
 - `authorizerServiceUrl`: hostname:port of authorizer service (_required_)
 - `policyRoot`: Policy root (_required_)
 - `instanceName`: instance name (_required_ if using hosted authorizer)
-- `instanceLabel`: instance label (_required_ if using hosted authorizer)
 - `authorizerApiKey`: API key for authorizer service (_required_ if using hosted authorizer)
 - `tenantId`: Aserto tenant ID (_required_ if using hosted authorizer)
 - `caFile`: location on the filesystem of the CA certificate that signed the Aserto authorizer self-signed certificate. See the "Certificates" section for more information.
@@ -866,7 +861,6 @@ app.use(displayStateMap(options));
 - `authorizerServiceUrl`: hostname:port of authorizer service (_required_)
 - `policyRoot`: Policy root (_required_)
 - `instanceName`: instance name (_required_ if using hosted authorizer)
-- `instanceLabel`: instance label (_required_ if using hosted authorizer)
 - `authorizerApiKey`: API key for authorizer service (_required_ if using hosted authorizer)
 - `tenantId`: Aserto tenant ID (_required_ if using hosted authorizer)
 - `caFile`: location on the filesystem of the CA certificate that signed the Aserto authorizer self-signed certificate. See the "Certificates" section for more information.
@@ -929,7 +923,6 @@ The Express request object.
 - `authorizerServiceUrl`: hostname:port of authorizer service (_required_)
 - `policyRoot`: Policy root (_required_)
 - `instanceName`: instance name (_required_ if using hosted authorizer)
-- `instanceLabel`: instance label (_required_ if using hosted authorizer)
 - `authorizerApiKey`: API key for authorizer service (_required_ if using hosted authorizer)
 - `tenantId`: Aserto tenant ID (_required_ if using hosted authorizer)
 - `caFile`: location on the filesystem of the CA certificate that signed the Aserto authorizer self-signed certificate. See the "Certificates" section for more information.
