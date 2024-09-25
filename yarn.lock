@@ -31,16 +31,16 @@ __metadata:
     "@aserto/ts-linting-configs": "npm:^2.7.0"
     "@babel/core": "npm:^7.25.2"
     "@bufbuild/protobuf": "npm:^1.10.0"
-    "@connectrpc/connect": "npm:^1.4.0"
-    "@connectrpc/connect-node": "npm:^1.4.0"
+    "@connectrpc/connect": "npm:^1.5.0"
+    "@connectrpc/connect-node": "npm:^1.5.0"
     "@types/express": "npm:^4.17.21"
-    "@types/jest": "npm:^29.5.12"
-    "@types/node": "npm:^20.16.5"
+    "@types/jest": "npm:^29.5.13"
+    "@types/node": "npm:^20.16.7"
     "@types/supertest": "npm:^6.0.2"
     "@typescript-eslint/eslint-plugin": "npm:^6.21.0"
     "@typescript-eslint/parser": "npm:^6.21.0"
     dotenv: "npm:^16.4.5"
-    eslint: "npm:^8.57.0"
+    eslint: "npm:^8.57.1"
     eslint-config-prettier: "npm:^8.10.0"
     eslint-plugin-prettier: "npm:^4.2.1"
     eslint-plugin-simple-import-sort: "npm:^10.0.0"
@@ -48,7 +48,7 @@ __metadata:
     express: "npm:^4.21.0"
     jest: "npm:^29.7.0"
     jwt-decode: "npm:^3.1.2"
-    knip: "npm:^5.30.1"
+    knip: "npm:^5.30.5"
     njwt: "npm:^2.0.1"
     node-mocks-http: "npm:^1.16.0"
     prettier: "npm:^2.8.8"
@@ -474,24 +474,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@connectrpc/connect-node@npm:^1.4.0":
-  version: 1.4.0
-  resolution: "@connectrpc/connect-node@npm:1.4.0"
+"@connectrpc/connect-node@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "@connectrpc/connect-node@npm:1.5.0"
   dependencies:
-    undici: "npm:^5.28.3"
+    undici: "npm:^5.28.4"
   peerDependencies:
-    "@bufbuild/protobuf": ^1.4.2
-    "@connectrpc/connect": 1.4.0
-  checksum: 10/3b0647b3f202222fafe42a95db72d5dd96acf2307238324158240bdad5af45b3c3851899e7ea33cbefd484c69ecd9d6759a52dd24f48b30c239c445069c5075e
+    "@bufbuild/protobuf": ^1.10.0
+    "@connectrpc/connect": 1.5.0
+  checksum: 10/237a844f8b30ffeaa1ea5e566ce3cbfbb88a99c293d3c85fa68962509688f0c025ceadb8f1e8faf8e1a1388e84493fa3feca60b80c10dcca59105fe32492c7d8
   languageName: node
   linkType: hard
 
-"@connectrpc/connect@npm:^1.4.0":
-  version: 1.4.0
-  resolution: "@connectrpc/connect@npm:1.4.0"
+"@connectrpc/connect@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "@connectrpc/connect@npm:1.5.0"
   peerDependencies:
-    "@bufbuild/protobuf": ^1.4.2
-  checksum: 10/5e84fbba544f7e52533bdd0058caaa6d5c89903f522fbd9551c6bad0cd2fea2d3f14c7396696609d1787a5e2018054dd53db40b2d08c55975ff81334074eeeae
+    "@bufbuild/protobuf": ^1.10.0
+  checksum: 10/4643585b8610b84e985474346f95b98168cec028ffa82e3b20071b916cea6ccbd8042d58c06a267a3abcfbf39a713acf939eda6aa41b48753458d2651106e366
   languageName: node
   linkType: hard
 
@@ -530,10 +530,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/js@npm:8.57.0":
-  version: 8.57.0
-  resolution: "@eslint/js@npm:8.57.0"
-  checksum: 10/3c501ce8a997cf6cbbaf4ed358af5492875e3550c19b9621413b82caa9ae5382c584b0efa79835639e6e0ddaa568caf3499318e5bdab68643ef4199dce5eb0a0
+"@eslint/js@npm:8.57.1":
+  version: 8.57.1
+  resolution: "@eslint/js@npm:8.57.1"
+  checksum: 10/7562b21be10c2adbfa4aa5bb2eccec2cb9ac649a3569560742202c8d1cb6c931ce634937a2f0f551e078403a1c1285d6c2c0aa345dafc986149665cd69fe8b59
   languageName: node
   linkType: hard
 
@@ -544,14 +544,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@humanwhocodes/config-array@npm:^0.11.14":
-  version: 0.11.14
-  resolution: "@humanwhocodes/config-array@npm:0.11.14"
+"@humanwhocodes/config-array@npm:^0.13.0":
+  version: 0.13.0
+  resolution: "@humanwhocodes/config-array@npm:0.13.0"
   dependencies:
-    "@humanwhocodes/object-schema": "npm:^2.0.2"
+    "@humanwhocodes/object-schema": "npm:^2.0.3"
     debug: "npm:^4.3.1"
     minimatch: "npm:^3.0.5"
-  checksum: 10/3ffb24ecdfab64014a230e127118d50a1a04d11080cbb748bc21629393d100850496456bbcb4e8c438957fe0934430d731042f1264d6a167b62d32fc2863580a
+  checksum: 10/524df31e61a85392a2433bf5d03164e03da26c03d009f27852e7dcfdafbc4a23f17f021dacf88e0a7a9fe04ca032017945d19b57a16e2676d9114c22a53a9d11
   languageName: node
   linkType: hard
 
@@ -562,7 +562,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@humanwhocodes/object-schema@npm:^2.0.2":
+"@humanwhocodes/object-schema@npm:^2.0.3":
   version: 2.0.3
   resolution: "@humanwhocodes/object-schema@npm:2.0.3"
   checksum: 10/05bb99ed06c16408a45a833f03a732f59bf6184795d4efadd33238ff8699190a8c871ad1121241bb6501589a9598dc83bf25b99dcbcf41e155cdf36e35e937a3
@@ -1131,13 +1131,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jest@npm:^29.5.12":
-  version: 29.5.12
-  resolution: "@types/jest@npm:29.5.12"
+"@types/jest@npm:^29.5.13":
+  version: 29.5.13
+  resolution: "@types/jest@npm:29.5.13"
   dependencies:
     expect: "npm:^29.0.0"
     pretty-format: "npm:^29.0.0"
-  checksum: 10/312e8dcf92cdd5a5847d6426f0940829bca6fe6b5a917248f3d7f7ef5d85c9ce78ef05e47d2bbabc40d41a930e0e36db2d443d2610a9e3db9062da2d5c904211
+  checksum: 10/7d6e3e4ef4b1cab0f61270d55764709512fdfbcb1bd47c0ef44117d48490529c1f264dacf3440b9188363e99e290b80b79c529eadc3af2184116a90f6856b192
   languageName: node
   linkType: hard
 
@@ -1169,12 +1169,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^20.16.5":
-  version: 20.16.5
-  resolution: "@types/node@npm:20.16.5"
+"@types/node@npm:*, @types/node@npm:^20.16.7":
+  version: 20.16.7
+  resolution: "@types/node@npm:20.16.7"
   dependencies:
     undici-types: "npm:~6.19.2"
-  checksum: 10/39a8457149dc17cdea57afc90d4da53182fdb8b958d5bb065a15d123d81d4efa6b51a0de92428d05ead2e63ce07195586f71083401b99cdbcd04662344fbf7a1
+  checksum: 10/931d6689af8d02b578a1490475df025063ca1f1c7c064ce891f7ac4da38f28bfda949e79569ac49cb5cf492b2caf91d31aecda6a4efc099e4af4be42ae7315e5
   languageName: node
   linkType: hard
 
@@ -2903,15 +2903,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^8.2.0, eslint@npm:^8.57.0":
-  version: 8.57.0
-  resolution: "eslint@npm:8.57.0"
+"eslint@npm:^8.2.0, eslint@npm:^8.57.1":
+  version: 8.57.1
+  resolution: "eslint@npm:8.57.1"
   dependencies:
     "@eslint-community/eslint-utils": "npm:^4.2.0"
     "@eslint-community/regexpp": "npm:^4.6.1"
     "@eslint/eslintrc": "npm:^2.1.4"
-    "@eslint/js": "npm:8.57.0"
-    "@humanwhocodes/config-array": "npm:^0.11.14"
+    "@eslint/js": "npm:8.57.1"
+    "@humanwhocodes/config-array": "npm:^0.13.0"
     "@humanwhocodes/module-importer": "npm:^1.0.1"
     "@nodelib/fs.walk": "npm:^1.2.8"
     "@ungap/structured-clone": "npm:^1.2.0"
@@ -2947,7 +2947,7 @@ __metadata:
     text-table: "npm:^0.2.0"
   bin:
     eslint: bin/eslint.js
-  checksum: 10/00496e218b23747a7a9817bf58b522276d0dc1f2e546dceb4eea49f9871574088f72f1f069a6b560ef537efa3a75261b8ef70e51ef19033da1cc4c86a755ef15
+  checksum: 10/5504fa24879afdd9f9929b2fbfc2ee9b9441a3d464efd9790fbda5f05738858530182029f13323add68d19fec749d3ab4a70320ded091ca4432b1e9cc4ed104c
   languageName: node
   linkType: hard
 
@@ -4710,9 +4710,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"knip@npm:^5.30.1":
-  version: 5.30.1
-  resolution: "knip@npm:5.30.1"
+"knip@npm:^5.30.5":
+  version: 5.30.5
+  resolution: "knip@npm:5.30.5"
   dependencies:
     "@nodelib/fs.walk": "npm:1.2.8"
     "@snyk/github-codeowners": "npm:1.1.0"
@@ -4725,7 +4725,7 @@ __metadata:
     picocolors: "npm:^1.0.0"
     picomatch: "npm:^4.0.1"
     pretty-ms: "npm:^9.0.0"
-    smol-toml: "npm:^1.1.4"
+    smol-toml: "npm:^1.3.0"
     strip-json-comments: "npm:5.0.1"
     summary: "npm:2.1.0"
     zod: "npm:^3.22.4"
@@ -4736,7 +4736,7 @@ __metadata:
   bin:
     knip: bin/knip.js
     knip-bun: bin/knip-bun.js
-  checksum: 10/20859a9845ef8145fb38173c518d42240f03697af5c5d1abd2ef08d3baaf8314e1c136f7b49859d2d2fd827c9362eb78138b37b61699d97b3e140e3346195ebc
+  checksum: 10/0cf47fee73ae57a41014a78cb6768228746b8b8fcfd908262caae2c857f5b04c86b6ae2184f5534345fcad5931d8f6a8ecd274a80b1103ab1115ae91785d574a
   languageName: node
   linkType: hard
 
@@ -6039,10 +6039,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"smol-toml@npm:^1.1.4":
-  version: 1.2.2
-  resolution: "smol-toml@npm:1.2.2"
-  checksum: 10/38fe25141e369d48389845e8e9bea95dce698006ec73a0a491d828c29a199ccbece6e39cc122c7c6eb408bbf82ef64c0627ce4ddf9bdf8b9797d770efb81f162
+"smol-toml@npm:^1.3.0":
+  version: 1.3.0
+  resolution: "smol-toml@npm:1.3.0"
+  checksum: 10/dc3e49a9202abca4a60c352ff48c8088a0c48886924b81a0fbab8c66d4575aaa1867f4eac783acea00dcfa34047ccd22634040d2282f9ccb05dc73511c1b0e4e
   languageName: node
   linkType: hard
 
@@ -6618,7 +6618,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:^5.28.3":
+"undici@npm:^5.28.4":
   version: 5.28.4
   resolution: "undici@npm:5.28.4"
   dependencies:

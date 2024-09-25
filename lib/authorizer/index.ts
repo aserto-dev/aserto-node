@@ -27,6 +27,7 @@ type AuthorizerConfig = {
   authorizerCertFile?: string;
   caFile?: string;
   insecure?: boolean;
+  customHeaders?: { [key: string]: unknown };
 };
 
 type Path = {
@@ -59,6 +60,7 @@ export class Authorizer {
     const baseNodeOptions = {
       rejectUnauthorized: !insecure,
       ca: baseCaFile,
+      headers: config.customHeaders,
     };
 
     const baseGrpcTransport = createGrpcTransport({

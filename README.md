@@ -50,6 +50,8 @@ type AuthorizerConfig = {
   token?: string;
   caFile?: string;
   insecure?: boolean;
+  customHeaders?: { [key: string]: unknown };
+
 };
 ```
 ```ts
@@ -429,6 +431,8 @@ type ServiceConfig = {
   caFile?: string;
   rejectUnauthorized?: boolean;
   insecure?: boolean;
+  customHeaders?: { [key: string]: unknown };
+
 };
 
 export type DirectoryV3Config = ServiceConfig & {

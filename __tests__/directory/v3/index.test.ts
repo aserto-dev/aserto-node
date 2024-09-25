@@ -59,6 +59,9 @@ describe("DirectoryV3", () => {
       url: "example.com",
       tenantId: "tenantId",
       apiKey: "apiKey",
+      customHeaders: {
+        foo: "bar",
+      },
     };
     const directory = DirectoryServiceV3(config);
 
@@ -83,16 +86,25 @@ describe("DirectoryV3", () => {
       tenantId: "tenantId",
       apiKey: "apiKey",
       caFile: "caFile",
+      customHeaders: {
+        base: "bar",
+      },
       reader: {
         url: "readerUrl",
         apiKey: "readerApiKey",
         tenantId: "readerTenantId",
         caFile: "readerCaFile",
+        customHeaders: {
+          reader: "bar",
+        },
       },
       writer: {
         url: "writerUrl",
         apiKey: "writerApiKey",
         tenantId: "writerTenantId",
+        customHeaders: {
+          writer: "bar",
+        },
       },
       importer: {
         url: "importerUrl",
@@ -101,6 +113,7 @@ describe("DirectoryV3", () => {
       },
       exporter: {
         caFile: "exporterCaFile",
+        customHeaders: {},
       },
       model: {
         apiKey: "modelApiKey",
@@ -116,42 +129,76 @@ describe("DirectoryV3", () => {
         expect.objectContaining({
           baseUrl: "https://directory.prod.aserto.com:8443",
           httpVersion: "2",
-          nodeOptions: { ca: "caFile", rejectUnauthorized: true },
+          nodeOptions: {
+            ca: "caFile",
+            rejectUnauthorized: true,
+            headers: {
+              base: "bar",
+            },
+          },
         }),
       ],
       [
         expect.objectContaining({
           baseUrl: "https://readerUrl",
           httpVersion: "2",
-          nodeOptions: { ca: "readerCaFile", rejectUnauthorized: true },
+          nodeOptions: {
+            ca: "readerCaFile",
+            rejectUnauthorized: true,
+            headers: {
+              reader: "bar",
+            },
+          },
         }),
       ],
       [
         expect.objectContaining({
           baseUrl: "https://writerUrl",
           httpVersion: "2",
-          nodeOptions: { ca: "caFile", rejectUnauthorized: true },
+          nodeOptions: {
+            ca: "caFile",
+            rejectUnauthorized: true,
+            headers: {
+              writer: "bar",
+            },
+          },
         }),
       ],
       [
         expect.objectContaining({
           baseUrl: "https://importerUrl",
           httpVersion: "2",
-          nodeOptions: { ca: "caFile", rejectUnauthorized: true },
+          nodeOptions: {
+            ca: "caFile",
+            rejectUnauthorized: true,
+            headers: {
+              base: "bar",
+            },
+          },
         }),
       ],
       [
         expect.objectContaining({
           baseUrl: "https://directory.prod.aserto.com:8443",
           httpVersion: "2",
-          nodeOptions: { ca: "exporterCaFile", rejectUnauthorized: true },
+          nodeOptions: {
+            ca: "exporterCaFile",
+            rejectUnauthorized: true,
+            headers: {},
+          },
         }),
       ],
       [
         expect.objectContaining({
           baseUrl: "https://directory.prod.aserto.com:8443",
           httpVersion: "2",
-          nodeOptions: { ca: "caFile", rejectUnauthorized: true },
+          nodeOptions: {
+            ca: "caFile",
+            rejectUnauthorized: true,
+            headers: {
+              base: "bar",
+            },
+          },
         }),
       ],
     ]);

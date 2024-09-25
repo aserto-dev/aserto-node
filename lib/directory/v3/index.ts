@@ -141,6 +141,11 @@ export class DirectoryV3 {
       );
     };
 
+    const definedProps = (obj: object) =>
+      Object.fromEntries(
+        Object.entries(obj).filter(([_k, v]) => v !== undefined)
+      );
+
     const createTransport = (
       config: ServiceConfig | undefined,
       fallback: ServiceConfig | undefined
@@ -168,7 +173,10 @@ export class DirectoryV3 {
           httpVersion: "2",
           baseUrl: `https://${serviceUrl || "directory.prod.aserto.com:8443"}`,
           interceptors: interceptors,
-          nodeOptions: nodeOptions,
+          nodeOptions: Object.assign(
+            definedProps(baseNodeOptions),
+            definedProps(nodeOptions)
+          ),
         });
       }
       return baseGrpcTransport;
@@ -178,6 +186,7 @@ export class DirectoryV3 {
       return {
         rejectUnauthorized,
         ca: config?.caFile ? readFileSync(config.caFile) : baseCaFile,
+        headers: config?.customHeaders,
       };
     };
 
@@ -197,7 +206,11 @@ export class DirectoryV3 {
       ? readFileSync(config.caFile)
       : undefined;
 
-    const baseNodeOptions = { rejectUnauthorized, ca: baseCaFile };
+    const baseNodeOptions = {
+      rejectUnauthorized,
+      ca: baseCaFile,
+      headers: config.customHeaders,
+    };
     const interceptors = [baseServiceHeaders];
     if (process.env.NODE_TRACE_MESSAGE) {
       interceptors.push(traceMessage);
