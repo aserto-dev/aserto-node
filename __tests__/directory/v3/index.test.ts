@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import { describe } from "node:test";
 import { ExportResponse } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
 import { ImportResponse } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
 import {
@@ -494,10 +495,16 @@ describe("DirectoryV3", () => {
         objectType: "group",
         objectId: "admin",
       };
-      const result = await directory.checkPermission(params);
+      const options = {
+        headers: {
+          customKey: "customValue",
+        },
+      };
+      const result = await directory.checkPermission(params, options);
 
       expect(directory.ReaderClient.checkPermission).toHaveBeenCalledWith(
-        params
+        params,
+        options
       );
 
       expect(result?.check).toBe(true);
@@ -595,7 +602,10 @@ describe("DirectoryV3", () => {
       };
       const result = await directory.checkRelation(params);
 
-      expect(directory.ReaderClient.checkRelation).toHaveBeenCalledWith(params);
+      expect(directory.ReaderClient.checkRelation).toHaveBeenCalledWith(
+        params,
+        undefined
+      );
       expect(result?.check).toBe(true);
 
       mockCheckRelation.mockReset();
@@ -636,7 +646,10 @@ describe("DirectoryV3", () => {
       };
       const result = await directory.check(params);
 
-      expect(directory.ReaderClient.check).toHaveBeenCalledWith(params);
+      expect(directory.ReaderClient.check).toHaveBeenCalledWith(
+        params,
+        undefined
+      );
       expect(result?.check).toBe(true);
 
       mockCheck.mockReset();
@@ -730,7 +743,7 @@ describe("DirectoryV3", () => {
 
       await directory.objects(params);
 
-      expect(mockGetObjects).toHaveBeenCalledWith(params);
+      expect(mockGetObjects).toHaveBeenCalledWith(params, undefined);
       const result = await directory.objects(params);
 
       expect(result).toEqual({ results: [] });
@@ -772,15 +785,20 @@ describe("DirectoryV3", () => {
 
       await directory.setObject(params);
 
-      expect(mockSetObject).toHaveBeenCalledWith({
-        object: {
-          id: "123",
-          type: "user",
-          displayName: "test",
-          etag: "",
-          properties: objectPropertiesAsStruct(params.object?.properties || {}),
+      expect(mockSetObject).toHaveBeenCalledWith(
+        {
+          object: {
+            id: "123",
+            type: "user",
+            displayName: "test",
+            etag: "",
+            properties: objectPropertiesAsStruct(
+              params.object?.properties || {}
+            ),
+          },
         },
-      });
+        undefined
+      );
 
       mockSetObject.mockReset();
     });
@@ -907,7 +925,7 @@ describe("DirectoryV3", () => {
       };
       const result = await directory.graph(params);
 
-      expect(mockGetGraph).toHaveBeenCalledWith(params);
+      expect(mockGetGraph).toHaveBeenCalledWith(params, undefined);
       expect(result).toEqual({ results: [], trace: [] });
 
       mockGetGraph.mockReset();
@@ -940,7 +958,10 @@ describe("DirectoryV3", () => {
       const params = { objectId: "123", objectType: "user" };
       await directory.deleteObject(params);
 
-      expect(directory.WriterClient.deleteObject).toHaveBeenCalledWith(params);
+      expect(directory.WriterClient.deleteObject).toHaveBeenCalledWith(
+        params,
+        undefined
+      );
 
       mockDeleteObject.mockReset();
     });
@@ -1039,7 +1060,7 @@ describe("DirectoryV3", () => {
 
       await directory.relations(params);
 
-      expect(mockGetRelations).toHaveBeenCalledWith(params);
+      expect(mockGetRelations).toHaveBeenCalledWith(params, undefined);
       const result = await directory.relations(params);
 
       expect(result).toEqual({ results: [], objects: {} });
@@ -1085,15 +1106,18 @@ describe("DirectoryV3", () => {
 
       await directory.setRelation(params);
 
-      expect(mockSetRelation).toHaveBeenCalledWith({
-        relation: {
-          subjectType: "user",
-          subjectId: "123",
-          objectType: "identity",
-          objectId: "identity",
-          relation: "identifier",
+      expect(mockSetRelation).toHaveBeenCalledWith(
+        {
+          relation: {
+            subjectType: "user",
+            subjectId: "123",
+            objectType: "identity",
+            objectId: "identity",
+            relation: "identifier",
+          },
         },
-      });
+        undefined
+      );
 
       mockSetRelation.mockReset();
     });
@@ -1127,7 +1151,8 @@ describe("DirectoryV3", () => {
       const result = await directory.deleteRelation(params);
 
       expect(directory.WriterClient.deleteRelation).toHaveBeenCalledWith(
-        params
+        params,
+        undefined
       );
       expect(result).toEqual({});
 
@@ -1261,7 +1286,7 @@ describe("DirectoryV3", () => {
       const params = createAsyncIterable([]);
       await directory.import(params);
 
-      expect(mockImport).toHaveBeenCalledWith(params);
+      expect(mockImport).toHaveBeenCalledWith(params, undefined);
 
       mockImport.mockReset();
     });
@@ -1289,7 +1314,7 @@ describe("DirectoryV3", () => {
 
       await directory.export({ options: "DATA" });
 
-      expect(mockExport).toHaveBeenCalledWith({ options: 24 });
+      expect(mockExport).toHaveBeenCalledWith({ options: 24 }, undefined);
 
       mockExport.mockReset();
     });

@@ -111,7 +111,7 @@ authClient
 ### Methods
 ```ts
 // Is
-// (method) Authorizer.Is(params: IsRequest): Promise<boolean>
+// (method) Authorizer.Is(params: IsRequest, options?: CallOptions): Promise<boolean>
 await authClient
   .Is({
     identityContext: identityContext(
@@ -126,7 +126,7 @@ await authClient
   })
 
 // Query
-// (method) Authorizer.Query(params: QueryRequest): Promise<JsonObject>
+// (method) Authorizer.Query(params: QueryRequest, options?: CallOptions): Promise<JsonObject>
 await authClient
   .Query({
     identityContext: identityContext(
@@ -143,7 +143,7 @@ await authClient
 
 
 // DecisionTree
-// (method) Authorizer.DecisionTree(params: DecisionTreeRequest): Promise<{
+// (method) Authorizer.DecisionTree(params: DecisionTreeRequest, options?: CallOptions): Promise<{
 //     path: Path;
 //     pathRoot: string;
 // }>
@@ -162,9 +162,17 @@ await authClient
 
 
 // ListPolicies
-// (method) Authorizer.ListPolicies(params: PlainMessage<ListPoliciesRequest>): Promise<Module[]>
+// (method) Authorizer.ListPolicies(params: PlainMessage<ListPoliciesRequest>, options?: CallOptions): Promise<Module[]>
 await authClient
   .ListPolicies({ policyInstance: policyInstance("todo", "todo") })
+```
+
+#### Custom Headers
+```ts
+await authClient.ListPolicies(
+  { policyInstance: policyInstance("todo", "todo") },
+  { headers: { customKey: "customValue" } }
+);
 ```
 
 ### Middleware
@@ -172,6 +180,7 @@ await authClient
 When authorization middleware is configured and attached to a server, it examines incoming requests, extracts authorization parameters like the caller's identity, calls the Aserto authorizers, and rejects messages if their access is denied.
 
 `failWithError`: When set to `true`, will forward errors to `next` instead of ending the response directly.
+`callOptions`: Options for a call.(see: https://github.com/connectrpc/connect-es/blob/v1.5.0/packages/connect/src/call-options.ts#L21-L54)
 
 ```ts
 interface Middleware {
@@ -181,6 +190,7 @@ interface Middleware {
   identityMapper?: IdentityMapper;
   policyMapper?: PolicyMapper;
   failWithError?: boolean;
+  callOptions?: CallOptions;
 }
 
 type Policy = {
@@ -486,7 +496,7 @@ const directoryClient = DirectoryServiceV3({
 
 #### 'object' function
 
-`object({ objectType: "type-name", objectId: "object-id" })`:
+`object({ objectType: "type-name", objectId: "object-id" }, options?: CallOptions)`:
 
 Get an object instance with the type `type-name` and the id `object-id`. For example:
 
@@ -549,7 +559,7 @@ const relation = await directoryClient.relation({
 
 #### 'setObject' function
 
-`setObject({ object: $Object })`:
+`setObject({ object: $Object }, options?: CallOptions)`:
 
 Create an object instance with the specified fields. For example:
 
@@ -569,7 +579,7 @@ const user = await directoryClient.setObject(
 
 #### 'setRelation' function
 
-`setRelation({ relation: Relation })`:
+`setRelation({ relation: Relation }, options?: CallOptions)`:
 
 Create a relation with a specified name between two objects. For example:
 
@@ -585,7 +595,7 @@ const relation = await directoryClient.setRelation({
 
 #### 'deleteObject' function
 
-`deleteObject({ objectType: "type-name", objectId: "object-id", withRelations: false })`:
+`deleteObject({ objectType: "type-name", objectId: "object-id", withRelations: false }, options?: CallOptions)`:
 
 Deletes an object instance with the specified type and key. For example:
 
@@ -616,7 +626,7 @@ You can evaluate graph queries over the directory, to determine whether a subjec
 
 #### 'checkPermission' function
 
-`checkPermission({ objectType: string, objectId: string, permission: string, subjectType: string, subjectId: string, trace: boolean })`:
+`checkPermission({ objectType: string, objectId: string, permission: string, subjectType: string, subjectId: string, trace: boolean }, options?: CallOptions)`:
 
 Check that an `user` object with the key `euang@acmecorp.com` has the `read` permission in the `admin` group:
 
@@ -632,7 +642,7 @@ const check = await directoryClient.checkPermission({
 
 #### 'checkRelation' function
 
-`checkRelation({ objectType: string, objectId: string, relation: string, subjectType: string, subjectId: string, trace: boolean })`:
+`checkRelation({ objectType: string, objectId: string, relation: string, subjectType: string, subjectId: string, trace: boolean }, options?: CallOptions)`:
 
 Check that `euang@acmecorp.com` has an `identifier` relation to an object with key `euang@acmecorp.com` and type `identity`:
 
@@ -773,7 +783,28 @@ await (readAsyncIterable(resp))
 const response = await readAsyncIterable(
   await directoryClient.export({ options: "DATA" })
 )
+
 ```
+
+
+### Custom Headers
+
+```ts
+// passing custom headers to a request
+const user = await directoryClient.object(
+  {
+    objectType: "user",
+    objectId: "euang@acmecorp.com",
+  },
+  {
+    headers: {
+      customKey: "customValue",
+    },
+  }
+);
+```
+
+
 
 ## Deprecated Methods
 

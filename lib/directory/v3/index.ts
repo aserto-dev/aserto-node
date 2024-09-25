@@ -23,6 +23,7 @@ import {
   Struct,
 } from "@bufbuild/protobuf";
 import {
+  CallOptions,
   createPromiseClient,
   Interceptor,
   PromiseClient,
@@ -251,9 +252,9 @@ export class DirectoryV3 {
     this.CreateTransport = createTransport;
   }
 
-  async checkPermission(params: CheckPermissionRequest) {
+  async checkPermission(params: CheckPermissionRequest, options?: CallOptions) {
     try {
-      const response = await this.ReaderClient.checkPermission(params);
+      const response = await this.ReaderClient.checkPermission(params, options);
 
       return response;
     } catch (error) {
@@ -261,9 +262,9 @@ export class DirectoryV3 {
     }
   }
 
-  async checkRelation(params: CheckRelationRequest) {
+  async checkRelation(params: CheckRelationRequest, options?: CallOptions) {
     try {
-      const response = await this.ReaderClient.checkRelation(params);
+      const response = await this.ReaderClient.checkRelation(params, options);
 
       return response;
     } catch (error) {
@@ -271,9 +272,9 @@ export class DirectoryV3 {
     }
   }
 
-  async check(params: CheckRequest) {
+  async check(params: CheckRequest, options?: CallOptions) {
     try {
-      const response = await this.ReaderClient.check(params);
+      const response = await this.ReaderClient.check(params, options);
 
       return response;
     } catch (error) {
@@ -281,21 +282,24 @@ export class DirectoryV3 {
     }
   }
 
-  async object(params: GetObjectRequest) {
+  async object(params: GetObjectRequest, options?: CallOptions) {
     try {
-      const response = await this.ReaderClient.getObject(params);
+      const response = await this.ReaderClient.getObject(params, options);
 
       return response.result;
     } catch (error) {
       handleError(error, "object");
     }
   }
-  async objects(params: {
-    objectType: string;
-    page?: PartialMessage<PaginationRequest>;
-  }) {
+  async objects(
+    params: {
+      objectType: string;
+      page?: PartialMessage<PaginationRequest>;
+    },
+    options?: CallOptions
+  ) {
     try {
-      const response = await this.ReaderClient.getObjects(params);
+      const response = await this.ReaderClient.getObjects(params, options);
 
       return response;
     } catch (error) {
@@ -303,9 +307,12 @@ export class DirectoryV3 {
     }
   }
 
-  async objectMany(params: PlainMessage<GetObjectManyRequest>) {
+  async objectMany(
+    params: PlainMessage<GetObjectManyRequest>,
+    options?: CallOptions
+  ) {
     try {
-      const response = await this.ReaderClient.getObjectMany(params);
+      const response = await this.ReaderClient.getObjectMany(params, options);
 
       return response.results;
     } catch (error) {
@@ -313,7 +320,7 @@ export class DirectoryV3 {
     }
   }
 
-  async setObject(params: SetObjectRequest) {
+  async setObject(params: SetObjectRequest, options?: CallOptions) {
     try {
       const structProperties = Struct.fromJsonString(
         JSON.stringify(params.object?.properties || {})
@@ -323,7 +330,7 @@ export class DirectoryV3 {
         object: { ...params.object, properties: structProperties },
       });
 
-      const response = await this.WriterClient.setObject(newParams);
+      const response = await this.WriterClient.setObject(newParams, options);
 
       return response?.result;
     } catch (error) {
@@ -331,9 +338,9 @@ export class DirectoryV3 {
     }
   }
 
-  async deleteObject(params: DeleteObjectRequest) {
+  async deleteObject(params: DeleteObjectRequest, options?: CallOptions) {
     try {
-      const response = await this.WriterClient.deleteObject(params);
+      const response = await this.WriterClient.deleteObject(params, options);
 
       return response.result;
     } catch (error) {
@@ -341,9 +348,9 @@ export class DirectoryV3 {
     }
   }
 
-  async relation(params: GetRelationRequest) {
+  async relation(params: GetRelationRequest, options?: CallOptions) {
     try {
-      const response = await this.ReaderClient.getRelation(params);
+      const response = await this.ReaderClient.getRelation(params, options);
 
       return response;
     } catch (error) {
@@ -351,9 +358,9 @@ export class DirectoryV3 {
     }
   }
 
-  async setRelation(params: SetRelationRequest) {
+  async setRelation(params: SetRelationRequest, options?: CallOptions) {
     try {
-      const response = await this.WriterClient.setRelation(params);
+      const response = await this.WriterClient.setRelation(params, options);
 
       return response.result;
     } catch (error) {
@@ -361,9 +368,9 @@ export class DirectoryV3 {
     }
   }
 
-  async deleteRelation(params: DeleteRelationRequest) {
+  async deleteRelation(params: DeleteRelationRequest, options?: CallOptions) {
     try {
-      const response = await this.WriterClient.deleteRelation(params);
+      const response = await this.WriterClient.deleteRelation(params, options);
 
       return response.result;
     } catch (error) {
@@ -371,9 +378,9 @@ export class DirectoryV3 {
     }
   }
 
-  async relations(params: GetRelationsRequest) {
+  async relations(params: GetRelationsRequest, options?: CallOptions) {
     try {
-      const response = await this.ReaderClient.getRelations(params);
+      const response = await this.ReaderClient.getRelations(params, options);
 
       return response;
     } catch (error) {
@@ -381,9 +388,9 @@ export class DirectoryV3 {
     }
   }
 
-  async graph(params: GetGraphRequest) {
+  async graph(params: GetGraphRequest, options?: CallOptions) {
     try {
-      const response = await this.ReaderClient.getGraph(params);
+      const response = await this.ReaderClient.getGraph(params, options);
 
       return response;
     } catch (error) {
@@ -391,21 +398,25 @@ export class DirectoryV3 {
     }
   }
 
-  async import(params: AsyncIterable<PartialMessage<ImportRequest>>) {
+  async import(
+    params: AsyncIterable<PartialMessage<ImportRequest>>,
+    options?: CallOptions
+  ) {
     try {
-      return this.ImporterClient.import(params);
+      return this.ImporterClient.import(params, options);
     } catch (error) {
       handleError(error, "import");
       return createAsyncIterable([]);
     }
   }
 
-  async export(params: { options: DATA_TYPE_OPTIONS }) {
+  async export(params: { options: DATA_TYPE_OPTIONS }, options?: CallOptions) {
     try {
       return this.ExporterClient.export(
         new ExportRequest({
           options: ExportOptions[params.options],
-        })
+        }),
+        options
       );
     } catch (error) {
       handleError(error, "export");
@@ -413,9 +424,12 @@ export class DirectoryV3 {
     }
   }
 
-  async getManifest(params?: PlainMessage<GetManifestRequest>) {
+  async getManifest(
+    params?: PlainMessage<GetManifestRequest>,
+    options?: CallOptions
+  ) {
     try {
-      const response = this.ModelClient.getManifest(params!);
+      const response = this.ModelClient.getManifest(params!, options);
       if (!response) {
         return;
       }
@@ -449,7 +463,7 @@ export class DirectoryV3 {
     }
   }
 
-  async setManifest(params: { body: string }) {
+  async setManifest(params: { body: string }, options?: CallOptions) {
     try {
       const response = await this.ModelClient.setManifest(
         createAsyncIterable([
@@ -459,7 +473,8 @@ export class DirectoryV3 {
               value: { data: new TextEncoder().encode(params.body) },
             },
           }),
-        ])
+        ]),
+        options
       );
 
       return response;
@@ -468,9 +483,12 @@ export class DirectoryV3 {
     }
   }
 
-  async deleteManifest(params?: PlainMessage<DeleteManifestRequest>) {
+  async deleteManifest(
+    params?: PlainMessage<DeleteManifestRequest>,
+    options?: CallOptions
+  ) {
     try {
-      const response = this.ModelClient.deleteManifest(params!);
+      const response = this.ModelClient.deleteManifest(params!, options);
 
       return response;
     } catch (error) {

@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { IdentityContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/identity_context_pb";
 import { PolicyContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/policy_context_pb";
 import { PolicyInstance } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/policy_instance_pb";
+import { CallOptions } from "@connectrpc/connect";
 
 import { errorHandler } from "../errorHandler";
 import { Authorizer } from ".";
@@ -48,6 +49,7 @@ export class Middleware {
   resourceMapper?: ResourceMapper;
   identityMapper?: IdentityMapper;
   policyMapper?: PolicyMapper;
+  callOptions?: CallOptions;
   constructor({
     client,
     policy,
@@ -55,6 +57,7 @@ export class Middleware {
     identityMapper,
     policyMapper,
     failWithError,
+    callOptions,
   }: {
     client: Authorizer;
     policy: Policy;
@@ -62,6 +65,7 @@ export class Middleware {
     identityMapper?: IdentityMapper;
     policyMapper?: PolicyMapper;
     failWithError?: boolean;
+    callOptions?: CallOptions;
   }) {
     this.client = client;
     this.policy = policy;
@@ -69,6 +73,7 @@ export class Middleware {
     this.identityMapper = identityMapper;
     this.policyMapper = policyMapper;
     this.failWithError = failWithError || false;
+    this.callOptions = callOptions;
   }
 
   private policyInstance(): PolicyInstance | undefined {
@@ -109,12 +114,15 @@ export class Middleware {
         }
 
         return [
-          await this.client.Is({
-            identityContext: await this.identityContext(req),
-            policyContext: policyCtx,
-            policyInstance: this.policyInstance(),
-            resourceContext: resourceContext,
-          }),
+          await this.client.Is(
+            {
+              identityContext: await this.identityContext(req),
+              policyContext: policyCtx,
+              policyInstance: this.policyInstance(),
+              resourceContext: resourceContext,
+            },
+            this.callOptions
+          ),
           policyCtx.path,
         ];
       };
@@ -153,6 +161,7 @@ export class Middleware {
             resourceContext: resourceContext,
           }),
           policyCtx.path,
+          this.callOptions,
         ];
       };
       try {
