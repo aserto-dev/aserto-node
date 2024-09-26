@@ -40,6 +40,7 @@ export type ServiceConfig = {
   caFile?: string;
   rejectUnauthorized?: boolean;
   insecure?: boolean;
+  customHeaders?: { [key: string]: unknown };
 };
 
 export type DirectoryV3Config = ServiceConfig & {

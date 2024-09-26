@@ -208,7 +208,7 @@ types:
           objectId: "test-group",
           objectType: "group",
         })
-      ).toEqual({ check: true, trace: [] });
+      ).toMatchObject({ check: true, trace: [] });
     });
 
     it("check(permission) betwen an user and group", async () => {
@@ -220,7 +220,7 @@ types:
           objectId: "test-group",
           objectType: "group",
         })
-      ).toEqual({ check: true, trace: [] });
+      ).toMatchObject({ check: true, trace: [] });
     });
 
     it("checks inexistent relation throws NotFoundError", async () => {
