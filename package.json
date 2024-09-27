@@ -14,7 +14,7 @@
     "format": "prettier --write lib",
     "lint": "eslint lib --max-warnings=0",
     "prepare": "yarn run build",
-    "prepublishOnly": "NODE_ENV=production yarn build",
+    "prepack": "NODE_ENV=production yarn build",
     "push": "scripts/publish.sh",
     "release": "scripts/release.sh",
     "test": "jest test --coverage --verbose"
