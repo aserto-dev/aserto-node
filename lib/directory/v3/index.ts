@@ -30,7 +30,12 @@ import {
 } from "@connectrpc/connect";
 import { createGrpcTransport } from "@connectrpc/connect-node";
 
-import { handleError, setHeader, traceMessage } from "../../util/connect";
+import {
+  handleError,
+  setCustomHeaders,
+  setHeader,
+  traceMessage,
+} from "../../util/connect";
 import {
   nullExporterProxy,
   nullImporterProxy,
@@ -141,11 +146,6 @@ export class DirectoryV3 {
       );
     };
 
-    const definedProps = (obj: object) =>
-      Object.fromEntries(
-        Object.entries(obj).filter(([_k, v]) => v !== undefined)
-      );
-
     const createTransport = (
       config: ServiceConfig | undefined,
       fallback: ServiceConfig | undefined
@@ -158,6 +158,8 @@ export class DirectoryV3 {
       const apiKey = config?.apiKey || fallback?.apiKey;
       const tenantId = config?.tenantId || fallback?.tenantId;
       const nodeOptions = createNodeOptions(config);
+      let customHeaders = Object.assign({}, fallback?.customHeaders || {});
+      customHeaders = Object.assign(customHeaders, config?.customHeaders || {});
 
       if (
         serviceUrl !== baseServiceUrl ||
@@ -169,14 +171,12 @@ export class DirectoryV3 {
         if (process.env.NODE_TRACE_MESSAGE) {
           interceptors.push(traceMessage);
         }
+        interceptors.push(setCustomHeaders(customHeaders));
         return createGrpcTransport({
           httpVersion: "2",
           baseUrl: `https://${serviceUrl || "directory.prod.aserto.com:8443"}`,
           interceptors: interceptors,
-          nodeOptions: Object.assign(
-            definedProps(baseNodeOptions),
-            definedProps(nodeOptions)
-          ),
+          nodeOptions: nodeOptions,
         });
       }
       return baseGrpcTransport;
@@ -186,7 +186,6 @@ export class DirectoryV3 {
       return {
         rejectUnauthorized,
         ca: config?.caFile ? readFileSync(config.caFile) : baseCaFile,
-        headers: config?.customHeaders,
       };
     };
 
@@ -209,7 +208,6 @@ export class DirectoryV3 {
     const baseNodeOptions = {
       rejectUnauthorized,
       ca: baseCaFile,
-      headers: config.customHeaders,
     };
     const interceptors = [baseServiceHeaders];
     if (process.env.NODE_TRACE_MESSAGE) {

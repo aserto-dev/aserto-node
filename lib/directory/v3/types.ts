@@ -32,6 +32,9 @@ enum StatsExportOptions {
 export const ExportOptions = { ...Option, ...StatsExportOptions };
 export type ExportOptions = typeof Option & typeof StatsExportOptions;
 
+export type CustomHeaders = {
+  [key: string]: string;
+};
 export type ServiceConfig = {
   url?: string;
   tenantId?: string;
@@ -40,7 +43,7 @@ export type ServiceConfig = {
   caFile?: string;
   rejectUnauthorized?: boolean;
   insecure?: boolean;
-  customHeaders?: { [key: string]: unknown };
+  customHeaders?: CustomHeaders;
 };
 
 export type DirectoryV3Config = ServiceConfig & {

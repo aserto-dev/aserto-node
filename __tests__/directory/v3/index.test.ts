@@ -129,12 +129,10 @@ describe("DirectoryV3", () => {
         expect.objectContaining({
           baseUrl: "https://directory.prod.aserto.com:8443",
           httpVersion: "2",
+          interceptors: [expect.any(Function)],
           nodeOptions: {
             ca: "caFile",
             rejectUnauthorized: true,
-            headers: {
-              base: "bar",
-            },
           },
         }),
       ],
@@ -142,12 +140,10 @@ describe("DirectoryV3", () => {
         expect.objectContaining({
           baseUrl: "https://readerUrl",
           httpVersion: "2",
+          interceptors: [expect.any(Function), expect.any(Function)],
           nodeOptions: {
             ca: "readerCaFile",
             rejectUnauthorized: true,
-            headers: {
-              reader: "bar",
-            },
           },
         }),
       ],
@@ -155,12 +151,10 @@ describe("DirectoryV3", () => {
         expect.objectContaining({
           baseUrl: "https://writerUrl",
           httpVersion: "2",
+          interceptors: [expect.any(Function), expect.any(Function)],
           nodeOptions: {
             ca: "caFile",
             rejectUnauthorized: true,
-            headers: {
-              writer: "bar",
-            },
           },
         }),
       ],
@@ -168,12 +162,10 @@ describe("DirectoryV3", () => {
         expect.objectContaining({
           baseUrl: "https://importerUrl",
           httpVersion: "2",
+          interceptors: [expect.any(Function), expect.any(Function)],
           nodeOptions: {
             ca: "caFile",
             rejectUnauthorized: true,
-            headers: {
-              base: "bar",
-            },
           },
         }),
       ],
@@ -181,10 +173,10 @@ describe("DirectoryV3", () => {
         expect.objectContaining({
           baseUrl: "https://directory.prod.aserto.com:8443",
           httpVersion: "2",
+          interceptors: [expect.any(Function), expect.any(Function)],
           nodeOptions: {
             ca: "exporterCaFile",
             rejectUnauthorized: true,
-            headers: {},
           },
         }),
       ],
@@ -192,12 +184,10 @@ describe("DirectoryV3", () => {
         expect.objectContaining({
           baseUrl: "https://directory.prod.aserto.com:8443",
           httpVersion: "2",
+          interceptors: [expect.any(Function), expect.any(Function)],
           nodeOptions: {
             ca: "caFile",
             rejectUnauthorized: true,
-            headers: {
-              base: "bar",
-            },
           },
         }),
       ],

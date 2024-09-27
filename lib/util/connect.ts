@@ -7,6 +7,7 @@ import {
   UnaryRequest,
 } from "@connectrpc/connect";
 
+import { CustomHeaders } from "../directory/v3/types";
 import {
   EtagMismatchError,
   InvalidArgumentError,
@@ -28,6 +29,16 @@ export const setHeader = (
 export const traceMessage: Interceptor = (next) => async (req) => {
   log(JSON.stringify(req));
   return await next(req);
+};
+
+export const setCustomHeaders = (headers: CustomHeaders) => {
+  const customHaders: Interceptor = (next) => async (req) => {
+    for (const [key, value] of Object.entries(headers)) {
+      setHeader(req, key, value);
+    }
+    return await next(req);
+  };
+  return customHaders;
 };
 
 export const handleError = (error: unknown, method: string) => {

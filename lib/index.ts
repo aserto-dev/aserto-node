@@ -26,7 +26,7 @@ import {
   objectPropertiesAsStruct,
   readAsyncIterable,
 } from "./directory/v3";
-import { DirectoryV3Config } from "./directory/v3/types";
+import { CustomHeaders, DirectoryV3Config } from "./directory/v3/types";
 import { displayStateMap } from "./displayStateMap";
 import { is } from "./is";
 import { AuthzOptions, jwtAuthz } from "./jwtAuthz";
@@ -36,6 +36,7 @@ export {
   authz,
   AuthzOptions,
   createAsyncIterable,
+  CustomHeaders,
   decisionTreeOptions,
   Directory,
   DirectoryConfig as ServiceConfig,
