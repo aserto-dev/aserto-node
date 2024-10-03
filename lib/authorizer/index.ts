@@ -9,6 +9,7 @@ import {
 } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/authorizer_pb";
 import { JsonObject, PlainMessage, Struct } from "@bufbuild/protobuf";
 import {
+  CallOptions,
   createPromiseClient,
   Interceptor,
   PromiseClient,
@@ -73,7 +74,7 @@ export class Authorizer {
     this.AuthClient = createPromiseClient(AuthorizerClient, baseGrpcTransport);
   }
 
-  async Is(params: IsRequest): Promise<boolean> {
+  async Is(params: IsRequest, options?: CallOptions): Promise<boolean> {
     try {
       const request: IsRequest$ = new IsRequest$({
         ...params,
@@ -84,7 +85,7 @@ export class Authorizer {
           params.policyInstance &&
           policyInstance(params.policyInstance.name || ""),
       });
-      const response = await this.AuthClient.is(request);
+      const response = await this.AuthClient.is(request, options);
 
       const allowed = response.decisions[0]?.is;
       return !!allowed;
@@ -94,7 +95,10 @@ export class Authorizer {
     }
   }
 
-  async Query(params: QueryRequest): Promise<JsonObject> {
+  async Query(
+    params: QueryRequest,
+    options?: CallOptions
+  ): Promise<JsonObject> {
     try {
       const request: QueryRequest$ = new QueryRequest$({
         ...params,
@@ -106,7 +110,7 @@ export class Authorizer {
           policyInstance(params.policyInstance.name || ""),
       });
 
-      const response = await this.AuthClient.query(request);
+      const response = await this.AuthClient.query(request, options);
       const query: JsonObject = JSON.parse(
         response.response?.toJsonString() || "{}"
       );
@@ -118,7 +122,10 @@ export class Authorizer {
     }
   }
 
-  async DecisionTree(params: DecisionTreeRequest): Promise<{
+  async DecisionTree(
+    params: DecisionTreeRequest,
+    options?: CallOptions
+  ): Promise<{
     path: Path;
     pathRoot: string;
   }> {
@@ -132,7 +139,7 @@ export class Authorizer {
           params.policyInstance &&
           policyInstance(params.policyInstance.name || ""),
       });
-      const response = await this.AuthClient.decisionTree(request);
+      const response = await this.AuthClient.decisionTree(request, options);
 
       return {
         path: JSON.parse(response.path?.toJsonString() || "{}"),
@@ -147,10 +154,11 @@ export class Authorizer {
     }
   }
   async ListPolicies(
-    params: PlainMessage<ListPoliciesRequest>
+    params: PlainMessage<ListPoliciesRequest>,
+    options?: CallOptions
   ): Promise<Module[]> {
     try {
-      const response = await this.AuthClient.listPolicies(params);
+      const response = await this.AuthClient.listPolicies(params, options);
 
       return response.result;
     } catch (error) {

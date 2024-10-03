@@ -35,12 +35,20 @@ describe("Is", () => {
         name: "todo",
       },
     };
-    const result = await authorizer.Is(params);
+    const options = {
+      headers: {
+        customKey: "customValue",
+      },
+    };
+    const result = await authorizer.Is(params, options);
 
-    expect(authorizer.AuthClient.is).toHaveBeenCalledWith({
-      ...params,
-      policyInstance: { ...params.policyInstance, instanceLabel: "todo" },
-    });
+    expect(authorizer.AuthClient.is).toHaveBeenCalledWith(
+      {
+        ...params,
+        policyInstance: { ...params.policyInstance, instanceLabel: "todo" },
+      },
+      options
+    );
 
     expect(result).toBe(true);
 
@@ -66,11 +74,14 @@ describe("Is", () => {
     };
     const result = await authorizer.Is(params);
 
-    expect(authorizer.AuthClient.is).toHaveBeenCalledWith({
-      ...params,
-      resourceContext: Struct.fromJson(params.resourceContext),
-      policyInstance: { ...params.policyInstance, instanceLabel: "todo" },
-    });
+    expect(authorizer.AuthClient.is).toHaveBeenCalledWith(
+      {
+        ...params,
+        resourceContext: Struct.fromJson(params.resourceContext),
+        policyInstance: { ...params.policyInstance, instanceLabel: "todo" },
+      },
+      undefined
+    );
 
     expect(result).toBe(true);
 
@@ -96,11 +107,14 @@ describe("Is", () => {
     };
     const result = await authorizer.Is(params);
 
-    expect(authorizer.AuthClient.is).toHaveBeenCalledWith({
-      ...params,
-      resourceContext: Struct.fromJson(params.resourceContext),
-      policyInstance: { ...params.policyInstance, instanceLabel: "todo" },
-    });
+    expect(authorizer.AuthClient.is).toHaveBeenCalledWith(
+      {
+        ...params,
+        resourceContext: Struct.fromJson(params.resourceContext),
+        policyInstance: { ...params.policyInstance, instanceLabel: "todo" },
+      },
+      undefined
+    );
     expect(result).toBe(true);
 
     mock.mockReset();
@@ -123,7 +137,7 @@ describe("Is", () => {
     };
     const result = await authorizer.Is(params);
 
-    expect(authorizer.AuthClient.is).toHaveBeenCalledWith(params);
+    expect(authorizer.AuthClient.is).toHaveBeenCalledWith(params, undefined);
 
     expect(result).toBe(false);
 
@@ -241,16 +255,19 @@ describe("Query", () => {
       }),
     });
 
-    expect(authorizer.AuthClient.query).toHaveBeenCalledWith({
-      query: "query",
-      input: "input",
-      options: queryOptions({
-        metrics: true,
-        instrument: false,
-        trace: "FULL",
-        traceSummary: false,
-      }),
-    });
+    expect(authorizer.AuthClient.query).toHaveBeenCalledWith(
+      {
+        query: "query",
+        input: "input",
+        options: queryOptions({
+          metrics: true,
+          instrument: false,
+          trace: "FULL",
+          traceSummary: false,
+        }),
+      },
+      undefined
+    );
 
     expect(result).toEqual({ key1: "value1", key2: 2 });
 
