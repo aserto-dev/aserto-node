@@ -108,7 +108,7 @@ export class Authorizer {
 
       const response = await this.AuthClient.query(request);
       const query: JsonObject = JSON.parse(
-        response.response?.toJsonString() || "{}"
+        response.response?.toJsonString() || "{}",
       );
 
       return query;
@@ -147,7 +147,7 @@ export class Authorizer {
     }
   }
   async ListPolicies(
-    params: PlainMessage<ListPoliciesRequest>
+    params: PlainMessage<ListPoliciesRequest>,
   ): Promise<Module[]> {
     try {
       const response = await this.AuthClient.listPolicies(params);

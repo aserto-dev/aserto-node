@@ -21,7 +21,7 @@ export const setHeader = (
     | UnaryRequest<AnyMessage, AnyMessage>
     | StreamRequest<AnyMessage, AnyMessage>,
   key: string,
-  value: string
+  value: string,
 ) => {
   req.header.get(key) === null && req.header.set(key, value);
 };
@@ -46,7 +46,7 @@ export const handleError = (error: unknown, method: string) => {
     switch (error.code) {
       case Code.Unauthenticated: {
         throw new UnauthenticatedError(
-          `Authentication failed: ${error.message}`
+          `Authentication failed: ${error.message}`,
         );
       }
       case Code.NotFound: {
@@ -57,7 +57,7 @@ export const handleError = (error: unknown, method: string) => {
       }
       case Code.FailedPrecondition: {
         throw new EtagMismatchError(
-          `invalid etag in ${method} request: ${error.message}`
+          `invalid etag in ${method} request: ${error.message}`,
         );
       }
       default: {

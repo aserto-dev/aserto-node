@@ -2,7 +2,7 @@ import { PolicyInstance } from "@aserto/node-authorizer/src/gen/cjs/aserto/autho
 
 const policyInstance = (
   instanceName: string,
-  instanceLabel: string = instanceName
+  instanceLabel: string = instanceName,
 ) => {
   const policyInstance = new PolicyInstance({
     name: instanceName,

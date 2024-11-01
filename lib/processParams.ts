@@ -7,7 +7,7 @@ export const processParams = async (
   req: express.Request,
   policyRoot: string,
   packageName?: string,
-  resourceMap?: ResourceMapper
+  resourceMap?: ResourceMapper,
 ) => {
   // if a resourceMap wasn't explicitly passed in, get it from req.params
   if (!resourceMap) {

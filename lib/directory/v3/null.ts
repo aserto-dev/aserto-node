@@ -21,12 +21,12 @@ const interceptCall = (target: Client, prop: string, receiver: unknown) => {
     throw new ConfigError(
       `Cannot call '${prop}', '${target?.typeName
         ?.split(".")
-        ?.slice(-1)}' is not configured.`
+        ?.slice(-1)}' is not configured.`,
     );
   }
 
   throw new TypeError(
-    `'${prop}' is not defined on '${target?.typeName?.split(".")?.slice(-1)}'`
+    `'${prop}' is not defined on '${target?.typeName?.split(".")?.slice(-1)}'`,
   );
 };
 

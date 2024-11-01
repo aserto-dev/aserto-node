@@ -1,5 +1,6 @@
 // create identity context
 import express from "express";
+import { jwtDecode } from "jwt-decode";
 import { IdentityType } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/identity_context_pb";
 
 import identityContext from "./authorizer/model/identityContext";
@@ -10,8 +11,6 @@ export interface IdentityContextOptions {
   identity: string;
   subject: string;
 }
-
-const jwt_decode = require("jwt-decode");
 
 export default (req: express.Request, options: IdentityContextOptions) => {
   const { useAuthorizationHeader, identity, subject } = options;
@@ -24,8 +23,8 @@ export default (req: express.Request, options: IdentityContextOptions) => {
   if (useAuthorizationHeader) {
     try {
       // decode the JWT to make sure it's valid
-      const token = jwt_decode(req.headers.authorization);
-      localIdentity = token && token.sub;
+      const token = jwtDecode(req.headers.authorization || "");
+      localIdentity = (token && token.sub) || "";
       type = "SUB";
 
       // instead of fishing out the subject, just pass the JWT itself
@@ -36,6 +35,8 @@ export default (req: express.Request, options: IdentityContextOptions) => {
         : "";
 
       type = "JWT";
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // TODO: resolve error type ${error.message}
       log(`Authorization header contained malformed JWT:`, "ERROR");

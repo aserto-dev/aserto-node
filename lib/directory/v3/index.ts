@@ -101,7 +101,7 @@ export class DirectoryV3 {
   ModelClient: PromiseClient<typeof Model>;
   CreateTransport: (
     config: ServiceConfig | undefined,
-    fallback: ServiceConfig | undefined
+    fallback: ServiceConfig | undefined,
   ) => Transport | undefined;
 
   constructor(config: DirectoryV3Config) {
@@ -115,7 +115,7 @@ export class DirectoryV3 {
 
     const createHeadersInterceptor = (
       serviceApiKey?: string,
-      serviceTenantId?: string
+      serviceTenantId?: string,
     ) => {
       if (
         serviceApiKey === config.apiKey &&
@@ -136,7 +136,7 @@ export class DirectoryV3 {
 
     const validConfig = (
       config: ServiceConfig | undefined,
-      fallback: ServiceConfig | undefined
+      fallback: ServiceConfig | undefined,
     ) => {
       return (
         !!config?.url ||
@@ -148,7 +148,7 @@ export class DirectoryV3 {
 
     const createTransport = (
       config: ServiceConfig | undefined,
-      fallback: ServiceConfig | undefined
+      fallback: ServiceConfig | undefined,
     ) => {
       if (!validConfig(config, fallback)) {
         return;
@@ -316,7 +316,7 @@ export class DirectoryV3 {
   async setObject(params: SetObjectRequest) {
     try {
       const structProperties = Struct.fromJsonString(
-        JSON.stringify(params.object?.properties || {})
+        JSON.stringify(params.object?.properties || {}),
       );
 
       const newParams: SetObjectRequest$ = new SetObjectRequest$({
@@ -405,7 +405,7 @@ export class DirectoryV3 {
       return this.ExporterClient.export(
         new ExportRequest({
           options: ExportOptions[params.options],
-        })
+        }),
       );
     } catch (error) {
       handleError(error, "export");
@@ -459,7 +459,7 @@ export class DirectoryV3 {
               value: { data: new TextEncoder().encode(params.body) },
             },
           }),
-        ])
+        ]),
       );
 
       return response;
@@ -483,7 +483,7 @@ export class DirectoryV3 {
  * Read an asynchronous iterable into an array.
  */
 export async function readAsyncIterable<T>(
-  gen: AsyncIterable<T>
+  gen: AsyncIterable<T>,
 ): Promise<T[]> {
   const out: T[] = [];
   for await (const x of gen) {
