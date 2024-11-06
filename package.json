@@ -1,7 +1,7 @@
 {
   "name": "@aserto/aserto-node",
   "description": "Aserto Node SDK",
-  "version": "0.32.10",
+  "version": "0.32.11",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "author": "Aserto",
@@ -16,6 +16,7 @@
     "prepare": "yarn run build",
     "prepack": "NODE_ENV=production yarn build",
     "push": "scripts/publish.sh",
+    "release_prep": "scripts/release_prep.sh",
     "release": "scripts/release.sh",
     "test": "jest test --coverage --verbose"
   },
