@@ -14,7 +14,7 @@ const is = async (
   req: Request,
   optionsParam: AuthzOptions,
   packageName?: string,
-  resourceMapper?: ResourceMapper
+  resourceMapper?: ResourceMapper,
 ) => {
   const options = processOptions(optionsParam, req);
   if (!options) {
@@ -40,7 +40,7 @@ const is = async (
     req,
     policyRoot,
     packageName,
-    resourceMapper
+    resourceMapper,
   );
 
   const client = new Authorizer({

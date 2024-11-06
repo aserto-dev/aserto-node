@@ -2,7 +2,7 @@ import { PolicyContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/author
 
 const policyContext = (
   policyPath: string = "",
-  decisionsList: Array<string> = ["allowed"]
+  decisionsList: Array<string> = ["allowed"],
 ) => {
   const policyContext = new PolicyContext({
     path: policyPath,

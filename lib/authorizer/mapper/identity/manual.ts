@@ -3,7 +3,7 @@ import { IdentityContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/auth
 import identityContext from "../../model/identityContext";
 
 const ManualIdentityMapper = async (
-  value: string
+  value: string,
 ): Promise<IdentityContext> => {
   return identityContext(value, "MANUAL");
 };

@@ -9,11 +9,11 @@ export default (
   options: AuthzOptions,
   req: express.Request,
   res?: express.Response,
-  next?: express.NextFunction
+  next?: express.NextFunction,
 ) => {
   const error = (
     res: express.Response,
-    err_message = "aserto-node: unknown error"
+    err_message = "aserto-node: unknown error",
   ) => {
     if (options && options.failWithError && next) {
       return next({

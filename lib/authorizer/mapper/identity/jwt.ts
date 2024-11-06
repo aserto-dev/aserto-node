@@ -1,18 +1,18 @@
 import { Request } from "express";
-import jwt_decode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { IdentityContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/identity_context_pb";
 
 import { IdentityMapper } from "../../middleware";
 import identityContext from "../../model/identityContext";
 
 const JWTIdentityMapper = (
-  header: string = "Authorization"
+  header: string = "Authorization",
 ): IdentityMapper => {
   return async (req: Request): Promise<IdentityContext> => {
     const authHeader = req.header(header);
     if (authHeader) {
       // decode the JWT to make sure it's valid
-      jwt_decode(authHeader);
+      jwtDecode(authHeader);
       const bearer = authHeader.split(" ")[1];
       if (bearer && bearer !== "") {
         return identityContext(bearer, "JWT");

@@ -16,7 +16,7 @@ describe("SubIdentityMapper", () => {
 
     await expect(subMapper(req)).rejects.toEqual(
       new InvalidTokenError(
-        "Invalid token specified: Cannot read properties of undefined (reading 'replace')"
+        "Invalid token specified: missing part #2"
       )
     );
   });
@@ -30,7 +30,7 @@ describe("SubIdentityMapper", () => {
 
     await expect(subMapper(req)).rejects.toEqual(
       new InvalidTokenError(
-        "Invalid token specified: Cannot read properties of undefined (reading 'replace')"
+        "Invalid token specified: missing part #2"
       )
     );
   });

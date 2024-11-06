@@ -7,7 +7,7 @@ import { PartialMessage } from "@bufbuild/protobuf";
 const queryOptions = (
   options?: Omit<PartialMessage<QueryOptions>, "trace"> & {
     trace: keyof typeof TraceLevel;
-  }
+  },
 ) => {
   const queryOptions = new QueryOptions({
     metrics: !!options?.metrics,

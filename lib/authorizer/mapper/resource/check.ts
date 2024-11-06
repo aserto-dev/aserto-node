@@ -5,7 +5,7 @@ import { CheckResourceContext } from "../../model/resourceContext";
 
 export default async (
   options: CheckOptions,
-  req: Request
+  req: Request,
 ): Promise<Promise<CheckResourceContext>> => {
   const [objectId, objectType] = await object(options, req);
   const rel = await relation(options, req);
@@ -19,7 +19,7 @@ export default async (
 
 const relation = async (
   options: CheckOptions,
-  req: Request
+  req: Request,
 ): Promise<string> => {
   const relation = options.relation || "";
 
@@ -28,7 +28,7 @@ const relation = async (
 
 const object = async (
   options: CheckOptions,
-  req: Request
+  req: Request,
 ): Promise<[string, string]> => {
   const object = options.object;
   if (typeof object === "function") {

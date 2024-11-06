@@ -1,7 +1,0 @@
-{
-  "overrides": [
-    {
-      "files": ["lib/**/*.ts"]
-    }
-  ]
-}

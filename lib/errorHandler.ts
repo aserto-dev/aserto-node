@@ -16,7 +16,7 @@ const errorHandler =
       log(err_message, "ERROR");
       res.append(
         "WWW-Authenticate",
-        `Bearer error="${encodeURIComponent(err_message)}"`
+        `Bearer error="${encodeURIComponent(err_message)}"`,
       );
       res.status(403).send(err_message);
     }
