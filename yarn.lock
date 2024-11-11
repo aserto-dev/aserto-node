@@ -31,8 +31,8 @@ __metadata:
     "@aserto/ts-linting-configs": "npm:^2.7.0"
     "@babel/core": "npm:^7.25.2"
     "@bufbuild/protobuf": "npm:^1.10.0"
-    "@connectrpc/connect": "npm:^1.5.0"
-    "@connectrpc/connect-node": "npm:^1.5.0"
+    "@connectrpc/connect": "npm:^1.6.1"
+    "@connectrpc/connect-node": "npm:^1.6.1"
     "@eslint/compat": "npm:^1.2.2"
     "@eslint/eslintrc": "npm:^3.1.0"
     "@eslint/js": "npm:^9.13.0"
@@ -477,24 +477,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@connectrpc/connect-node@npm:^1.5.0":
-  version: 1.5.0
-  resolution: "@connectrpc/connect-node@npm:1.5.0"
+"@connectrpc/connect-node@npm:^1.6.1":
+  version: 1.6.1
+  resolution: "@connectrpc/connect-node@npm:1.6.1"
   dependencies:
     undici: "npm:^5.28.4"
   peerDependencies:
     "@bufbuild/protobuf": ^1.10.0
-    "@connectrpc/connect": 1.5.0
-  checksum: 10/237a844f8b30ffeaa1ea5e566ce3cbfbb88a99c293d3c85fa68962509688f0c025ceadb8f1e8faf8e1a1388e84493fa3feca60b80c10dcca59105fe32492c7d8
+    "@connectrpc/connect": 1.6.1
+  checksum: 10/af6fb393c0672334b61015fd69c41131cdf48532904127ccf066aadbab016b200a3e38d3e7e7cd4e1620055f7f64f2f444a2008525ced468c519430d8cf18854
   languageName: node
   linkType: hard
 
-"@connectrpc/connect@npm:^1.5.0":
-  version: 1.5.0
-  resolution: "@connectrpc/connect@npm:1.5.0"
+"@connectrpc/connect@npm:^1.6.1":
+  version: 1.6.1
+  resolution: "@connectrpc/connect@npm:1.6.1"
   peerDependencies:
     "@bufbuild/protobuf": ^1.10.0
-  checksum: 10/4643585b8610b84e985474346f95b98168cec028ffa82e3b20071b916cea6ccbd8042d58c06a267a3abcfbf39a713acf939eda6aa41b48753458d2651106e366
+  checksum: 10/4eaf2744076f7542661f660d2588ff11512e9826ca10548a0d911e5520a177b06e28239779c8c056b92d2db4c5708f9f135f4f8c09ec4d5d76087f28d7e37c2d
   languageName: node
   linkType: hard
 
