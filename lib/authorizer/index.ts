@@ -97,7 +97,7 @@ export class Authorizer {
 
   async Query(
     params: QueryRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<JsonObject> {
     try {
       const request: QueryRequest$ = new QueryRequest$({
@@ -112,7 +112,7 @@ export class Authorizer {
 
       const response = await this.AuthClient.query(request, options);
       const query: JsonObject = JSON.parse(
-        response.response?.toJsonString() || "{}"
+        response.response?.toJsonString() || "{}",
       );
 
       return query;
@@ -124,7 +124,7 @@ export class Authorizer {
 
   async DecisionTree(
     params: DecisionTreeRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<{
     path: Path;
     pathRoot: string;
@@ -155,7 +155,7 @@ export class Authorizer {
   }
   async ListPolicies(
     params: PlainMessage<ListPoliciesRequest>,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<Module[]> {
     try {
       const response = await this.AuthClient.listPolicies(params, options);

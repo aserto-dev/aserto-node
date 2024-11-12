@@ -102,7 +102,7 @@ export class DirectoryV3 {
   ModelClient: PromiseClient<typeof Model>;
   CreateTransport: (
     config: ServiceConfig | undefined,
-    fallback: ServiceConfig | undefined
+    fallback: ServiceConfig | undefined,
   ) => Transport | undefined;
 
   constructor(config: DirectoryV3Config) {
@@ -116,7 +116,7 @@ export class DirectoryV3 {
 
     const createHeadersInterceptor = (
       serviceApiKey?: string,
-      serviceTenantId?: string
+      serviceTenantId?: string,
     ) => {
       if (
         serviceApiKey === config.apiKey &&
@@ -137,7 +137,7 @@ export class DirectoryV3 {
 
     const validConfig = (
       config: ServiceConfig | undefined,
-      fallback: ServiceConfig | undefined
+      fallback: ServiceConfig | undefined,
     ) => {
       return (
         !!config?.url ||
@@ -149,7 +149,7 @@ export class DirectoryV3 {
 
     const createTransport = (
       config: ServiceConfig | undefined,
-      fallback: ServiceConfig | undefined
+      fallback: ServiceConfig | undefined,
     ) => {
       if (!validConfig(config, fallback)) {
         return;
@@ -296,7 +296,7 @@ export class DirectoryV3 {
       objectType: string;
       page?: PartialMessage<PaginationRequest>;
     },
-    options?: CallOptions
+    options?: CallOptions,
   ) {
     try {
       const response = await this.ReaderClient.getObjects(params, options);
@@ -309,7 +309,7 @@ export class DirectoryV3 {
 
   async objectMany(
     params: PlainMessage<GetObjectManyRequest>,
-    options?: CallOptions
+    options?: CallOptions,
   ) {
     try {
       const response = await this.ReaderClient.getObjectMany(params, options);
@@ -323,7 +323,7 @@ export class DirectoryV3 {
   async setObject(params: SetObjectRequest, options?: CallOptions) {
     try {
       const structProperties = Struct.fromJsonString(
-        JSON.stringify(params.object?.properties || {})
+        JSON.stringify(params.object?.properties || {}),
       );
 
       const newParams: SetObjectRequest$ = new SetObjectRequest$({
@@ -400,7 +400,7 @@ export class DirectoryV3 {
 
   async import(
     params: AsyncIterable<PartialMessage<ImportRequest>>,
-    options?: CallOptions
+    options?: CallOptions,
   ) {
     try {
       return this.ImporterClient.import(params, options);
@@ -416,7 +416,7 @@ export class DirectoryV3 {
         new ExportRequest({
           options: ExportOptions[params.options],
         }),
-        options
+        options,
       );
     } catch (error) {
       handleError(error, "export");
@@ -426,7 +426,7 @@ export class DirectoryV3 {
 
   async getManifest(
     params?: PlainMessage<GetManifestRequest>,
-    options?: CallOptions
+    options?: CallOptions,
   ) {
     try {
       const response = this.ModelClient.getManifest(params!, options);
@@ -474,7 +474,7 @@ export class DirectoryV3 {
             },
           }),
         ]),
-        options
+        options,
       );
 
       return response;
@@ -485,7 +485,7 @@ export class DirectoryV3 {
 
   async deleteManifest(
     params?: PlainMessage<DeleteManifestRequest>,
-    options?: CallOptions
+    options?: CallOptions,
   ) {
     try {
       const response = this.ModelClient.deleteManifest(params!, options);
@@ -501,7 +501,7 @@ export class DirectoryV3 {
  * Read an asynchronous iterable into an array.
  */
 export async function readAsyncIterable<T>(
-  gen: AsyncIterable<T>
+  gen: AsyncIterable<T>,
 ): Promise<T[]> {
   const out: T[] = [];
   for await (const x of gen) {

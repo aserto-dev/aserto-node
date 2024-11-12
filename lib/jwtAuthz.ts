@@ -38,7 +38,7 @@ const jwtAuthz = (
   packageName?: string,
   resourceMapper?: ResourceMapper,
   identityMapper?: IdentityMapper,
-  policyMapper?: PolicyMapper
+  policyMapper?: PolicyMapper,
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     const options = processOptions(optionsParam, req, res, next);
@@ -67,7 +67,7 @@ const jwtAuthz = (
       req,
       policyRoot,
       packageName,
-      resourceMapper
+      resourceMapper,
     );
 
     const callAuthorizer = async () => {

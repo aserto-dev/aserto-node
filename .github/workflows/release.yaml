@@ -10,6 +10,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.CODEGEN_APP_ID }}
+          private-key: ${{ secrets.CODEGEN_APP_KEY }}
+
       - name: Read Configuration
         uses: hashicorp/vault-action@v3
         id: vault
@@ -18,7 +24,11 @@ jobs:
           token: ${{ secrets.VAULT_TOKEN }}
           secrets: |
             kv/data/npmjs "NPM_TOKEN" | NODE_AUTH_TOKEN;
+
       - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20.x'
@@ -39,3 +49,19 @@ jobs:
 
       - run: yarn install --immutable
       - run: yarn npm publish --access public
+
+      # bump to the next patch version
+      - name: Bump version
+        id: bump_version
+        run: |
+          VERSION=$(npm version patch --no-git-tag-version)
+          echo $VERSION
+          echo "::set-output name=next_version::$VERSION"
+
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          default_author: github_actions
+          message: 'Bump to ${{ steps.bump_version.outputs.next_version }} (CI)'
+          add: 'package.json'
+          push: origin HEAD:main

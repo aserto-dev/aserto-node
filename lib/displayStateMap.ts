@@ -23,7 +23,7 @@ const displayStateMap = (
   optionsParam: DisplayStateMapOptions,
   resourceMapper?: ResourceMapper,
   identityMapper?: IdentityMapper,
-  policyMapper?: PolicyMapper
+  policyMapper?: PolicyMapper,
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     let endpointPath = `/__displaystatemap`;

@@ -38,7 +38,7 @@ export type IdentityMapper = (req: Request) => Promise<IdentityContext>;
 export type PolicyMapper = (req?: Request) => Promise<PolicyContext>;
 
 type ObjectMapper = (
-  req?: Request
+  req?: Request,
 ) => Promise<{ objectId: string; objectType: string }>;
 type StringMapper = (req?: Request) => Promise<string>;
 
@@ -102,7 +102,7 @@ export class Middleware {
 
         let resourceContext: ResourceContext = await checkResourceMapper(
           options,
-          req
+          req,
         );
         if (typeof this.resourceMapper === "function") {
           resourceContext = {
@@ -121,7 +121,7 @@ export class Middleware {
               policyInstance: this.policyInstance(),
               resourceContext: resourceContext,
             },
-            this.callOptions
+            this.callOptions,
           ),
           policyCtx.path,
         ];

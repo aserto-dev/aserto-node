@@ -93,7 +93,7 @@ export class Directory {
         | UnaryRequest<AnyMessage, AnyMessage>
         | StreamRequest<AnyMessage, AnyMessage>,
       key: string,
-      value: string
+      value: string,
     ) => {
       req.header.get(key) === null && req.header.set(key, value);
     };
@@ -107,7 +107,7 @@ export class Directory {
 
     const createHeadersInterceptor = (
       serviceApiKey?: string,
-      serviceTenantId?: string
+      serviceTenantId?: string,
     ) => {
       if (
         serviceApiKey === config.apiKey &&
@@ -129,7 +129,7 @@ export class Directory {
     const createTransport = (
       serviceUrl: string,
       apikey?: string,
-      tenantId?: string
+      tenantId?: string,
     ) => {
       if (
         serviceUrl !== baseServiceUrl ||
@@ -181,22 +181,22 @@ export class Directory {
     const readerGrpcTransport = createTransport(
       readerServiceUrl,
       readerApiKey,
-      readerTenantId
+      readerTenantId,
     );
     const writerGrpcTransport = createTransport(
       writerServiceUrl,
       writerApiKey,
-      writerTenantId
+      writerTenantId,
     );
     const importerGrpcTransport = createTransport(
       importerServiceUrl,
       importerApiKey,
-      importerTenantId
+      importerTenantId,
     );
     const exporterGrpcTransport = createTransport(
       exporterServiceUrl,
       exporterApiKey,
-      exporterTenantId
+      exporterTenantId,
     );
 
     this.ReaderClient = createPromiseClient(Reader, readerGrpcTransport);
@@ -280,7 +280,7 @@ export class Directory {
   async setObject(params: SetObjectRequest) {
     try {
       const structProperties = Struct.fromJsonString(
-        JSON.stringify(params.object?.properties || {})
+        JSON.stringify(params.object?.properties || {}),
       );
 
       const newParams: SetObjectRequest$ = new SetObjectRequest$({
@@ -301,9 +301,8 @@ export class Directory {
   async deleteObject(params: PlainMessage<ObjectIdentifier>) {
     const deleteObjectRequest = new DeleteObjectRequest({ param: params });
     try {
-      const response = await this.WriterClient.deleteObject(
-        deleteObjectRequest
-      );
+      const response =
+        await this.WriterClient.deleteObject(deleteObjectRequest);
       if (!response) {
         throw new Error("No response from directory service");
       }
@@ -349,7 +348,7 @@ export class Directory {
         param: params,
       });
       const response = await this.WriterClient.deleteRelation(
-        deleteRelationRequest
+        deleteRelationRequest,
       );
       if (!response) {
         throw new Error("No response from directory service");
@@ -364,9 +363,8 @@ export class Directory {
   async relations(params: PlainMessage<RelationIdentifier>) {
     const getRelationsRequest = new GetRelationsRequest({ param: params });
     try {
-      const response = await this.ReaderClient.getRelations(
-        getRelationsRequest
-      );
+      const response =
+        await this.ReaderClient.getRelations(getRelationsRequest);
       if (!response) {
         throw new Error("No response from directory service");
       }
@@ -394,7 +392,7 @@ export class Directory {
 function handleError(error: unknown, method: string) {
   if (error instanceof ConnectError) {
     throw new Error(
-      `"${method}" failed with code: ${error.code}, message: ${error.message}`
+      `"${method}" failed with code: ${error.code}, message: ${error.message}`,
     );
   } else {
     throw error;
