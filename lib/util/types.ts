@@ -3,11 +3,11 @@
 type NestedKeys<T extends string, U extends string[]> = {
   [K in keyof U]: U[K] extends `${T}.${infer V}` ? V : never;
 };
-export type DeepOptional<T, U extends string[]> = {
+export type NestedOptional<T, U extends string[]> = {
   [K in keyof T as K extends U[number] ? K : never]?: T[K];
 } & {
   [K in keyof T as K extends U[number] ? never : K]: K extends string
-    ? DeepOptional<T[K], NestedKeys<K, U>>
+    ? NestedOptional<T[K], NestedKeys<K, U>>
     : T[K];
 };
 

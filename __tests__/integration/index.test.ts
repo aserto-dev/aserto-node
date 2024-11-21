@@ -1,14 +1,15 @@
 import express, { Express } from "express";
 import nJwt from "njwt";
+import { describe } from "node:test";
 import request from "supertest";
 
 import {
   AnonymousIdentityMapper,
   Authorizer,
+  ConfigError,
   DirectoryServiceV3,
   DirectoryV3,
   displayStateMap,
-  EtagMismatchError,
   ImportMsgCase,
   ImportOpCode,
   NotFoundError,
@@ -37,6 +38,26 @@ describe("Integration", () => {
 
   afterAll(async () => {
     await topaz.stop();
+  });
+
+  describe("Directory Reader", () => {
+    it("fallsback to reader proxy when reader is not configured", async () => {
+      const readerClient = DirectoryServiceV3({
+        writer: {
+          url: "localhost:9292",
+          caFile: await topaz.caCert(),
+        },
+      });
+
+      await expect(
+        readerClient.objects({ objectType: "user" }),
+      ).rejects.toThrow(ConfigError);
+      await expect(
+        readerClient.objects({ objectType: "user" }),
+      ).rejects.toThrow(
+        `Cannot call 'getObjects', 'Reader' is not configured.`,
+      );
+    });
   });
 
   describe("Directory", () => {
@@ -106,19 +127,6 @@ types:
       ).resolves.not.toThrow();
     });
 
-    xit("throws EtagMismatchError when setting the same object without Etag", async () => {
-      await expect(
-        directoryClient.setObject({
-          object: {
-            type: "user",
-            id: "test-user",
-            displayName: "updated",
-            etag: "updated",
-          },
-        }),
-      ).rejects.toThrow(EtagMismatchError);
-    });
-
     it("sets a another object", async () => {
       await expect(
         directoryClient.setObject({
@@ -139,6 +147,7 @@ types:
         objectId: "test-user",
       });
 
+      expect(user?.id).toEqual("test-user");
       expect(user?.properties).toEqual({ displayName: "test user" });
     });
 
@@ -148,6 +157,7 @@ types:
         objectId: "test-group",
       });
 
+      expect(user?.id).toEqual("test-group");
       expect(user?.properties).toEqual({ displayName: "test group" });
     });
 
@@ -403,6 +413,36 @@ types:
           )
         ).length,
       ).toEqual(2);
+      expect(
+        await readAsyncIterable(
+          await directoryClient.export({ options: "DATA_OBJECTS" }),
+        ),
+      ).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            msg: {
+              case: "object",
+              value: expect.objectContaining({
+                id: "import-user",
+                type: "user",
+                properties: { foo: "bar" },
+                displayName: "name1",
+              }),
+            },
+          }),
+          expect.objectContaining({
+            msg: {
+              case: "object",
+              value: expect.objectContaining({
+                id: "import-group",
+                type: "group",
+                properties: {},
+                displayName: "name2",
+              }),
+            },
+          }),
+        ]),
+      );
     });
 
     it("exports relations", async () => {
@@ -413,6 +453,26 @@ types:
           )
         ).length,
       ).toEqual(1);
+      expect(
+        await readAsyncIterable(
+          await directoryClient.export({ options: "DATA_RELATIONS" }),
+        ),
+      ).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            msg: {
+              case: "relation",
+              value: expect.objectContaining({
+                subjectId: "import-user",
+                subjectType: "user",
+                objectId: "import-group",
+                objectType: "group",
+                relation: "member",
+              }),
+            },
+          }),
+        ]),
+      );
     });
 
     it("deletes an user object with relations", async () => {

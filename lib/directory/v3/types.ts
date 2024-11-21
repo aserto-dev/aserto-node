@@ -21,7 +21,7 @@ import {
   SetRelationRequest as SetRelationRequest$,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
 
-import { DeepOptional, NestedOmit, Optional } from "../../util/types";
+import { NestedOmit, NestedOptional, Optional } from "../../util/types";
 
 enum StatsExportOptions {
   STATS_OBJECTS = Option.STATS | Option.DATA_OBJECTS,
@@ -129,7 +129,7 @@ export type GetObjectManyRequest = Omit<
 
 export type ImportRequest = Omit<
   NestedOmit<
-    DeepOptional<
+    NestedOptional<
       ImportRequest$,
       ["msg.value.properties", "msg.value.etag", "msg.value.subjectRelation"]
     >,
