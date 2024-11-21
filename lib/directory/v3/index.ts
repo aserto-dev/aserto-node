@@ -351,7 +351,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return {};
+      return;
     } catch (error) {
       handleError(error, "deleteObject");
     }
@@ -369,7 +369,7 @@ export class DirectoryV3 {
         return { result: relation, objects: response.objects };
       }
 
-      return { result: {}, objects: response.objects };
+      return;
     } catch (error) {
       handleError(error, "relation");
     }
@@ -400,7 +400,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return {};
+      return;
     } catch (error) {
       handleError(error, "deleteRelation");
     }
@@ -506,7 +506,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return { result: {} };
+      return;
     } catch (error) {
       handleError(error, "setManifest");
     }
@@ -516,7 +516,7 @@ export class DirectoryV3 {
     try {
       await this.ModelClient.deleteManifest(params!, options);
 
-      return {};
+      return;
     } catch (error) {
       handleError(error, "deleteManifest");
     }

@@ -1041,7 +1041,7 @@ describe("DirectoryV3", () => {
         },
         undefined,
       );
-      expect(result).toEqual({});
+      expect(result).toEqual(undefined);
 
       mockDeleteRelation.mockReset();
     });
@@ -1121,7 +1121,7 @@ describe("DirectoryV3", () => {
         .mockResolvedValue(create(SetManifestResponseSchema, { result: {} }));
 
       const result = await directory.setManifest({ body: `a:\n b` });
-      expect(result).toEqual({ result: {} });
+      expect(result).toEqual(undefined);
 
       mockSetManifest.mockReset();
     });
@@ -1146,7 +1146,7 @@ describe("DirectoryV3", () => {
         .mockResolvedValue(create(DeleteManifestResponseSchema, {}));
 
       const result = await directory.deleteManifest();
-      expect(result).toEqual({});
+      expect(result).toEqual(undefined);
 
       mockDeleteManifest.mockReset();
     });
