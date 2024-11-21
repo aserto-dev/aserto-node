@@ -7,7 +7,7 @@ import {
   AnonymousIdentityMapper,
   Authorizer,
   ConfigError,
-  createImportRequest,
+  createAsyncIterable,
   DirectoryServiceV3,
   DirectoryV3,
   displayStateMap,
@@ -329,7 +329,7 @@ types:
     });
 
     it("imports objects and relationships", async () => {
-      const importRequest = createImportRequest([
+      const importRequest = createAsyncIterable([
         {
           opCode: ImportOpCode.SET,
           msg: {

@@ -1,5 +1,4 @@
 import { Opcode } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
-import { createAsyncIterable } from "@connectrpc/connect/protocol";
 
 import { Authorizer, authz } from "./authorizer";
 import AnonymousIdentityMapper from "./authorizer/mapper/identity/anonymous";
@@ -14,6 +13,7 @@ import policyContext from "./authorizer/model/policyContext";
 import policyInstance from "./authorizer/model/policyInstance";
 import queryOptions from "./authorizer/model/queryOptions";
 import {
+  createAsyncIterable,
   createImportRequest,
   DirectoryServiceV3,
   DirectoryV3,

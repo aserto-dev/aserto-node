@@ -43,9 +43,10 @@ import {
   Interceptor,
   Transport,
 } from "@connectrpc/connect";
-import { createAsyncIterable } from "@connectrpc/connect/protocol";
+import { createAsyncIterable as createAsyncIterable$ } from "@connectrpc/connect/protocol";
 import { createGrpcTransport } from "@connectrpc/connect-node";
 
+import { log } from "../../log";
 import {
   handleError,
   setCustomHeaders,
@@ -438,7 +439,7 @@ export class DirectoryV3 {
       return this.ImporterClient.import(params, options);
     } catch (error) {
       handleError(error, "import");
-      return createAsyncIterable([]);
+      return createAsyncIterable$([]);
     }
   }
 
@@ -452,7 +453,7 @@ export class DirectoryV3 {
       );
     } catch (error) {
       handleError(error, "export");
-      return createAsyncIterable([]);
+      return createAsyncIterable$([]);
     }
   }
 
@@ -495,7 +496,7 @@ export class DirectoryV3 {
   async setManifest(params: { body: string }, options?: CallOptions) {
     try {
       await this.ModelClient.setManifest(
-        createAsyncIterable([
+        createAsyncIterable$([
           create(SetManifestRequestSchema, {
             msg: {
               case: "body",
@@ -537,9 +538,14 @@ export async function readAsyncIterable<T>(
 }
 
 export function createImportRequest(params: ImportRequest$[]) {
-  return createAsyncIterable(
+  return createAsyncIterable$(
     params.map((param) => create(ImportRequestSchema, param as ImportRequest)),
   );
+}
+
+export async function* createAsyncIterable<T>(items: T[]) {
+  log("[Deprecated]: please use `createImportRequest`");
+  yield* createImportRequest(items as ImportRequest$[]);
 }
 
 /**
