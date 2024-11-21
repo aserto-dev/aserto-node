@@ -6,7 +6,7 @@ import {
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
 import {
   Importer,
-  ImportRequest as ImportRequest$,
+  ImportRequest,
   ImportRequestSchema,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
 import {
@@ -43,6 +43,7 @@ import {
   Interceptor,
   Transport,
 } from "@connectrpc/connect";
+import { createAsyncIterable } from "@connectrpc/connect/protocol";
 import { createGrpcTransport } from "@connectrpc/connect-node";
 
 import {
@@ -69,7 +70,7 @@ import {
   GetObjectRequest,
   GetRelationRequest,
   GetRelationsRequest,
-  ImportRequest,
+  ImportRequest as ImportRequest$,
   ServiceConfig,
   SetObjectRequest,
   SetRelationRequest,
@@ -432,14 +433,9 @@ export class DirectoryV3 {
     }
   }
 
-  async import(params: ImportRequest[], options?: CallOptions) {
+  async import(params: AsyncIterable<ImportRequest>, options?: CallOptions) {
     try {
-      const request = createAsyncIterable(
-        params.map((param) => {
-          return create(ImportRequestSchema, param as ImportRequest$);
-        }),
-      );
-      return this.ImporterClient.import(request, options);
+      return this.ImporterClient.import(params, options);
     } catch (error) {
       handleError(error, "import");
       return createAsyncIterable([]);
@@ -540,11 +536,10 @@ export async function readAsyncIterable<T>(
   return out;
 }
 
-/**
- * Create an asynchronous iterable from an array.
- */
-export async function* createAsyncIterable<T>(items: T[]): AsyncIterable<T> {
-  yield* items;
+export function createImportRequest(params: ImportRequest$[]) {
+  return createAsyncIterable(
+    params.map((param) => create(ImportRequestSchema, param as ImportRequest)),
+  );
 }
 
 /**

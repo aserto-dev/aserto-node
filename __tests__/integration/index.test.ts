@@ -7,6 +7,7 @@ import {
   AnonymousIdentityMapper,
   Authorizer,
   ConfigError,
+  createImportRequest,
   DirectoryServiceV3,
   DirectoryV3,
   displayStateMap,
@@ -17,7 +18,6 @@ import {
   policyInstance,
   readAsyncIterable,
 } from "../../lib";
-import { ImportRequest } from "../../lib/directory/v3/types";
 import { Topaz, TOPAZ_TIMEOUT } from "../topaz";
 
 describe("Integration", () => {
@@ -329,7 +329,7 @@ types:
     });
 
     it("imports objects and relationships", async () => {
-      const importRequest: ImportRequest[] = [
+      const importRequest = createImportRequest([
         {
           opCode: ImportOpCode.SET,
           msg: {
@@ -367,8 +367,7 @@ types:
             },
           },
         },
-      ];
-
+      ]);
       await expect(
         readAsyncIterable(await directoryClient.import(importRequest)),
       ).resolves.not.toThrow();

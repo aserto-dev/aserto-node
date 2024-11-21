@@ -732,8 +732,8 @@ await directoryClient.deleteManifest();
 ### Import
 
 ```ts
-import { ImportMsgCase, ImportOpCode, objectPropertiesAsStruct } from "@aserto/aserto-node"
-const importRequest = createAsyncIterable([
+import { ImportMsgCase, ImportOpCode, createImportRequest } from "@aserto/aserto-node"
+const importRequest = createImportRequest([
   {
     opCode: ImportOpCode.SET,
     msg: {
@@ -741,7 +741,7 @@ const importRequest = createAsyncIterable([
       value: {
         id: "import-user",
         type: "user",
-        properties: objectPropertiesAsStruct({ foo: "bar" }),
+        properties: { foo: "bar" },
         displayName: "name1",
       },
     },

@@ -36,6 +36,7 @@ import {
 } from "../../../lib/directory/v3/null";
 import {
   ConfigError,
+  createImportRequest,
   DirectoryServiceV3,
   DirectoryV3,
   EtagMismatchError,
@@ -390,9 +391,11 @@ describe("DirectoryV3", () => {
       });
 
       it("throws ClientNotConfigured Error when called", async () => {
-        await expect(directory.import([])).rejects.toThrow(ConfigError);
+        await expect(directory.import(createImportRequest([]))).rejects.toThrow(
+          ConfigError,
+        );
 
-        await expect(directory.import([])).rejects.toThrow(
+        await expect(directory.import(createImportRequest([]))).rejects.toThrow(
           `Cannot call 'import', 'Importer' is not configured.`,
         );
       });
@@ -794,7 +797,7 @@ describe("DirectoryV3", () => {
         .mockRejectedValue(new Error("Directory service error"));
 
       const params = {
-        obbjectId: "1234",
+        objectId: "1234",
         objectType: "user",
         relation: "member",
       };
@@ -1169,7 +1172,7 @@ describe("DirectoryV3", () => {
           createAsyncIterable([create(ImportResponseSchema, {})]),
         );
 
-      await directory.import([]);
+      await directory.import(createImportRequest([]));
 
       expect(mockImport).toHaveBeenCalledWith(
         expect.objectContaining({}),
@@ -1186,7 +1189,7 @@ describe("DirectoryV3", () => {
           throw new Error("Directory service error");
         });
 
-      await expect(directory.import([])).rejects.toThrow(
+      await expect(directory.import(createImportRequest([]))).rejects.toThrow(
         "Directory service error",
       );
 
