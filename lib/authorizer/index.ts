@@ -1,24 +1,33 @@
 import { readFileSync } from "fs";
 import { Module } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/module_pb";
-import { Authorizer as AuthorizerClient } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/authorizer_connect";
+import {
+  Authorizer as AuthorizerClient,
+  DecisionTreeRequestSchema,
+  IsRequestSchema,
+  QueryRequestSchema,
+} from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/authorizer_pb";
 import {
   DecisionTreeRequest as DecisionTreeRequest$,
   IsRequest as IsRequest$,
-  ListPoliciesRequest,
   QueryRequest as QueryRequest$,
 } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/authorizer_pb";
-import { JsonObject, PlainMessage, Struct } from "@bufbuild/protobuf";
+import { create, JsonObject } from "@bufbuild/protobuf";
 import {
   CallOptions,
-  createPromiseClient,
+  Client,
+  createClient,
   Interceptor,
-  PromiseClient,
 } from "@connectrpc/connect";
 import { createGrpcTransport } from "@connectrpc/connect-node";
 
 import { handleError, setHeader, traceMessage } from "../util/connect";
 import policyInstance from "./model/policyInstance";
-import { DecisionTreeRequest, IsRequest, QueryRequest } from "./type";
+import {
+  DecisionTreeRequest,
+  IsRequest,
+  ListPoliciesRequest,
+  QueryRequest,
+} from "./type";
 
 type AuthorizerConfig = {
   authorizerServiceUrl?: string;
@@ -37,7 +46,7 @@ type Path = {
   };
 };
 export class Authorizer {
-  AuthClient: PromiseClient<typeof AuthorizerClient>;
+  AuthClient: Client<typeof AuthorizerClient>;
   constructor(config: AuthorizerConfig) {
     const baseServiceHeaders: Interceptor = (next) => async (req) => {
       config.token && setHeader(req, "authorization", `${config.token}`);
@@ -65,22 +74,18 @@ export class Authorizer {
     };
 
     const baseGrpcTransport = createGrpcTransport({
-      httpVersion: "2",
       baseUrl: `https://${baseServiceUrl}`,
       interceptors: interceptors,
       nodeOptions: baseNodeOptions,
     });
 
-    this.AuthClient = createPromiseClient(AuthorizerClient, baseGrpcTransport);
+    this.AuthClient = createClient(AuthorizerClient, baseGrpcTransport);
   }
 
   async Is(params: IsRequest, options?: CallOptions): Promise<boolean> {
     try {
-      const request: IsRequest$ = new IsRequest$({
+      const request: IsRequest$ = create(IsRequestSchema, {
         ...params,
-        resourceContext: params.resourceContext
-          ? Struct.fromJson(params.resourceContext)
-          : undefined,
         policyInstance:
           params.policyInstance &&
           policyInstance(params.policyInstance.name || ""),
@@ -100,20 +105,15 @@ export class Authorizer {
     options?: CallOptions,
   ): Promise<JsonObject> {
     try {
-      const request: QueryRequest$ = new QueryRequest$({
+      const request: QueryRequest$ = create(QueryRequestSchema, {
         ...params,
-        resourceContext: params.resourceContext
-          ? Struct.fromJson(params.resourceContext)
-          : undefined,
         policyInstance:
           params.policyInstance &&
           policyInstance(params.policyInstance.name || ""),
       });
 
       const response = await this.AuthClient.query(request, options);
-      const query: JsonObject = JSON.parse(
-        response.response?.toJsonString() || "{}",
-      );
+      const query: JsonObject = response.response || {};
 
       return query;
     } catch (error) {
@@ -130,11 +130,8 @@ export class Authorizer {
     pathRoot: string;
   }> {
     try {
-      const request: DecisionTreeRequest$ = new DecisionTreeRequest$({
+      const request: DecisionTreeRequest$ = create(DecisionTreeRequestSchema, {
         ...params,
-        resourceContext: params.resourceContext
-          ? Struct.fromJson(params.resourceContext)
-          : undefined,
         policyInstance:
           params.policyInstance &&
           policyInstance(params.policyInstance.name || ""),
@@ -142,7 +139,7 @@ export class Authorizer {
       const response = await this.AuthClient.decisionTree(request, options);
 
       return {
-        path: JSON.parse(response.path?.toJsonString() || "{}"),
+        path: (response.path || {}) as Path,
         pathRoot: response.pathRoot,
       };
     } catch (error) {
@@ -154,7 +151,7 @@ export class Authorizer {
     }
   }
   async ListPolicies(
-    params: PlainMessage<ListPoliciesRequest>,
+    params: ListPoliciesRequest,
     options?: CallOptions,
   ): Promise<Module[]> {
     try {

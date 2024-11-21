@@ -1,9 +1,15 @@
-import { Option } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
 import {
-  CheckPermissionRequest as CheckPermissionRequest$,
-  CheckRelationRequest as CheckRelationRequest$,
+  Object$,
+  ObjectIdentifier as ObjectIdentifier$,
+  PaginationRequest as PaginationRequest$,
+  Relation as Relation$,
+} from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v3/common_pb";
+import { Option } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
+import { ImportRequest as ImportRequest$ } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
+import {
   CheckRequest as CheckRequest$,
   GetGraphRequest as GetGraphRequest$,
+  GetObjectManyRequest as GetObjectManyRequest$,
   GetObjectRequest as GetObjectRequest$,
   GetRelationRequest as GetRelationRequest$,
   GetRelationsRequest as GetRelationsRequest$,
@@ -14,14 +20,8 @@ import {
   SetObjectRequest as SetObjectRequest$,
   SetRelationRequest as SetRelationRequest$,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
-import {
-  JsonValue,
-  PartialMessage,
-  PlainMessage,
-  Struct,
-} from "@bufbuild/protobuf";
 
-import { NestedOmit, PartialExcept } from "../../util/types";
+import { DeepOptional, NestedOmit, Optional } from "../../util/types";
 
 enum StatsExportOptions {
   STATS_OBJECTS = Option.STATS | Option.DATA_OBJECTS,
@@ -53,66 +53,87 @@ export type DirectoryV3Config = ServiceConfig & {
   exporter?: ServiceConfig;
   model?: ServiceConfig;
 };
+type Object = Optional<Omit<Object$, "$typeName">, "etag" | "displayName">;
+type Relation = Optional<
+  Omit<Relation$, "$typeName">,
+  "etag" | "subjectRelation"
+>;
+type ObjectIdentifier = Omit<ObjectIdentifier$, "$typeName">;
 
-export type GetObjectRequest = PartialExcept<
-  PlainMessage<GetObjectRequest$>,
-  ["withRelations"]
+type PaginationRequest = Optional<
+  Omit<PaginationRequest$, "$typeName">,
+  "token"
 >;
 
-export type GetRelationRequest = PartialExcept<
-  PlainMessage<GetRelationRequest$>,
-  ["subjectRelation", "withObjects", "subjectId"]
+export type GetObjectRequest = Optional<
+  Omit<GetObjectRequest$, "$typeName" | "page">,
+  "withRelations"
+> & { page?: PaginationRequest };
+
+export type GetRelationRequest = Optional<
+  Omit<GetRelationRequest$, "$typeName">,
+  "subjectRelation" | "withObjects" | "subjectId"
 >;
 
-export type GetRelationsRequest = PartialMessage<GetRelationsRequest$>;
+export type GetRelationsRequest = Optional<
+  Omit<GetRelationsRequest$, "$typeName" | "page">,
+  | "objectId"
+  | "objectType"
+  | "relation"
+  | "subjectId"
+  | "subjectRelation"
+  | "subjectType"
+  | "withObjects"
+  | "withEmptySubjectRelation"
+> & { page?: PaginationRequest };
 
-export type SetObjectRequest = PartialExcept<
-  NestedOmit<PlainMessage<SetObjectRequest$>, "object.properties"> & {
-    object?: { properties?: { [key: string]: JsonValue } | Struct };
-  },
-  ["object.etag", "object.displayName"]
+export type SetObjectRequest = Omit<
+  SetObjectRequest$,
+  "$typeName" | "object"
+> & { object?: Object };
+
+export type DeleteObjectRequest = Optional<
+  Omit<DeleteObjectRequest$, "$typeName">,
+  "withRelations"
 >;
 
-export type DeleteObjectRequest = PartialExcept<
-  PlainMessage<DeleteObjectRequest$>,
-  ["withRelations"]
+export type SetRelationRequest = Omit<
+  SetRelationRequest$,
+  "$typeName" | "relation"
+> & { relation: Optional<Relation, "etag" | "subjectRelation"> };
+
+export type DeleteRelationRequest = Optional<
+  Omit<DeleteRelationRequest$, "$typeName">,
+  "subjectRelation"
 >;
 
-export type SetRelationRequest = PartialExcept<
-  PlainMessage<SetRelationRequest$>,
-  ["relation.etag", "relation.subjectRelation"]
+export type CheckRequest = Optional<Omit<CheckRequest$, "$typeName">, "trace">;
+
+export type GetGraphRequest = Optional<
+  Omit<GetGraphRequest$, "$typeName">,
+  | "objectType"
+  | "objectId"
+  | "subjectType"
+  | "subjectId"
+  | "subjectRelation"
+  | "explain"
+  | "trace"
 >;
 
-export type DeleteRelationRequest = PartialExcept<
-  PlainMessage<DeleteRelationRequest$>,
-  ["subjectRelation"]
->;
+export type GetObjectManyRequest = Omit<
+  GetObjectManyRequest$,
+  "$typeName" | "param"
+> & {
+  param: ObjectIdentifier[];
+};
 
-export type CheckPermissionRequest = PartialExcept<
-  PlainMessage<CheckPermissionRequest$>,
-  ["trace"]
->;
-
-export type CheckRelationRequest = PartialExcept<
-  PlainMessage<CheckRelationRequest$>,
-  ["trace"]
->;
-
-export type CheckRequest = PartialExcept<
-  PlainMessage<CheckRequest$>,
-  ["trace"]
->;
-
-export type GetGraphRequest = PartialExcept<
-  PlainMessage<GetGraphRequest$>,
-  [
-    "objectType",
-    "objectId",
-    "relation",
-    "subjectType",
-    "subjectId",
-    "subjectRelation",
-    "explain",
-    "trace",
-  ]
+export type ImportRequest = Omit<
+  NestedOmit<
+    DeepOptional<
+      ImportRequest$,
+      ["msg.value.properties", "msg.value.etag", "msg.value.subjectRelation"]
+    >,
+    "msg.value.$typeName"
+  >,
+  "$typeName"
 >;

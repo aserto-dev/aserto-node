@@ -15,9 +15,7 @@ describe("JWTIdentityMapper", () => {
     });
 
     await expect(jwtMapper(req)).rejects.toEqual(
-      new InvalidTokenError(
-        "Invalid token specified: missing part #2"
-      )
+      new InvalidTokenError("Invalid token specified: missing part #2"),
     );
   });
 
@@ -29,9 +27,7 @@ describe("JWTIdentityMapper", () => {
     });
 
     await expect(jwtMapper(req)).rejects.toEqual(
-      new InvalidTokenError(
-        "Invalid token specified: missing part #2"
-      )
+      new InvalidTokenError("Invalid token specified: missing part #2"),
     );
   });
 
@@ -39,7 +35,7 @@ describe("JWTIdentityMapper", () => {
     const req = httpMocks.createRequest({});
 
     await expect(jwtMapper(req)).rejects.toEqual(
-      new Error("Missing Authorization header")
+      new Error("Missing Authorization header"),
     );
   });
 
@@ -81,9 +77,7 @@ describe("JWTIdentityMapper", () => {
     const customJwtMapper = JWTIdentityMapper("custom");
 
     await expect(customJwtMapper(req)).rejects.toEqual(
-      new InvalidTokenError(
-        "Invalid token specified: missing part #2"
-      )
+      new InvalidTokenError("Invalid token specified: missing part #2"),
     );
   });
 
@@ -93,7 +87,7 @@ describe("JWTIdentityMapper", () => {
     const customJwtMapper = JWTIdentityMapper("custom");
 
     await expect(customJwtMapper(req)).rejects.toEqual(
-      new Error("Missing custom header")
+      new Error("Missing custom header"),
     );
   });
 });

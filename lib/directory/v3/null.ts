@@ -1,10 +1,10 @@
 // import { GetManifestResponse } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
 
-import { Exporter } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_connect";
-import { Importer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_connect";
-import { Model } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_connect";
-import { Reader } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_connect";
-import { Writer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_connect";
+import { Exporter } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
+import { Importer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
+import { Model } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
+import { Reader } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_pb";
+import { Writer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
 
 import { ConfigError } from "../../errors";
 

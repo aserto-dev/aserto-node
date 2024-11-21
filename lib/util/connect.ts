@@ -1,4 +1,3 @@
-import { AnyMessage } from "@bufbuild/protobuf";
 import {
   Code,
   ConnectError,
@@ -17,9 +16,7 @@ import {
 import { log } from "../log";
 
 export const setHeader = (
-  req:
-    | UnaryRequest<AnyMessage, AnyMessage>
-    | StreamRequest<AnyMessage, AnyMessage>,
+  req: UnaryRequest | StreamRequest,
   key: string,
   value: string,
 ) => {

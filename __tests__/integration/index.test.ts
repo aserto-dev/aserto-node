@@ -5,7 +5,6 @@ import request from "supertest";
 import {
   AnonymousIdentityMapper,
   Authorizer,
-  createAsyncIterable,
   DirectoryServiceV3,
   DirectoryV3,
   displayStateMap,
@@ -13,11 +12,11 @@ import {
   ImportMsgCase,
   ImportOpCode,
   NotFoundError,
-  objectPropertiesAsStruct,
   policyContext,
   policyInstance,
   readAsyncIterable,
 } from "../../lib";
+import { ImportRequest } from "../../lib/directory/v3/types";
 import { Topaz, TOPAZ_TIMEOUT } from "../topaz";
 
 describe("Integration", () => {
@@ -72,7 +71,7 @@ types:
 `;
 
     it("deletes a manifest", async () => {
-      await expect(directoryClient.deleteManifest({})).resolves.not.toThrow();
+      await expect(directoryClient.deleteManifest()).resolves.not.toThrow();
     });
 
     it("reads an empty manifest", async () => {
@@ -84,7 +83,7 @@ types:
       await expect(
         directoryClient.setManifest({
           body: manifest,
-        })
+        }),
       ).resolves.not.toThrow();
     });
 
@@ -103,7 +102,7 @@ types:
               displayName: "test user",
             },
           },
-        })
+        }),
       ).resolves.not.toThrow();
     });
 
@@ -116,7 +115,7 @@ types:
             displayName: "updated",
             etag: "updated",
           },
-        })
+        }),
       ).rejects.toThrow(EtagMismatchError);
     });
 
@@ -130,7 +129,7 @@ types:
               displayName: "test group",
             },
           },
-        })
+        }),
       ).resolves.not.toThrow();
     });
 
@@ -140,7 +139,7 @@ types:
         objectId: "test-user",
       });
 
-      expect(user?.properties?.toJson()).toEqual({ displayName: "test user" });
+      expect(user?.properties).toEqual({ displayName: "test user" });
     });
 
     it("gets another object", async () => {
@@ -149,7 +148,7 @@ types:
         objectId: "test-group",
       });
 
-      expect(user?.properties?.toJson()).toEqual({ displayName: "test group" });
+      expect(user?.properties).toEqual({ displayName: "test group" });
     });
 
     it("creates a relation between user and group", async () => {
@@ -162,7 +161,7 @@ types:
             objectId: "test-group",
             objectType: "group",
           },
-        })
+        }),
       ).resolves.not.toThrow();
     });
 
@@ -174,7 +173,7 @@ types:
           relation: "member",
           objectId: "test-group",
           objectType: "group",
-        })
+        }),
       ).toEqual({
         objects: {},
         result: expect.objectContaining({
@@ -187,18 +186,6 @@ types:
       });
     });
 
-    it("checks the relation betwen an user and group(true)", async () => {
-      expect(
-        await directoryClient.checkRelation({
-          subjectId: "test-user",
-          subjectType: "user",
-          relation: "member",
-          objectId: "test-group",
-          objectType: "group",
-        })
-      ).toEqual({ check: true, trace: [] });
-    });
-
     it("check(relation) betwen an user and group", async () => {
       expect(
         await directoryClient.check({
@@ -207,7 +194,7 @@ types:
           relation: "member",
           objectId: "test-group",
           objectType: "group",
-        })
+        }),
       ).toMatchObject({ check: true, trace: [] });
     });
 
@@ -219,32 +206,8 @@ types:
           relation: "read",
           objectId: "test-group",
           objectType: "group",
-        })
+        }),
       ).toMatchObject({ check: true, trace: [] });
-    });
-
-    it("checks inexistent relation throws NotFoundError", async () => {
-      await expect(
-        directoryClient.checkRelation({
-          subjectId: "test-user",
-          subjectType: "user",
-          relation: "owner",
-          objectId: "test-group",
-          objectType: "group",
-        })
-      ).rejects.toThrow(NotFoundError);
-    });
-
-    it("checks inexistent permission throws NotFoundError", async () => {
-      await expect(
-        directoryClient.checkPermission({
-          subjectId: "test-user",
-          subjectType: "user",
-          permission: "write",
-          objectId: "test-group",
-          objectType: "group",
-        })
-      ).rejects.toThrow(NotFoundError);
     });
 
     it("lists the relations of an object", async () => {
@@ -252,7 +215,7 @@ types:
         await directoryClient.relations({
           subjectId: "test-user",
           subjectType: "user",
-        })
+        }),
       ).toEqual({
         objects: {},
         page: { nextToken: "" },
@@ -276,7 +239,7 @@ types:
           relation: "member",
           objectId: "test-group",
           objectType: "group",
-        })
+        }),
       ).resolves.not.toThrow();
     });
 
@@ -288,7 +251,7 @@ types:
           relation: "member",
           objectId: "test-group",
           objectType: "group",
-        })
+        }),
       ).rejects.toThrow(NotFoundError);
     });
 
@@ -323,7 +286,7 @@ types:
         directoryClient.deleteObject({
           objectType: "user",
           objectId: "test-user",
-        })
+        }),
       ).resolves.not.toThrow();
     });
 
@@ -332,19 +295,19 @@ types:
         directoryClient.deleteObject({
           objectType: "group",
           objectId: "test-group",
-        })
+        }),
       ).resolves.not.toThrow();
     });
 
     it("throws NotFoundError when getting a deleted user object", async () => {
       await expect(
-        directoryClient.object({ objectType: "user", objectId: "test-user" })
+        directoryClient.object({ objectType: "user", objectId: "test-user" }),
       ).rejects.toThrow(NotFoundError);
     });
 
     it("throws NotFoundError when getting a deleted group object", async () => {
       await expect(
-        directoryClient.object({ objectType: "group", objectId: "test-group" })
+        directoryClient.object({ objectType: "group", objectId: "test-group" }),
       ).rejects.toThrow(NotFoundError);
     });
 
@@ -356,7 +319,7 @@ types:
     });
 
     it("imports objects and relationships", async () => {
-      const importRequest = createAsyncIterable([
+      const importRequest: ImportRequest[] = [
         {
           opCode: ImportOpCode.SET,
           msg: {
@@ -364,7 +327,7 @@ types:
             value: {
               id: "import-user",
               type: "user",
-              properties: objectPropertiesAsStruct({ foo: "bar" }),
+              properties: { foo: "bar" },
               displayName: "name1",
             },
           },
@@ -394,10 +357,10 @@ types:
             },
           },
         },
-      ]);
+      ];
 
       await expect(
-        readAsyncIterable(await directoryClient.import(importRequest))
+        readAsyncIterable(await directoryClient.import(importRequest)),
       ).resolves.not.toThrow();
     });
 
@@ -405,9 +368,9 @@ types:
       expect(
         (
           await readAsyncIterable(
-            await directoryClient.export({ options: "DATA" })
+            await directoryClient.export({ options: "DATA" }),
           )
-        ).length
+        ).length,
       ).toEqual(3);
     });
 
@@ -421,14 +384,13 @@ types:
       };
 
       const response = await readAsyncIterable(
-        await directoryClient.export({ options: "STATS_OBJECTS" })
+        await directoryClient.export({ options: "STATS_OBJECTS" }),
       );
-      const stats: Stats = JSON.parse(
-        response?.[0]?.msg?.value?.toJsonString() || "{}"
-      );
+      const stats: Stats = response?.[0]?.msg?.value as Stats;
+
       const totals = Object.values(stats["object_types"] || {}).reduce(
         (n, { _obj_count }) => n + _obj_count,
-        0
+        0,
       );
       expect(totals).toEqual(2);
     });
@@ -437,9 +399,9 @@ types:
       expect(
         (
           await readAsyncIterable(
-            await directoryClient.export({ options: "DATA_OBJECTS" })
+            await directoryClient.export({ options: "DATA_OBJECTS" }),
           )
-        ).length
+        ).length,
       ).toEqual(2);
     });
 
@@ -447,9 +409,9 @@ types:
       expect(
         (
           await readAsyncIterable(
-            await directoryClient.export({ options: "DATA_RELATIONS" })
+            await directoryClient.export({ options: "DATA_RELATIONS" }),
           )
-        ).length
+        ).length,
       ).toEqual(1);
     });
 
@@ -459,7 +421,7 @@ types:
           objectType: "user",
           objectId: "import-user",
           withRelations: true,
-        })
+        }),
       ).resolves.not.toThrow();
     });
 
@@ -469,13 +431,13 @@ types:
           objectType: "group",
           objectId: "import-group",
           withRelations: true,
-        })
+        }),
       ).resolves.not.toThrow();
     });
 
     it("throws NotFoundError when getting a deleted user object", async () => {
       await expect(
-        directoryClient.object({ objectType: "user", objectId: "import-user" })
+        directoryClient.object({ objectType: "user", objectId: "import-user" }),
       ).rejects.toThrow(NotFoundError);
     });
 
@@ -484,7 +446,7 @@ types:
         directoryClient.object({
           objectType: "group",
           objectId: "import-group",
-        })
+        }),
       ).rejects.toThrow(NotFoundError);
     });
 
@@ -496,7 +458,7 @@ types:
           relation: "member",
           objectId: "import-group",
           objectType: "group",
-        })
+        }),
       ).rejects.toThrow(NotFoundError);
     });
   });
@@ -559,8 +521,8 @@ types:
             return new Promise((resolve) => {
               resolve(policyContext("todoApp", ["allowed"]));
             });
-          }
-        )
+          },
+        ),
       );
 
       const response = await request(app)
@@ -610,8 +572,8 @@ types:
             return new Promise((resolve) => {
               resolve(policyContext("todoApp", ["allowed"]));
             });
-          }
-        )
+          },
+        ),
       );
 
       const response = await request(app)
