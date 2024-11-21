@@ -624,9 +624,9 @@ await directoryClient.deleteRelation({
 
 You can evaluate graph queries over the directory, to determine whether a subject (e.g. user) has a permission or a relation to an object instance.
 
-#### 'checkPermission' function
+#### 'check' function
 
-`checkPermission({ objectType: string, objectId: string, permission: string, subjectType: string, subjectId: string, trace: boolean }, options?: CallOptions)`:
+`check({ objectType: string, objectId: string, relation: string, subjectType: string, subjectId: string, trace: boolean }, options?: CallOptions)`:
 
 Check that an `user` object with the key `euang@acmecorp.com` has the `read` permission in the `admin` group:
 
@@ -639,10 +639,6 @@ const check = await directoryClient.checkPermission({
   objectId: 'admin',
 });
 ```
-
-#### 'checkRelation' function
-
-`checkRelation({ objectType: string, objectId: string, relation: string, subjectType: string, subjectId: string, trace: boolean }, options?: CallOptions)`:
 
 Check that `euang@acmecorp.com` has an `identifier` relation to an object with key `euang@acmecorp.com` and type `identity`:
 
@@ -730,6 +726,8 @@ await directoryClient.deleteManifest();
 ```
 
 ### Import
+
+`createAsyncIterable` has been deprecated, please use `createImportRequest`
 
 ```ts
 import { ImportMsgCase, ImportOpCode, createImportRequest } from "@aserto/aserto-node"
