@@ -1,3 +1,4 @@
+import { DescMessage } from "@bufbuild/protobuf";
 import {
   Code,
   ConnectError,
@@ -16,7 +17,9 @@ import {
 import { log } from "../log";
 
 export const setHeader = (
-  req: UnaryRequest | StreamRequest,
+  req:
+    | UnaryRequest<DescMessage, DescMessage>
+    | StreamRequest<DescMessage, DescMessage>,
   key: string,
   value: string,
 ) => {
@@ -24,7 +27,15 @@ export const setHeader = (
 };
 
 export const traceMessage: Interceptor = (next) => async (req) => {
-  log(JSON.stringify(req));
+  log(
+    JSON.stringify({
+      message: req.message,
+      method: req.method.toString(),
+      requestMethod: req.requestMethod.toString(),
+      service: req.service.toString(),
+      url: req.url.toString(),
+    }),
+  );
   return await next(req);
 };
 
