@@ -131,7 +131,12 @@ export type ImportRequest = Omit<
   NestedOmit<
     NestedOptional<
       ImportRequest$,
-      ["msg.value.properties", "msg.value.etag", "msg.value.subjectRelation"]
+      [
+        "msg.value.properties",
+        "msg.value.etag",
+        "msg.value.displayName",
+        "msg.value.subjectRelation",
+      ]
     >,
     "msg.value.$typeName"
   >,

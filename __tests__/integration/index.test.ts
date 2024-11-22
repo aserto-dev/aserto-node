@@ -8,6 +8,7 @@ import {
   Authorizer,
   ConfigError,
   createAsyncIterable,
+  createImportRequest,
   DirectoryServiceV3,
   DirectoryV3,
   displayStateMap,
@@ -510,6 +511,111 @@ types:
     });
 
     it("throws NotFoundError when getting a delete relation", async () => {
+      await expect(
+        directoryClient.relation({
+          subjectId: "import-user",
+          subjectType: "user",
+          relation: "member",
+          objectId: "import-group",
+          objectType: "group",
+        }),
+      ).rejects.toThrow(NotFoundError);
+    });
+
+    it("deletes imported objects and relationships", async () => {
+      const importRequest = createImportRequest([
+        {
+          opCode: ImportOpCode.SET,
+          msg: {
+            case: ImportMsgCase.OBJECT,
+            value: {
+              id: "import-user",
+              type: "user",
+              properties: { foo: "bar" },
+              displayName: "name1",
+            },
+          },
+        },
+        {
+          opCode: ImportOpCode.SET,
+          msg: {
+            case: ImportMsgCase.OBJECT,
+            value: {
+              id: "import-group",
+              type: "group",
+              properties: {},
+              displayName: "name2",
+            },
+          },
+        },
+        {
+          opCode: ImportOpCode.SET,
+          msg: {
+            case: ImportMsgCase.RELATION,
+            value: {
+              subjectId: "import-user",
+              subjectType: "user",
+              objectId: "import-group",
+              objectType: "group",
+              relation: "member",
+            },
+          },
+        },
+      ]);
+      await expect(
+        readAsyncIterable(await directoryClient.import(importRequest)),
+      ).resolves.not.toThrow();
+      await expect(
+        directoryClient.object({
+          objectType: "user",
+          objectId: "import-user",
+        }),
+      ).resolves.not.toThrow();
+      await expect(
+        directoryClient.relation({
+          subjectId: "import-user",
+          subjectType: "user",
+          relation: "member",
+          objectId: "import-group",
+          objectType: "group",
+        }),
+      ).resolves.not.toThrow();
+
+      const deleteRequest = createImportRequest([
+        {
+          opCode: ImportOpCode.DELETE,
+          msg: {
+            case: ImportMsgCase.OBJECT,
+            value: {
+              id: "import-user",
+              type: "user",
+            },
+          },
+        },
+        {
+          opCode: ImportOpCode.DELETE,
+          msg: {
+            case: ImportMsgCase.RELATION,
+            value: {
+              subjectId: "import-user",
+              subjectType: "user",
+              objectId: "import-group",
+              objectType: "group",
+              relation: "member",
+            },
+          },
+        },
+      ]);
+
+      await expect(
+        readAsyncIterable(await directoryClient.import(deleteRequest)),
+      ).resolves.not.toThrow();
+      await expect(
+        directoryClient.object({
+          objectType: "user",
+          objectId: "import-user",
+        }),
+      ).rejects.toThrow(NotFoundError);
       await expect(
         directoryClient.relation({
           subjectId: "import-user",

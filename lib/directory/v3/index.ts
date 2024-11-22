@@ -537,8 +537,8 @@ export async function readAsyncIterable<T>(
   return out;
 }
 
-export function createImportRequest(params: ImportRequest$[]) {
-  return createAsyncIterable$(
+export async function* createImportRequest(params: ImportRequest$[]) {
+  yield* createAsyncIterable$(
     params.map((param) => create(ImportRequestSchema, param as ImportRequest)),
   );
 }
