@@ -28,13 +28,6 @@ import { createAsyncIterable } from "@connectrpc/connect/protocol";
 import * as connectNode from "@connectrpc/connect-node";
 
 import {
-  nullExporterProxy,
-  nullImporterProxy,
-  nullModelProxy,
-  nullReaderProxy,
-  nullWriterProxy,
-} from "../../../lib/directory/v3/null";
-import {
   ConfigError,
   createImportRequest,
   DirectoryServiceV3,
@@ -318,10 +311,6 @@ describe("DirectoryV3", () => {
         },
       });
 
-      it("is defined as a proxy", () => {
-        expect(directory.ReaderClient).toBe(nullReaderProxy);
-      });
-
       it("throws ClientNotConfigured Error when called", async () => {
         await expect(directory.objects({ objectType: "" })).rejects.toThrow(
           ConfigError,
@@ -353,10 +342,6 @@ describe("DirectoryV3", () => {
         },
       });
 
-      it("is defined as a proxy", () => {
-        expect(directory.WriterClient).toBe(nullWriterProxy);
-      });
-
       it("throws ClientNotConfigured Error when called", async () => {
         await expect(directory.setObject({})).rejects.toThrow(ConfigError);
 
@@ -384,10 +369,6 @@ describe("DirectoryV3", () => {
           tenantId: "tenantId",
           apiKey: "apiKey",
         },
-      });
-
-      it("is defined as a proxy", () => {
-        expect(directory.ImporterClient).toBe(nullImporterProxy);
       });
 
       it("throws ClientNotConfigured Error when called", async () => {
@@ -421,10 +402,6 @@ describe("DirectoryV3", () => {
         },
       });
 
-      it("is defined as a proxy", () => {
-        expect(directory.ExporterClient).toBe(nullExporterProxy);
-      });
-
       it("throws ClientNotConfigured Error when called", async () => {
         await expect(directory.export({ options: "DATA" })).rejects.toThrow(
           ConfigError,
@@ -454,10 +431,6 @@ describe("DirectoryV3", () => {
           tenantId: "tenantId",
           apiKey: "apiKey",
         },
-      });
-
-      it("is defined as a proxy", () => {
-        expect(directory.ModelClient).toBe(nullModelProxy);
       });
 
       it("throws ClientNotConfigured Error when called", async () => {

@@ -248,20 +248,20 @@ export class DirectoryV3 {
 
     this.ReaderClient = !!readerGrpcTransport
       ? createClient(Reader, readerGrpcTransport)
-      : (nullReaderProxy as unknown as Client<typeof Reader>);
+      : nullReaderProxy();
     this.WriterClient = !!writerGrpcTransport
       ? createClient(Writer, writerGrpcTransport)
-      : (nullWriterProxy as unknown as Client<typeof Writer>);
+      : nullWriterProxy();
     this.ImporterClient = !!importerGrpcTransport
       ? createClient(Importer, importerGrpcTransport)
-      : (nullImporterProxy as unknown as Client<typeof Importer>);
+      : nullImporterProxy();
     this.ExporterClient = !!exporterGrpcTransport
       ? createClient(Exporter, exporterGrpcTransport)
-      : (nullExporterProxy as unknown as Client<typeof Exporter>);
+      : nullExporterProxy();
 
     this.ModelClient = !!modelGrpcTransport
       ? createClient(Model, modelGrpcTransport)
-      : (nullModelProxy as unknown as Client<typeof Model>);
+      : nullModelProxy();
 
     this.CreateTransport = createTransport;
   }

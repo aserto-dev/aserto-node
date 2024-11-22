@@ -16,3 +16,5 @@ yalc.lock
 !.yarn/versions
 
 .early.coverage
+
+tsconfig.tsbuildinfo

@@ -113,6 +113,5 @@ const execute = async (command: string) => {
     log(`stderr: ${stderr}`);
     return;
   }
-  log(`stdout: ${stdout}`);
   return stdout;
 };
