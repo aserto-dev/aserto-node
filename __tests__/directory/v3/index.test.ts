@@ -468,7 +468,11 @@ describe("DirectoryV3", () => {
         },
         undefined,
       );
-      expect(result).toEqual({ check: true, trace: [] });
+      expect(result).toEqual({
+        $typeName: "aserto.directory.reader.v3.CheckResponse",
+        check: true,
+        trace: [],
+      });
 
       mockCheck.mockReset();
     });
@@ -509,10 +513,15 @@ describe("DirectoryV3", () => {
       const result = await directory.object(params);
 
       expect(result).toEqual({
-        displayName: "",
-        etag: "",
-        id: "123",
-        type: "",
+        $typeName: "aserto.directory.reader.v3.GetObjectResponse",
+        relations: [],
+        result: {
+          $typeName: "aserto.directory.common.v3.Object",
+          displayName: "",
+          etag: "",
+          id: "123",
+          type: "",
+        },
       });
 
       mockGetObject.mockReset();
@@ -570,7 +579,10 @@ describe("DirectoryV3", () => {
       );
       const result = await directory.objects(params);
 
-      expect(result).toEqual({ results: [], page: {} });
+      expect(result).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
+        results: [],
+      });
 
       mockGetObjects.mockReset();
     });
@@ -715,7 +727,10 @@ describe("DirectoryV3", () => {
       const params = { param: [{ objectType: "user", objectId: "123" }] };
       const result = await directory.objectMany(params);
 
-      expect(result).toEqual({ results: [] });
+      expect(result).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetObjectManyResponse",
+        results: [],
+      });
 
       mockGetObjectMany.mockReset();
     });
@@ -759,7 +774,11 @@ describe("DirectoryV3", () => {
         },
         undefined,
       );
-      expect(result).toEqual({ results: [], trace: [] });
+      expect(result).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetGraphResponse",
+        results: [],
+        trace: [],
+      });
 
       mockGetGraph.mockReset();
     });
@@ -843,7 +862,9 @@ describe("DirectoryV3", () => {
       const result = await directory.relation(params);
 
       expect(result).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetRelationResponse",
         result: {
+          $typeName: "aserto.directory.common.v3.Relation",
           subjectType: "user",
           subjectId: "123",
           objectType: "identity",
@@ -905,7 +926,11 @@ describe("DirectoryV3", () => {
       );
       const result = await directory.relations(params);
 
-      expect(result).toEqual({ results: [], objects: {}, page: {} });
+      expect(result).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetRelationsResponse",
+        results: [],
+        objects: {},
+      });
 
       mockGetRelations.mockReset();
     });
@@ -1014,7 +1039,10 @@ describe("DirectoryV3", () => {
         },
         undefined,
       );
-      expect(result).toEqual(undefined);
+      expect(result).toEqual({
+        $typeName: "aserto.directory.writer.v3.DeleteRelationResponse",
+        result: { $typeName: "google.protobuf.Empty" },
+      });
 
       mockDeleteRelation.mockReset();
     });
@@ -1094,7 +1122,10 @@ describe("DirectoryV3", () => {
         .mockResolvedValue(create(SetManifestResponseSchema, { result: {} }));
 
       const result = await directory.setManifest({ body: `a:\n b` });
-      expect(result).toEqual(undefined);
+      expect(result).toEqual({
+        $typeName: "aserto.directory.model.v3.SetManifestResponse",
+        result: { $typeName: "google.protobuf.Empty" },
+      });
 
       mockSetManifest.mockReset();
     });
@@ -1119,7 +1150,9 @@ describe("DirectoryV3", () => {
         .mockResolvedValue(create(DeleteManifestResponseSchema, {}));
 
       const result = await directory.deleteManifest();
-      expect(result).toEqual(undefined);
+      expect(result).toEqual({
+        $typeName: "aserto.directory.model.v3.DeleteManifestResponse",
+      });
 
       mockDeleteManifest.mockReset();
     });

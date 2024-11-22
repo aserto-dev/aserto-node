@@ -268,12 +268,10 @@ export class DirectoryV3 {
 
   async check(params: CheckRequest, options?: CallOptions) {
     try {
-      const response = await this.ReaderClient.check(
+      return await this.ReaderClient.check(
         create(CheckRequestSchema, params),
         options,
       );
-
-      return { check: response.check, trace: response.trace };
     } catch (error) {
       handleError(error, "check");
     }
@@ -281,16 +279,10 @@ export class DirectoryV3 {
 
   async object(params: GetObjectRequest, options?: CallOptions) {
     try {
-      const response = await this.ReaderClient.getObject(
+      return await this.ReaderClient.getObject(
         create(GetObjectRequestSchema, params),
         options,
       );
-
-      if (response.result) {
-        const { $typeName: _, ...obj } = response.result;
-        return obj;
-      }
-      return;
     } catch (error) {
       handleError(error, "object");
     }
@@ -303,13 +295,10 @@ export class DirectoryV3 {
     options?: CallOptions,
   ) {
     try {
-      const response = await this.ReaderClient.getObjects(
+      return await this.ReaderClient.getObjects(
         create(GetObjectsRequestSchema, params),
         options,
       );
-
-      const { $typeName: _, ...page } = response.page || {};
-      return { results: response.results, page: page };
     } catch (error) {
       handleError(error, "objects");
     }
@@ -317,12 +306,10 @@ export class DirectoryV3 {
 
   async objectMany(params: GetObjectManyRequest, options?: CallOptions) {
     try {
-      const response = await this.ReaderClient.getObjectMany(
+      return await this.ReaderClient.getObjectMany(
         create(GetObjectManyRequestSchema, params),
         options,
       );
-
-      return { results: response.results };
     } catch (error) {
       handleError(error, "objectMany");
     }
@@ -330,16 +317,10 @@ export class DirectoryV3 {
 
   async setObject(params: SetObjectRequest, options?: CallOptions) {
     try {
-      const response = await this.WriterClient.setObject(
+      return await this.WriterClient.setObject(
         create(SetObjectRequestSchema, params),
         options,
       );
-
-      if (response.result) {
-        const { $typeName: _, ...obj } = response.result;
-        return obj;
-      }
-      return;
     } catch (error) {
       handleError(error, "setObject");
     }
@@ -347,12 +328,10 @@ export class DirectoryV3 {
 
   async deleteObject(params: DeleteObjectRequest, options?: CallOptions) {
     try {
-      await this.WriterClient.deleteObject(
+      return await this.WriterClient.deleteObject(
         create(DeleteObjectRequestSchema, params),
         options,
       );
-
-      return;
     } catch (error) {
       handleError(error, "deleteObject");
     }
@@ -360,17 +339,10 @@ export class DirectoryV3 {
 
   async relation(params: GetRelationRequest, options?: CallOptions) {
     try {
-      const response = await this.ReaderClient.getRelation(
+      return await this.ReaderClient.getRelation(
         create(GetRelationRequestSchema, params),
         options,
       );
-
-      if (response.result) {
-        const { $typeName: _, ...relation } = response.result;
-        return { result: relation, objects: response.objects };
-      }
-
-      return;
     } catch (error) {
       handleError(error, "relation");
     }
@@ -378,17 +350,10 @@ export class DirectoryV3 {
 
   async setRelation(params: SetRelationRequest, options?: CallOptions) {
     try {
-      const response = await this.WriterClient.setRelation(
+      return this.WriterClient.setRelation(
         create(SetRelationRequestSchema, params),
         options,
       );
-
-      if (response.result) {
-        const { $typeName: _, ...relation } = response.result;
-        return relation;
-      }
-
-      return;
     } catch (error) {
       handleError(error, "setRelation");
     }
@@ -396,12 +361,10 @@ export class DirectoryV3 {
 
   async deleteRelation(params: DeleteRelationRequest, options?: CallOptions) {
     try {
-      await this.WriterClient.deleteRelation(
+      return await this.WriterClient.deleteRelation(
         create(DeleteRelationRequestSchema, params),
         options,
       );
-
-      return;
     } catch (error) {
       handleError(error, "deleteRelation");
     }
@@ -409,13 +372,7 @@ export class DirectoryV3 {
 
   async relations(params: GetRelationsRequest, options?: CallOptions) {
     try {
-      const response = await this.ReaderClient.getRelations(params, options);
-      const { $typeName: _, ...page } = response.page || {};
-      return {
-        objects: response.objects,
-        results: response.results,
-        page: page,
-      };
+      return await this.ReaderClient.getRelations(params, options);
     } catch (error) {
       handleError(error, "relations");
     }
@@ -423,12 +380,10 @@ export class DirectoryV3 {
 
   async graph(params: GetGraphRequest, options?: CallOptions) {
     try {
-      const response = await this.ReaderClient.getGraph(
+      return await this.ReaderClient.getGraph(
         create(GetGraphRequestSchema, params),
         options,
       );
-
-      return { results: response.results, trace: response.trace };
     } catch (error) {
       handleError(error, "graph");
     }
@@ -495,7 +450,7 @@ export class DirectoryV3 {
 
   async setManifest(params: { body: string }, options?: CallOptions) {
     try {
-      await this.ModelClient.setManifest(
+      return await this.ModelClient.setManifest(
         createAsyncIterable$([
           create(SetManifestRequestSchema, {
             msg: {
@@ -506,8 +461,6 @@ export class DirectoryV3 {
         ]),
         options,
       );
-
-      return;
     } catch (error) {
       handleError(error, "setManifest");
     }
@@ -515,9 +468,7 @@ export class DirectoryV3 {
 
   async deleteManifest(params?: DeleteManifestRequest, options?: CallOptions) {
     try {
-      await this.ModelClient.deleteManifest(params!, options);
-
-      return;
+      return await this.ModelClient.deleteManifest(params!, options);
     } catch (error) {
       handleError(error, "deleteManifest");
     }

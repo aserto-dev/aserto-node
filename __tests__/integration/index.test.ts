@@ -143,20 +143,24 @@ types:
     });
 
     it("gets an object", async () => {
-      const user = await directoryClient.object({
-        objectType: "user",
-        objectId: "test-user",
-      });
+      const user = (
+        await directoryClient.object({
+          objectType: "user",
+          objectId: "test-user",
+        })
+      )?.result;
 
       expect(user?.id).toEqual("test-user");
       expect(user?.properties).toEqual({ displayName: "test user" });
     });
 
     it("gets another object", async () => {
-      const user = await directoryClient.object({
-        objectType: "group",
-        objectId: "test-group",
-      });
+      const user = (
+        await directoryClient.object({
+          objectType: "group",
+          objectId: "test-group",
+        })
+      )?.result;
 
       expect(user?.id).toEqual("test-group");
       expect(user?.properties).toEqual({ displayName: "test group" });
@@ -186,6 +190,7 @@ types:
           objectType: "group",
         }),
       ).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetRelationResponse",
         objects: {},
         result: expect.objectContaining({
           subjectId: "test-user",
@@ -229,7 +234,11 @@ types:
         }),
       ).toEqual({
         objects: {},
-        page: { nextToken: "" },
+        page: {
+          $typeName: "aserto.directory.common.v3.PaginationResponse",
+          nextToken: "",
+        },
+        $typeName: "aserto.directory.reader.v3.GetRelationsResponse",
         results: [
           expect.objectContaining({
             subjectId: "test-user",
@@ -268,7 +277,11 @@ types:
 
     it("list user objects", async () => {
       expect(await directoryClient.objects({ objectType: "user" })).toEqual({
-        page: { nextToken: "" },
+        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
+        page: {
+          $typeName: "aserto.directory.common.v3.PaginationResponse",
+          nextToken: "",
+        },
         results: expect.arrayContaining([
           expect.objectContaining({
             id: "test-user",
@@ -281,7 +294,11 @@ types:
 
     it("list group objects", async () => {
       expect(await directoryClient.objects({ objectType: "group" })).toEqual({
-        page: { nextToken: "" },
+        page: {
+          $typeName: "aserto.directory.common.v3.PaginationResponse",
+          nextToken: "",
+        },
+        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
         results: expect.arrayContaining([
           expect.objectContaining({
             id: "test-group",
@@ -324,8 +341,12 @@ types:
 
     it("returns [] when  there are no objects", async () => {
       expect(await directoryClient.objects({ objectType: "user" })).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
         results: [],
-        page: { nextToken: "" },
+        page: {
+          $typeName: "aserto.directory.common.v3.PaginationResponse",
+          nextToken: "",
+        },
       });
     });
 
