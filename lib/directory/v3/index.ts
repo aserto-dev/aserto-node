@@ -1,5 +1,4 @@
 import { readFileSync } from "fs";
-import { PaginationRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v3/common_pb";
 import {
   Exporter,
   ExportRequestSchema,
@@ -72,6 +71,7 @@ import {
   GetRelationRequest,
   GetRelationsRequest,
   ImportRequest as ImportRequest$,
+  PaginationRequest,
   ServiceConfig,
   SetObjectRequest,
   SetRelationRequest,

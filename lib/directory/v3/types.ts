@@ -60,7 +60,7 @@ type Relation = Optional<
 >;
 type ObjectIdentifier = Omit<ObjectIdentifier$, "$typeName">;
 
-type PaginationRequest = Optional<
+export type PaginationRequest = Optional<
   Omit<PaginationRequest$, "$typeName">,
   "token"
 >;
