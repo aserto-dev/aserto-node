@@ -279,6 +279,10 @@ export class DirectoryV3 {
 
   async object(params: GetObjectRequest, options?: CallOptions) {
     try {
+      if (params.page) {
+        params.page.size ||= 100;
+      }
+
       return await this.ReaderClient.getObject(
         create(GetObjectRequestSchema, params),
         options,
@@ -289,6 +293,10 @@ export class DirectoryV3 {
   }
   async objects(params: GetObjectsRequest, options?: CallOptions) {
     try {
+      if (params.page) {
+        params.page.size ||= 100;
+      }
+
       return await this.ReaderClient.getObjects(
         create(GetObjectsRequestSchema, params),
         options,
@@ -366,6 +374,10 @@ export class DirectoryV3 {
 
   async relations(params: GetRelationsRequest, options?: CallOptions) {
     try {
+      if (params.page) {
+        params.page.size ||= 100;
+      }
+
       return await this.ReaderClient.getRelations(params, options);
     } catch (error) {
       handleError(error, "relations");

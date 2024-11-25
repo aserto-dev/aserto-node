@@ -231,6 +231,9 @@ types:
         await directoryClient.relations({
           subjectId: "test-user",
           subjectType: "user",
+          page: {
+            token: "",
+          },
         }),
       ).toEqual({
         objects: {},
@@ -276,7 +279,12 @@ types:
     });
 
     it("list user objects", async () => {
-      expect(await directoryClient.objects({ objectType: "user" })).toEqual({
+      expect(
+        await directoryClient.objects({
+          objectType: "user",
+          page: { token: "" },
+        }),
+      ).toEqual({
         $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
         page: {
           $typeName: "aserto.directory.common.v3.PaginationResponse",

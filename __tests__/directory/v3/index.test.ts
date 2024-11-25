@@ -587,6 +587,115 @@ describe("DirectoryV3", () => {
       mockGetObjects.mockReset();
     });
 
+    it("sets default page size", async () => {
+      const mockGetObjects = jest
+        .spyOn(directory.ReaderClient, "getObjects")
+        .mockResolvedValue(create(GetObjectsResponseSchema, {}));
+
+      const params = {
+        objectType: "user",
+        page: {
+          token: "",
+        },
+      };
+
+      await directory.objects(params);
+
+      expect(mockGetObjects).toHaveBeenCalledWith(
+        {
+          ...params,
+          $typeName: "aserto.directory.reader.v3.GetObjectsRequest",
+          page: {
+            $typeName: "aserto.directory.common.v3.PaginationRequest",
+            token: "",
+            size: 100,
+          },
+        },
+        undefined,
+      );
+      const result = await directory.objects(params);
+
+      expect(result).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
+        results: [],
+      });
+
+      mockGetObjects.mockReset();
+    });
+
+    it("sets default page token", async () => {
+      const mockGetObjects = jest
+        .spyOn(directory.ReaderClient, "getObjects")
+        .mockResolvedValue(create(GetObjectsResponseSchema, {}));
+
+      const params = {
+        objectType: "user",
+        page: {
+          size: 45,
+        },
+      };
+
+      await directory.objects(params);
+
+      expect(mockGetObjects).toHaveBeenCalledWith(
+        {
+          ...params,
+          $typeName: "aserto.directory.reader.v3.GetObjectsRequest",
+          page: {
+            $typeName: "aserto.directory.common.v3.PaginationRequest",
+            token: "",
+            size: 45,
+          },
+        },
+        undefined,
+      );
+      const result = await directory.objects(params);
+
+      expect(result).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
+        results: [],
+      });
+
+      mockGetObjects.mockReset();
+    });
+
+    it("respects page size", async () => {
+      const mockGetObjects = jest
+        .spyOn(directory.ReaderClient, "getObjects")
+        .mockResolvedValue(create(GetObjectsResponseSchema, {}));
+
+      const params = {
+        objectType: "user",
+        page: {
+          token: "1234",
+          size: 1,
+        },
+      };
+
+      await directory.objects(params);
+
+      expect(mockGetObjects).toHaveBeenCalledWith(
+        {
+          ...params,
+          $typeName: "aserto.directory.reader.v3.GetObjectsRequest",
+          page: {
+            $typeName: "aserto.directory.common.v3.PaginationRequest",
+            token: "1234",
+            size: 1,
+          },
+        },
+        undefined,
+      );
+      const result = await directory.objects(params);
+
+      expect(result).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
+        results: [],
+      });
+
+      mockGetObjects.mockReset();
+    });
+
     it("handles errors returned by the directory service", async () => {
       const mockGetObjects = jest
         .spyOn(directory.ReaderClient, "getObjects")

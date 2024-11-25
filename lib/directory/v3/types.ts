@@ -63,7 +63,7 @@ type ObjectIdentifier = Omit<ObjectIdentifier$, "$typeName">;
 
 type PaginationRequest = Optional<
   Omit<PaginationRequest$, "$typeName">,
-  "token"
+  "token" | "size"
 >;
 
 export type GetObjectRequest = Optional<
