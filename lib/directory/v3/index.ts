@@ -68,10 +68,10 @@ import {
   GetGraphRequest,
   GetObjectManyRequest,
   GetObjectRequest,
+  GetObjectsRequest,
   GetRelationRequest,
   GetRelationsRequest,
   ImportRequest as ImportRequest$,
-  PaginationRequest,
   ServiceConfig,
   SetObjectRequest,
   SetRelationRequest,
@@ -287,13 +287,7 @@ export class DirectoryV3 {
       handleError(error, "object");
     }
   }
-  async objects(
-    params: {
-      objectType: string;
-      page?: PaginationRequest;
-    },
-    options?: CallOptions,
-  ) {
+  async objects(params: GetObjectsRequest, options?: CallOptions) {
     try {
       return await this.ReaderClient.getObjects(
         create(GetObjectsRequestSchema, params),

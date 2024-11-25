@@ -11,6 +11,7 @@ import {
   GetGraphRequest as GetGraphRequest$,
   GetObjectManyRequest as GetObjectManyRequest$,
   GetObjectRequest as GetObjectRequest$,
+  GetObjectsRequest as GetObjectsRequest$,
   GetRelationRequest as GetRelationRequest$,
   GetRelationsRequest as GetRelationsRequest$,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_pb";
@@ -60,7 +61,7 @@ type Relation = Optional<
 >;
 type ObjectIdentifier = Omit<ObjectIdentifier$, "$typeName">;
 
-export type PaginationRequest = Optional<
+type PaginationRequest = Optional<
   Omit<PaginationRequest$, "$typeName">,
   "token"
 >;
@@ -68,6 +69,11 @@ export type PaginationRequest = Optional<
 export type GetObjectRequest = Optional<
   Omit<GetObjectRequest$, "$typeName" | "page">,
   "withRelations"
+> & { page?: PaginationRequest };
+
+export type GetObjectsRequest = Omit<
+  GetObjectsRequest$,
+  "$typeName" | "page"
 > & { page?: PaginationRequest };
 
 export type GetRelationRequest = Optional<
