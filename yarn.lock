@@ -56,8 +56,10 @@ __metadata:
 
 "@aserto/node-authorizer@https://github.com/aserto-dev/node-authorizer#connect_2":
   version: 0.20.10
-  resolution: "@aserto/node-authorizer@https://github.com/aserto-dev/node-authorizer.git#commit=71c713b20da6b5d81724f1bf6d66fae3b09a1dbe"
-  checksum: 10/da9aa62fb32c08dc308dbcf3d33414f7283b851cae3001f3747647b907d0aef0d7ea7d0eb72e4ff7d32e03fe758bd6b94913103f8141dfd34d5f1f67cd9302ca
+  resolution: "@aserto/node-authorizer@https://github.com/aserto-dev/node-authorizer.git#commit=aa3451233b5c939af1b94a64bdcf15746751d46d"
+  dependencies:
+    "@bufbuild/protobuf": "npm:^2.2.2"
+  checksum: 10/af9290cab19fe1d8ecbafe199839374d0584221476f10e7544b3aa01a9bf5646c608afb88933a66ec5f5df8e4ec36c5288a05318b0680906d7d70f9106a0c5f1
   languageName: node
   linkType: hard
 
