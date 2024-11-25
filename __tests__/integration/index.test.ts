@@ -2,6 +2,8 @@ import express, { Express } from "express";
 import nJwt from "njwt";
 import { describe } from "node:test";
 import request from "supertest";
+import { GetObjectsResponseSchema } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_pb";
+import { toJson } from "@bufbuild/protobuf";
 
 import {
   AnonymousIdentityMapper,
@@ -295,6 +297,22 @@ types:
             id: "test-user",
             type: "user",
             displayName: "",
+          }),
+        ]),
+      });
+    });
+
+    it("can serialize to json objects", async () => {
+      const response = await directoryClient.objects({
+        objectType: "user",
+        page: { token: "" },
+      });
+      expect(toJson(GetObjectsResponseSchema, response!)).toEqual({
+        page: {},
+        results: expect.arrayContaining([
+          expect.objectContaining({
+            id: "test-user",
+            type: "user",
           }),
         ]),
       });
