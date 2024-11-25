@@ -63,8 +63,10 @@ __metadata:
 
 "@aserto/node-directory@https://github.com/aserto-dev/node-directory#connect_2":
   version: 0.31.4
-  resolution: "@aserto/node-directory@https://github.com/aserto-dev/node-directory.git#commit=d2b1c1755ab3b7fa257107d0c131bda0af708e14"
-  checksum: 10/fabb6daeaba5f3ecadd8e84248153f025feff5ae710a30e6915c24810aa4c01b390f97108576c418d114c3cf56721a39a25cd3640b039a16ca00deefd925c7a9
+  resolution: "@aserto/node-directory@https://github.com/aserto-dev/node-directory.git#commit=5f1bf5bfae4603aa89b69bb461d72d87d521cb5e"
+  dependencies:
+    "@bufbuild/protobuf": "npm:^2.2.2"
+  checksum: 10/50ef70083c8d36fe663114054d4599bdc548dec168d72c048ff4b8971cb3c680106f4d1e3ddcfb138c0d1bbc257aae7b7d383cc20c018f2babc7d65a429d6785
   languageName: node
   linkType: hard
 
