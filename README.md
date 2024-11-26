@@ -802,6 +802,19 @@ const user = await directoryClient.object(
 );
 ```
 
+### Serializing data
+
+Use [Protocol Buffers](https://github.com/bufbuild/protobuf-es) to serialize data.
+
+
+```ts
+import { GetObjectsResponseSchema } from "@aserto/aserto-node";
+import { toJson } from "@bufbuild/protobuf";
+
+const objects = await directoryClient.objects({objectType: "user"});
+const json = toJson(GetObjectsResponseSchema, objects)
+```
+
 
 
 ## Deprecated Methods
