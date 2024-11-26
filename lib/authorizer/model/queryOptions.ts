@@ -4,7 +4,7 @@ import {
 } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/authorizer_pb";
 import { create } from "@bufbuild/protobuf";
 
-import { QueryOptions } from "../type";
+import { QueryOptions } from "../types";
 
 const queryOptions = (
   options?: Omit<QueryOptions, "trace"> & {

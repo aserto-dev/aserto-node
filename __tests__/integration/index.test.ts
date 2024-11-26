@@ -2,8 +2,6 @@ import express, { Express } from "express";
 import nJwt from "njwt";
 import { describe } from "node:test";
 import request from "supertest";
-import { GetObjectsResponseSchema } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_pb";
-import { toJson } from "@bufbuild/protobuf";
 
 import {
   AnonymousIdentityMapper,
@@ -14,12 +12,14 @@ import {
   DirectoryServiceV3,
   DirectoryV3,
   displayStateMap,
+  GetObjectsResponseSchema,
   ImportMsgCase,
   ImportOpCode,
   NotFoundError,
   policyContext,
   policyInstance,
   readAsyncIterable,
+  toJson,
 } from "../../lib";
 import { Topaz, TOPAZ_TIMEOUT } from "../topaz";
 

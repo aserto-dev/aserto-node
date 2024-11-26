@@ -4,16 +4,33 @@ import { PolicyInstance as PolicyInstance$ } from "@aserto/node-authorizer/src/g
 import {
   DecisionTreeRequest as DecisionTreeRequest$,
   IsRequest as IsRequest$,
+  ListPoliciesRequest as ListPoliciesRequest$,
   QueryOptions as QueryOptions$,
   QueryRequest as QueryRequest$,
 } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/authorizer_pb";
-import { ListPoliciesRequest as ListPoliciesRequest$ } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/authorizer_pb";
 
 import { Optional } from "../util/types";
 
-type PolicyInstance = Omit<PolicyInstance$, "$typeName" | "instanceLabel">;
-type PolicyContext = Omit<PolicyContext$, "$typeName">;
-type IdentityContext = Omit<IdentityContext$, "$typeName">;
+export * from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/authorizer_pb";
+export * from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/identity_context_pb";
+export * from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/policy_context_pb";
+export * from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/policy_instance_pb";
+export * from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/module_pb";
+export {
+  Decision as DecisionLog,
+  DecisionSchema as DecisionLogSchema,
+  DecisionUser,
+  DecisionUserSchema,
+  DecisionPolicy,
+  DecisionPolicySchema,
+} from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/decision_logs_pb";
+
+export type PolicyInstance = Omit<
+  PolicyInstance$,
+  "$typeName" | "instanceLabel"
+>;
+export type PolicyContext = Omit<PolicyContext$, "$typeName">;
+export type IdentityContext = Omit<IdentityContext$, "$typeName">;
 export type QueryOptions = Optional<
   Omit<QueryOptions$, "$typeName">,
   "instrument" | "metrics" | "trace" | "traceSummary"

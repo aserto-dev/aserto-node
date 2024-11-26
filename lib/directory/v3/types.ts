@@ -1,5 +1,5 @@
 import {
-  Object$,
+  Object$ as Object$$,
   ObjectIdentifier as ObjectIdentifier$,
   PaginationRequest as PaginationRequest$,
   Relation as Relation$,
@@ -24,7 +24,19 @@ import {
 
 import { NestedOmit, NestedOptional, Optional } from "../../util/types";
 
-enum StatsExportOptions {
+// export service types
+export * from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v3/common_pb";
+export * from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
+export * from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
+export * from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
+export * from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_pb";
+export * from "@aserto/node-directory/src/gen/cjs/aserto/directory/schema/v3/group_pb";
+export * from "@aserto/node-directory/src/gen/cjs/aserto/directory/schema/v3/identity_pb";
+export * from "@aserto/node-directory/src/gen/cjs/aserto/directory/schema/v3/tenant_pb";
+export * from "@aserto/node-directory/src/gen/cjs/aserto/directory/schema/v3/user_pb";
+export * from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
+
+export enum StatsExportOptions {
   STATS_OBJECTS = Option.STATS | Option.DATA_OBJECTS,
   STATS_RELATIONS = Option.STATS | Option.DATA_RELATIONS,
   STATS_DATA = Option.STATS | Option.DATA,
@@ -54,14 +66,17 @@ export type DirectoryV3Config = ServiceConfig & {
   exporter?: ServiceConfig;
   model?: ServiceConfig;
 };
-type Object = Optional<Omit<Object$, "$typeName">, "etag" | "displayName">;
-type Relation = Optional<
+export type Object$ = Optional<
+  Omit<Object$$, "$typeName">,
+  "etag" | "displayName"
+>;
+export type Relation = Optional<
   Omit<Relation$, "$typeName">,
   "etag" | "subjectRelation"
 >;
-type ObjectIdentifier = Omit<ObjectIdentifier$, "$typeName">;
+export type ObjectIdentifier = Omit<ObjectIdentifier$, "$typeName">;
 
-type PaginationRequest = Optional<
+export type PaginationRequest = Optional<
   Omit<PaginationRequest$, "$typeName">,
   "token" | "size"
 >;
@@ -96,7 +111,7 @@ export type GetRelationsRequest = Optional<
 export type SetObjectRequest = Omit<
   SetObjectRequest$,
   "$typeName" | "object"
-> & { object?: Object };
+> & { object?: Object$ };
 
 export type DeleteObjectRequest = Optional<
   Omit<DeleteObjectRequest$, "$typeName">,

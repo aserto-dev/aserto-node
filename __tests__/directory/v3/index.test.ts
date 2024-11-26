@@ -1,40 +1,34 @@
 import * as fs from "fs";
 import { describe } from "node:test";
-import { ExportResponseSchema } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
-import { ImportResponseSchema } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
-import {
-  DeleteManifestResponseSchema,
-  GetManifestResponseSchema,
-  SetManifestResponseSchema,
-} from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
-import {
-  CheckResponseSchema,
-  GetGraphResponseSchema,
-  GetObjectManyResponseSchema,
-  GetObjectResponseSchema,
-  GetObjectsResponseSchema,
-  GetRelationResponseSchema,
-  GetRelationsResponseSchema,
-} from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_pb";
-import {
-  DeleteObjectResponseSchema,
-  DeleteRelationResponseSchema,
-  SetObjectResponseSchema,
-  SetRelationResponseSchema,
-} from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
-import { create } from "@bufbuild/protobuf";
 import { Code, ConnectError } from "@connectrpc/connect";
 import { createAsyncIterable } from "@connectrpc/connect/protocol";
 import * as connectNode from "@connectrpc/connect-node";
 
 import {
+  CheckResponseSchema,
   ConfigError,
+  create,
   createImportRequest,
+  DeleteManifestResponseSchema,
+  DeleteObjectResponseSchema,
+  DeleteRelationResponseSchema,
   DirectoryServiceV3,
   DirectoryV3,
   EtagMismatchError,
+  ExportResponseSchema,
+  GetGraphResponseSchema,
+  GetManifestResponseSchema,
+  GetObjectManyResponseSchema,
+  GetObjectResponseSchema,
+  GetObjectsResponseSchema,
+  GetRelationResponseSchema,
+  GetRelationsResponseSchema,
+  ImportResponseSchema,
   InvalidArgumentError,
   NotFoundError,
+  SetManifestResponseSchema,
+  SetObjectResponseSchema,
+  SetRelationResponseSchema,
 } from "../../../lib/index";
 jest.mock("fs");
 

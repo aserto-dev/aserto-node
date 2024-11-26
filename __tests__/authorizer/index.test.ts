@@ -1,15 +1,13 @@
-import {
-  DecisionTreeResponseSchema,
-  IsResponseSchema,
-  ListPoliciesResponseSchema,
-  QueryResponseSchema,
-} from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/authorizer_pb";
-import { create } from "@bufbuild/protobuf";
 import { Code, ConnectError } from "@connectrpc/connect";
 
 import {
+  create,
   decisionTreeOptions,
+  DecisionTreeResponseSchema,
+  IsResponseSchema,
+  ListPoliciesResponseSchema,
   queryOptions,
+  QueryResponseSchema,
   UnauthenticatedError,
 } from "../../lib";
 import { Authorizer } from "../../lib/authorizer";

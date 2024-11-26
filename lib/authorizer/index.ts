@@ -27,7 +27,7 @@ import {
   IsRequest,
   ListPoliciesRequest,
   QueryRequest,
-} from "./type";
+} from "./types";
 
 type AuthorizerConfig = {
   authorizerServiceUrl?: string;
