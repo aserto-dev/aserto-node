@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import { describe } from "node:test";
+import { create } from "@bufbuild/protobuf";
 import { Code, ConnectError } from "@connectrpc/connect";
 import { createAsyncIterable } from "@connectrpc/connect/protocol";
 import * as connectNode from "@connectrpc/connect-node";
@@ -7,7 +8,6 @@ import * as connectNode from "@connectrpc/connect-node";
 import {
   CheckResponseSchema,
   ConfigError,
-  create,
   createImportRequest,
   DeleteManifestResponseSchema,
   DeleteObjectResponseSchema,

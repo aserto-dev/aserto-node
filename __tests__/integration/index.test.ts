@@ -2,6 +2,7 @@ import express, { Express } from "express";
 import nJwt from "njwt";
 import { describe } from "node:test";
 import request from "supertest";
+import { toJson } from "@bufbuild/protobuf";
 
 import {
   AnonymousIdentityMapper,
@@ -19,7 +20,6 @@ import {
   policyContext,
   policyInstance,
   readAsyncIterable,
-  toJson,
 } from "../../lib";
 import { Topaz, TOPAZ_TIMEOUT } from "../topaz";
 
