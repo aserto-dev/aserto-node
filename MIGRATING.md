@@ -90,6 +90,13 @@ const json = toJson(GetObjectsResponseSchema, response)
 The same applies to the methods `equals`, `clone`, `toJson`, and `toJsonString`, and to the static methods `fromBinary`, `fromJson`, `fromJsonString`.
 
 
+#### Reading object properties is now simplified, and can be accessed directly
+```diff
+const object = await directoryClient.object({objectType: 'user', objectId: "key"});
+-  const owner = object?.properties?.fields?.owner?.kind?.value as string
++  const { owner } = object.result.properties
+```
+
 ## Troubleshooting
 
 #### Express.js
