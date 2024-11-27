@@ -12,10 +12,14 @@ it makes use of all the [enhancements of Protobuf-ES v2](https://buf.build/blog/
 
 ## Deprecations
 
-#### `objectPropertiesAsStruct` has been deprecated. The new SDK allows passing JSON objects directly as properties
+#### objectPropertiesAsStruct
 
-#### Usage of `createAsyncIterable` in the context of creating import requests has been deprecated and will be replaced with `createImportRequest`.
+ `objectPropertiesAsStruct` has been deprecated. The new SDK allows passing JSON objects directly as properties
 
+#### createAsyncIterable
+Usage of `createAsyncIterable` in the context of creating import requests has been deprecated and will be replaced with `createImportRequest`.
+
+#### Example:
 ```diff
 -import { ImportMsgCase, ImportOpCode, objectPropertiesAsStruct, createAsyncIterable } from "@aserto/aserto-node"
 -const importRequest = createAsyncIterable([
