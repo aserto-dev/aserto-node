@@ -5,6 +5,7 @@ import path from "path";
 import { DirectoryServiceV3 } from "../lib";
 import { log } from "../lib/log";
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const exec = util.promisify(require("node:child_process").exec);
 const RETRY_OPTIONS = { retries: 30, retryIntervalMs: 4000 };
 export const TOPAZ_TIMEOUT =
@@ -30,7 +31,7 @@ export class Topaz {
     });
     await retry(
       async () => directoryClient.objects({ objectType: "user" }),
-      RETRY_OPTIONS
+      RETRY_OPTIONS,
     );
   }
 
@@ -61,12 +62,12 @@ export class Topaz {
     fs.rename(
       path.join(await this.dbDir(), "directory.db"),
       path.join(await this.dbDir(), "directory.bak"),
-      () => {}
+      () => {},
     );
     fs.rename(
       path.join(await this.configDir(), "todo.yaml"),
       path.join(await this.configDir(), "todo.bak"),
-      () => {}
+      () => {},
     );
   }
 
@@ -74,19 +75,19 @@ export class Topaz {
     fs.rename(
       path.join(await this.dbDir(), "directory.bak"),
       path.join(await this.dbDir(), "directory.db"),
-      () => {}
+      () => {},
     );
     fs.rename(
       path.join(await this.configDir(), "todo.bak"),
       path.join(await this.configDir(), "todo.yaml"),
-      () => {}
+      () => {},
     );
   }
 }
 
 const retry = async <T>(
   fn: () => Promise<T> | T,
-  { retries, retryIntervalMs }: { retries: number; retryIntervalMs: number }
+  { retries, retryIntervalMs }: { retries: number; retryIntervalMs: number },
 ): Promise<T> => {
   try {
     return await fn();
@@ -112,6 +113,5 @@ const execute = async (command: string) => {
     log(`stderr: ${stderr}`);
     return;
   }
-  log(`stdout: ${stdout}`);
   return stdout;
 };

@@ -1,19 +1,22 @@
 import express, { Express } from "express";
 import nJwt from "njwt";
+import { describe } from "node:test";
 import request from "supertest";
+import { toJson } from "@bufbuild/protobuf";
 
 import {
   AnonymousIdentityMapper,
   Authorizer,
+  ConfigError,
   createAsyncIterable,
+  createImportRequest,
   DirectoryServiceV3,
   DirectoryV3,
   displayStateMap,
-  EtagMismatchError,
+  GetObjectsResponseSchema,
   ImportMsgCase,
   ImportOpCode,
   NotFoundError,
-  objectPropertiesAsStruct,
   policyContext,
   policyInstance,
   readAsyncIterable,
@@ -38,6 +41,26 @@ describe("Integration", () => {
 
   afterAll(async () => {
     await topaz.stop();
+  });
+
+  describe("Directory Reader", () => {
+    it("fallsback to reader proxy when reader is not configured", async () => {
+      const readerClient = DirectoryServiceV3({
+        writer: {
+          url: "localhost:9292",
+          caFile: await topaz.caCert(),
+        },
+      });
+
+      await expect(
+        readerClient.objects({ objectType: "user" }),
+      ).rejects.toThrow(ConfigError);
+      await expect(
+        readerClient.objects({ objectType: "user" }),
+      ).rejects.toThrow(
+        `Cannot call 'getObjects', 'Reader' is not configured.`,
+      );
+    });
   });
 
   describe("Directory", () => {
@@ -72,7 +95,7 @@ types:
 `;
 
     it("deletes a manifest", async () => {
-      await expect(directoryClient.deleteManifest({})).resolves.not.toThrow();
+      await expect(directoryClient.deleteManifest()).resolves.not.toThrow();
     });
 
     it("reads an empty manifest", async () => {
@@ -84,13 +107,13 @@ types:
       await expect(
         directoryClient.setManifest({
           body: manifest,
-        })
+        }),
       ).resolves.not.toThrow();
     });
 
     it("reads a manifest", async () => {
       const manifestData = await directoryClient.getManifest();
-      expect(manifestData?.body).toEqual(manifest);
+      expect(manifestData.body).toEqual(manifest);
     });
 
     it("sets a new object", async () => {
@@ -103,21 +126,8 @@ types:
               displayName: "test user",
             },
           },
-        })
+        }),
       ).resolves.not.toThrow();
-    });
-
-    xit("throws EtagMismatchError when setting the same object without Etag", async () => {
-      await expect(
-        directoryClient.setObject({
-          object: {
-            type: "user",
-            id: "test-user",
-            displayName: "updated",
-            etag: "updated",
-          },
-        })
-      ).rejects.toThrow(EtagMismatchError);
     });
 
     it("sets a another object", async () => {
@@ -130,26 +140,32 @@ types:
               displayName: "test group",
             },
           },
-        })
+        }),
       ).resolves.not.toThrow();
     });
 
     it("gets an object", async () => {
-      const user = await directoryClient.object({
-        objectType: "user",
-        objectId: "test-user",
-      });
+      const user = (
+        await directoryClient.object({
+          objectType: "user",
+          objectId: "test-user",
+        })
+      ).result;
 
-      expect(user?.properties?.toJson()).toEqual({ displayName: "test user" });
+      expect(user?.id).toEqual("test-user");
+      expect(user?.properties).toEqual({ displayName: "test user" });
     });
 
     it("gets another object", async () => {
-      const user = await directoryClient.object({
-        objectType: "group",
-        objectId: "test-group",
-      });
+      const user = (
+        await directoryClient.object({
+          objectType: "group",
+          objectId: "test-group",
+        })
+      ).result;
 
-      expect(user?.properties?.toJson()).toEqual({ displayName: "test group" });
+      expect(user?.id).toEqual("test-group");
+      expect(user?.properties).toEqual({ displayName: "test group" });
     });
 
     it("creates a relation between user and group", async () => {
@@ -162,7 +178,7 @@ types:
             objectId: "test-group",
             objectType: "group",
           },
-        })
+        }),
       ).resolves.not.toThrow();
     });
 
@@ -174,8 +190,9 @@ types:
           relation: "member",
           objectId: "test-group",
           objectType: "group",
-        })
+        }),
       ).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetRelationResponse",
         objects: {},
         result: expect.objectContaining({
           subjectId: "test-user",
@@ -187,18 +204,6 @@ types:
       });
     });
 
-    it("checks the relation betwen an user and group(true)", async () => {
-      expect(
-        await directoryClient.checkRelation({
-          subjectId: "test-user",
-          subjectType: "user",
-          relation: "member",
-          objectId: "test-group",
-          objectType: "group",
-        })
-      ).toEqual({ check: true, trace: [] });
-    });
-
     it("check(relation) betwen an user and group", async () => {
       expect(
         await directoryClient.check({
@@ -207,7 +212,7 @@ types:
           relation: "member",
           objectId: "test-group",
           objectType: "group",
-        })
+        }),
       ).toMatchObject({ check: true, trace: [] });
     });
 
@@ -219,32 +224,8 @@ types:
           relation: "read",
           objectId: "test-group",
           objectType: "group",
-        })
+        }),
       ).toMatchObject({ check: true, trace: [] });
-    });
-
-    it("checks inexistent relation throws NotFoundError", async () => {
-      await expect(
-        directoryClient.checkRelation({
-          subjectId: "test-user",
-          subjectType: "user",
-          relation: "owner",
-          objectId: "test-group",
-          objectType: "group",
-        })
-      ).rejects.toThrow(NotFoundError);
-    });
-
-    it("checks inexistent permission throws NotFoundError", async () => {
-      await expect(
-        directoryClient.checkPermission({
-          subjectId: "test-user",
-          subjectType: "user",
-          permission: "write",
-          objectId: "test-group",
-          objectType: "group",
-        })
-      ).rejects.toThrow(NotFoundError);
     });
 
     it("lists the relations of an object", async () => {
@@ -252,10 +233,17 @@ types:
         await directoryClient.relations({
           subjectId: "test-user",
           subjectType: "user",
-        })
+          page: {
+            token: "",
+          },
+        }),
       ).toEqual({
         objects: {},
-        page: { nextToken: "" },
+        page: {
+          $typeName: "aserto.directory.common.v3.PaginationResponse",
+          nextToken: "",
+        },
+        $typeName: "aserto.directory.reader.v3.GetRelationsResponse",
         results: [
           expect.objectContaining({
             subjectId: "test-user",
@@ -276,7 +264,7 @@ types:
           relation: "member",
           objectId: "test-group",
           objectType: "group",
-        })
+        }),
       ).resolves.not.toThrow();
     });
 
@@ -288,13 +276,22 @@ types:
           relation: "member",
           objectId: "test-group",
           objectType: "group",
-        })
+        }),
       ).rejects.toThrow(NotFoundError);
     });
 
     it("list user objects", async () => {
-      expect(await directoryClient.objects({ objectType: "user" })).toEqual({
-        page: { nextToken: "" },
+      expect(
+        await directoryClient.objects({
+          objectType: "user",
+          page: { token: "" },
+        }),
+      ).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
+        page: {
+          $typeName: "aserto.directory.common.v3.PaginationResponse",
+          nextToken: "",
+        },
         results: expect.arrayContaining([
           expect.objectContaining({
             id: "test-user",
@@ -305,9 +302,29 @@ types:
       });
     });
 
+    it("can serialize to json objects", async () => {
+      const response = await directoryClient.objects({
+        objectType: "user",
+        page: { token: "" },
+      });
+      expect(toJson(GetObjectsResponseSchema, response)).toEqual({
+        page: {},
+        results: expect.arrayContaining([
+          expect.objectContaining({
+            id: "test-user",
+            type: "user",
+          }),
+        ]),
+      });
+    });
+
     it("list group objects", async () => {
       expect(await directoryClient.objects({ objectType: "group" })).toEqual({
-        page: { nextToken: "" },
+        page: {
+          $typeName: "aserto.directory.common.v3.PaginationResponse",
+          nextToken: "",
+        },
+        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
         results: expect.arrayContaining([
           expect.objectContaining({
             id: "test-group",
@@ -323,7 +340,7 @@ types:
         directoryClient.deleteObject({
           objectType: "user",
           objectId: "test-user",
-        })
+        }),
       ).resolves.not.toThrow();
     });
 
@@ -332,26 +349,30 @@ types:
         directoryClient.deleteObject({
           objectType: "group",
           objectId: "test-group",
-        })
+        }),
       ).resolves.not.toThrow();
     });
 
     it("throws NotFoundError when getting a deleted user object", async () => {
       await expect(
-        directoryClient.object({ objectType: "user", objectId: "test-user" })
+        directoryClient.object({ objectType: "user", objectId: "test-user" }),
       ).rejects.toThrow(NotFoundError);
     });
 
     it("throws NotFoundError when getting a deleted group object", async () => {
       await expect(
-        directoryClient.object({ objectType: "group", objectId: "test-group" })
+        directoryClient.object({ objectType: "group", objectId: "test-group" }),
       ).rejects.toThrow(NotFoundError);
     });
 
     it("returns [] when  there are no objects", async () => {
       expect(await directoryClient.objects({ objectType: "user" })).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
         results: [],
-        page: { nextToken: "" },
+        page: {
+          $typeName: "aserto.directory.common.v3.PaginationResponse",
+          nextToken: "",
+        },
       });
     });
 
@@ -364,7 +385,7 @@ types:
             value: {
               id: "import-user",
               type: "user",
-              properties: objectPropertiesAsStruct({ foo: "bar" }),
+              properties: { foo: "bar" },
               displayName: "name1",
             },
           },
@@ -395,9 +416,8 @@ types:
           },
         },
       ]);
-
       await expect(
-        readAsyncIterable(await directoryClient.import(importRequest))
+        readAsyncIterable(await directoryClient.import(importRequest)),
       ).resolves.not.toThrow();
     });
 
@@ -405,9 +425,9 @@ types:
       expect(
         (
           await readAsyncIterable(
-            await directoryClient.export({ options: "DATA" })
+            await directoryClient.export({ options: "DATA" }),
           )
-        ).length
+        ).length,
       ).toEqual(3);
     });
 
@@ -421,14 +441,13 @@ types:
       };
 
       const response = await readAsyncIterable(
-        await directoryClient.export({ options: "STATS_OBJECTS" })
+        await directoryClient.export({ options: "STATS_OBJECTS" }),
       );
-      const stats: Stats = JSON.parse(
-        response?.[0]?.msg?.value?.toJsonString() || "{}"
-      );
+      const stats: Stats = response?.[0]?.msg?.value as Stats;
+
       const totals = Object.values(stats["object_types"] || {}).reduce(
         (n, { _obj_count }) => n + _obj_count,
-        0
+        0,
       );
       expect(totals).toEqual(2);
     });
@@ -437,20 +456,70 @@ types:
       expect(
         (
           await readAsyncIterable(
-            await directoryClient.export({ options: "DATA_OBJECTS" })
+            await directoryClient.export({ options: "DATA_OBJECTS" }),
           )
-        ).length
+        ).length,
       ).toEqual(2);
+      expect(
+        await readAsyncIterable(
+          await directoryClient.export({ options: "DATA_OBJECTS" }),
+        ),
+      ).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            msg: {
+              case: "object",
+              value: expect.objectContaining({
+                id: "import-user",
+                type: "user",
+                properties: { foo: "bar" },
+                displayName: "name1",
+              }),
+            },
+          }),
+          expect.objectContaining({
+            msg: {
+              case: "object",
+              value: expect.objectContaining({
+                id: "import-group",
+                type: "group",
+                properties: {},
+                displayName: "name2",
+              }),
+            },
+          }),
+        ]),
+      );
     });
 
     it("exports relations", async () => {
       expect(
         (
           await readAsyncIterable(
-            await directoryClient.export({ options: "DATA_RELATIONS" })
+            await directoryClient.export({ options: "DATA_RELATIONS" }),
           )
-        ).length
+        ).length,
       ).toEqual(1);
+      expect(
+        await readAsyncIterable(
+          await directoryClient.export({ options: "DATA_RELATIONS" }),
+        ),
+      ).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            msg: {
+              case: "relation",
+              value: expect.objectContaining({
+                subjectId: "import-user",
+                subjectType: "user",
+                objectId: "import-group",
+                objectType: "group",
+                relation: "member",
+              }),
+            },
+          }),
+        ]),
+      );
     });
 
     it("deletes an user object with relations", async () => {
@@ -459,7 +528,7 @@ types:
           objectType: "user",
           objectId: "import-user",
           withRelations: true,
-        })
+        }),
       ).resolves.not.toThrow();
     });
 
@@ -469,13 +538,13 @@ types:
           objectType: "group",
           objectId: "import-group",
           withRelations: true,
-        })
+        }),
       ).resolves.not.toThrow();
     });
 
     it("throws NotFoundError when getting a deleted user object", async () => {
       await expect(
-        directoryClient.object({ objectType: "user", objectId: "import-user" })
+        directoryClient.object({ objectType: "user", objectId: "import-user" }),
       ).rejects.toThrow(NotFoundError);
     });
 
@@ -484,7 +553,7 @@ types:
         directoryClient.object({
           objectType: "group",
           objectId: "import-group",
-        })
+        }),
       ).rejects.toThrow(NotFoundError);
     });
 
@@ -496,7 +565,112 @@ types:
           relation: "member",
           objectId: "import-group",
           objectType: "group",
-        })
+        }),
+      ).rejects.toThrow(NotFoundError);
+    });
+
+    it("deletes imported objects and relationships", async () => {
+      const importRequest = createImportRequest([
+        {
+          opCode: ImportOpCode.SET,
+          msg: {
+            case: ImportMsgCase.OBJECT,
+            value: {
+              id: "import-user",
+              type: "user",
+              properties: { foo: "bar" },
+              displayName: "name1",
+            },
+          },
+        },
+        {
+          opCode: ImportOpCode.SET,
+          msg: {
+            case: ImportMsgCase.OBJECT,
+            value: {
+              id: "import-group",
+              type: "group",
+              properties: {},
+              displayName: "name2",
+            },
+          },
+        },
+        {
+          opCode: ImportOpCode.SET,
+          msg: {
+            case: ImportMsgCase.RELATION,
+            value: {
+              subjectId: "import-user",
+              subjectType: "user",
+              objectId: "import-group",
+              objectType: "group",
+              relation: "member",
+            },
+          },
+        },
+      ]);
+      await expect(
+        readAsyncIterable(await directoryClient.import(importRequest)),
+      ).resolves.not.toThrow();
+      await expect(
+        directoryClient.object({
+          objectType: "user",
+          objectId: "import-user",
+        }),
+      ).resolves.not.toThrow();
+      await expect(
+        directoryClient.relation({
+          subjectId: "import-user",
+          subjectType: "user",
+          relation: "member",
+          objectId: "import-group",
+          objectType: "group",
+        }),
+      ).resolves.not.toThrow();
+
+      const deleteRequest = createImportRequest([
+        {
+          opCode: ImportOpCode.DELETE,
+          msg: {
+            case: ImportMsgCase.OBJECT,
+            value: {
+              id: "import-user",
+              type: "user",
+            },
+          },
+        },
+        {
+          opCode: ImportOpCode.DELETE,
+          msg: {
+            case: ImportMsgCase.RELATION,
+            value: {
+              subjectId: "import-user",
+              subjectType: "user",
+              objectId: "import-group",
+              objectType: "group",
+              relation: "member",
+            },
+          },
+        },
+      ]);
+
+      await expect(
+        readAsyncIterable(await directoryClient.import(deleteRequest)),
+      ).resolves.not.toThrow();
+      await expect(
+        directoryClient.object({
+          objectType: "user",
+          objectId: "import-user",
+        }),
+      ).rejects.toThrow(NotFoundError);
+      await expect(
+        directoryClient.relation({
+          subjectId: "import-user",
+          subjectType: "user",
+          relation: "member",
+          objectId: "import-group",
+          objectType: "group",
+        }),
       ).rejects.toThrow(NotFoundError);
     });
   });
@@ -559,8 +733,8 @@ types:
             return new Promise((resolve) => {
               resolve(policyContext("todoApp", ["allowed"]));
             });
-          }
-        )
+          },
+        ),
       );
 
       const response = await request(app)
@@ -610,8 +784,8 @@ types:
             return new Promise((resolve) => {
               resolve(policyContext("todoApp", ["allowed"]));
             });
-          }
-        )
+          },
+        ),
       );
 
       const response = await request(app)

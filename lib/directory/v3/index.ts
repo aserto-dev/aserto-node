@@ -1,36 +1,66 @@
 import { readFileSync } from "fs";
-import { PaginationRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v3/common_pb";
-import { Exporter } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_connect";
-import { ExportRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
-import { Importer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_connect";
-import { ImportRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
-import { Model } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_connect";
+import {
+  Exporter,
+  ExportRequestSchema,
+  ExportResponse,
+} from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
+import {
+  Importer,
+  ImportRequest,
+  ImportRequestSchema,
+  ImportResponse,
+} from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
+import {
+  DeleteManifestResponse,
+  Model,
+  SetManifestRequestSchema,
+  SetManifestResponse,
+} from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
 import {
   Body,
   DeleteManifestRequest,
   GetManifestRequest,
   Metadata,
-  SetManifestRequest,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
-import { Reader } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_connect";
-import { GetObjectManyRequest } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_pb";
-import { Writer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_connect";
-import { SetObjectRequest as SetObjectRequest$ } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
 import {
-  JsonObject,
-  PartialMessage,
-  PlainMessage,
-  Struct,
-} from "@bufbuild/protobuf";
+  CheckRequestSchema,
+  CheckResponse,
+  GetGraphRequestSchema,
+  GetGraphResponse,
+  GetObjectManyRequestSchema,
+  GetObjectManyResponse,
+  GetObjectRequestSchema,
+  GetObjectResponse,
+  GetObjectsRequestSchema,
+  GetObjectsResponse,
+  GetRelationRequestSchema,
+  GetRelationResponse,
+  GetRelationsResponse,
+  Reader,
+} from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_pb";
+import {
+  DeleteObjectRequestSchema,
+  DeleteObjectResponse,
+  DeleteRelationRequestSchema,
+  DeleteRelationResponse,
+  SetObjectRequestSchema,
+  SetObjectResponse,
+  SetRelationRequestSchema,
+  SetRelationResponse,
+  Writer,
+} from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
+import { create, JsonObject } from "@bufbuild/protobuf";
 import {
   CallOptions,
-  createPromiseClient,
+  Client,
+  createClient,
   Interceptor,
-  PromiseClient,
   Transport,
 } from "@connectrpc/connect";
+import { createAsyncIterable as createAsyncIterable$ } from "@connectrpc/connect/protocol";
 import { createGrpcTransport } from "@connectrpc/connect-node";
 
+import { log } from "../../log";
 import {
   handleError,
   setCustomHeaders,
@@ -44,18 +74,20 @@ import {
   nullReaderProxy,
   nullWriterProxy,
 } from "./null";
-import { ExportOptions } from "./types";
 import {
-  CheckPermissionRequest,
-  CheckRelationRequest,
   CheckRequest,
   DeleteObjectRequest,
   DeleteRelationRequest,
   DirectoryV3Config,
+  ExportOptions,
   GetGraphRequest,
+  GetManifestResponse,
+  GetObjectManyRequest,
   GetObjectRequest,
+  GetObjectsRequest,
   GetRelationRequest,
   GetRelationsRequest,
+  ImportRequest as ImportRequest$,
   ServiceConfig,
   SetObjectRequest,
   SetRelationRequest,
@@ -95,11 +127,11 @@ export enum ImportMsgCase {
 }
 
 export class DirectoryV3 {
-  ReaderClient: PromiseClient<typeof Reader>;
-  WriterClient: PromiseClient<typeof Writer>;
-  ImporterClient: PromiseClient<typeof Importer>;
-  ExporterClient: PromiseClient<typeof Exporter>;
-  ModelClient: PromiseClient<typeof Model>;
+  ReaderClient: Client<typeof Reader>;
+  WriterClient: Client<typeof Writer>;
+  ImporterClient: Client<typeof Importer>;
+  ExporterClient: Client<typeof Exporter>;
+  ModelClient: Client<typeof Model>;
   CreateTransport: (
     config: ServiceConfig | undefined,
     fallback: ServiceConfig | undefined,
@@ -174,7 +206,6 @@ export class DirectoryV3 {
         }
         interceptors.push(setCustomHeaders(customHeaders));
         return createGrpcTransport({
-          httpVersion: "2",
           baseUrl: `https://${serviceUrl || "directory.prod.aserto.com:8443"}`,
           interceptors: interceptors,
           nodeOptions: nodeOptions,
@@ -218,7 +249,6 @@ export class DirectoryV3 {
     const baseGrpcTransport =
       !!config.url || (!!config.apiKey && !!config.tenantId)
         ? createGrpcTransport({
-            httpVersion: "2",
             baseUrl: `https://${baseServiceUrl}`,
             interceptors: interceptors,
             nodeOptions: baseNodeOptions,
@@ -233,206 +263,220 @@ export class DirectoryV3 {
     const modelGrpcTransport = createTransport(config.model, config);
 
     this.ReaderClient = !!readerGrpcTransport
-      ? createPromiseClient(Reader, readerGrpcTransport)
-      : (nullReaderProxy as unknown as PromiseClient<typeof Reader>);
+      ? createClient(Reader, readerGrpcTransport)
+      : nullReaderProxy();
     this.WriterClient = !!writerGrpcTransport
-      ? createPromiseClient(Writer, writerGrpcTransport)
-      : (nullWriterProxy as unknown as PromiseClient<typeof Writer>);
+      ? createClient(Writer, writerGrpcTransport)
+      : nullWriterProxy();
     this.ImporterClient = !!importerGrpcTransport
-      ? createPromiseClient(Importer, importerGrpcTransport)
-      : (nullImporterProxy as unknown as PromiseClient<typeof Importer>);
+      ? createClient(Importer, importerGrpcTransport)
+      : nullImporterProxy();
     this.ExporterClient = !!exporterGrpcTransport
-      ? createPromiseClient(Exporter, exporterGrpcTransport)
-      : (nullExporterProxy as unknown as PromiseClient<typeof Exporter>);
+      ? createClient(Exporter, exporterGrpcTransport)
+      : nullExporterProxy();
 
     this.ModelClient = !!modelGrpcTransport
-      ? createPromiseClient(Model, modelGrpcTransport)
-      : (nullModelProxy as unknown as PromiseClient<typeof Model>);
+      ? createClient(Model, modelGrpcTransport)
+      : nullModelProxy();
 
     this.CreateTransport = createTransport;
   }
 
-  async checkPermission(params: CheckPermissionRequest, options?: CallOptions) {
+  async check(
+    params: CheckRequest,
+    options?: CallOptions,
+  ): Promise<CheckResponse> {
     try {
-      const response = await this.ReaderClient.checkPermission(params, options);
-
-      return response;
+      return await this.ReaderClient.check(
+        create(CheckRequestSchema, params),
+        options,
+      );
     } catch (error) {
-      handleError(error, "checkPermission");
+      throw handleError(error, "check");
     }
   }
 
-  async checkRelation(params: CheckRelationRequest, options?: CallOptions) {
+  async object(
+    params: GetObjectRequest,
+    options?: CallOptions,
+  ): Promise<GetObjectResponse> {
     try {
-      const response = await this.ReaderClient.checkRelation(params, options);
+      if (params.page) {
+        params.page.size ||= 100;
+      }
 
-      return response;
+      return await this.ReaderClient.getObject(
+        create(GetObjectRequestSchema, params),
+        options,
+      );
     } catch (error) {
-      handleError(error, "checkRelation");
-    }
-  }
-
-  async check(params: CheckRequest, options?: CallOptions) {
-    try {
-      const response = await this.ReaderClient.check(params, options);
-
-      return response;
-    } catch (error) {
-      handleError(error, "check");
-    }
-  }
-
-  async object(params: GetObjectRequest, options?: CallOptions) {
-    try {
-      const response = await this.ReaderClient.getObject(params, options);
-
-      return response.result;
-    } catch (error) {
-      handleError(error, "object");
+      throw handleError(error, "object");
     }
   }
   async objects(
-    params: {
-      objectType: string;
-      page?: PartialMessage<PaginationRequest>;
-    },
+    params: GetObjectsRequest,
     options?: CallOptions,
-  ) {
+  ): Promise<GetObjectsResponse> {
     try {
-      const response = await this.ReaderClient.getObjects(params, options);
+      if (params.page) {
+        params.page.size ||= 100;
+      }
 
-      return response;
+      return await this.ReaderClient.getObjects(
+        create(GetObjectsRequestSchema, params),
+        options,
+      );
     } catch (error) {
-      handleError(error, "objects");
+      throw handleError(error, "objects");
     }
   }
 
   async objectMany(
-    params: PlainMessage<GetObjectManyRequest>,
+    params: GetObjectManyRequest,
     options?: CallOptions,
-  ) {
+  ): Promise<GetObjectManyResponse> {
     try {
-      const response = await this.ReaderClient.getObjectMany(params, options);
-
-      return response.results;
-    } catch (error) {
-      handleError(error, "objectMany");
-    }
-  }
-
-  async setObject(params: SetObjectRequest, options?: CallOptions) {
-    try {
-      const structProperties = Struct.fromJsonString(
-        JSON.stringify(params.object?.properties || {}),
+      return await this.ReaderClient.getObjectMany(
+        create(GetObjectManyRequestSchema, params),
+        options,
       );
-
-      const newParams: SetObjectRequest$ = new SetObjectRequest$({
-        object: { ...params.object, properties: structProperties },
-      });
-
-      const response = await this.WriterClient.setObject(newParams, options);
-
-      return response?.result;
     } catch (error) {
-      handleError(error, "setObject");
+      throw handleError(error, "objectMany");
     }
   }
 
-  async deleteObject(params: DeleteObjectRequest, options?: CallOptions) {
+  async setObject(
+    params: SetObjectRequest,
+    options?: CallOptions,
+  ): Promise<SetObjectResponse> {
     try {
-      const response = await this.WriterClient.deleteObject(params, options);
-
-      return response.result;
+      return await this.WriterClient.setObject(
+        create(SetObjectRequestSchema, params),
+        options,
+      );
     } catch (error) {
-      handleError(error, "deleteObject");
+      throw handleError(error, "setObject");
     }
   }
 
-  async relation(params: GetRelationRequest, options?: CallOptions) {
+  async deleteObject(
+    params: DeleteObjectRequest,
+    options?: CallOptions,
+  ): Promise<DeleteObjectResponse> {
     try {
-      const response = await this.ReaderClient.getRelation(params, options);
-
-      return response;
+      return await this.WriterClient.deleteObject(
+        create(DeleteObjectRequestSchema, params),
+        options,
+      );
     } catch (error) {
-      handleError(error, "relation");
+      throw handleError(error, "deleteObject");
     }
   }
 
-  async setRelation(params: SetRelationRequest, options?: CallOptions) {
+  async relation(
+    params: GetRelationRequest,
+    options?: CallOptions,
+  ): Promise<GetRelationResponse> {
     try {
-      const response = await this.WriterClient.setRelation(params, options);
-
-      return response.result;
+      return await this.ReaderClient.getRelation(
+        create(GetRelationRequestSchema, params),
+        options,
+      );
     } catch (error) {
-      handleError(error, "setRelation");
+      throw handleError(error, "relation");
     }
   }
 
-  async deleteRelation(params: DeleteRelationRequest, options?: CallOptions) {
+  async setRelation(
+    params: SetRelationRequest,
+    options?: CallOptions,
+  ): Promise<SetRelationResponse> {
     try {
-      const response = await this.WriterClient.deleteRelation(params, options);
-
-      return response.result;
+      return this.WriterClient.setRelation(
+        create(SetRelationRequestSchema, params),
+        options,
+      );
     } catch (error) {
-      handleError(error, "deleteRelation");
+      throw handleError(error, "setRelation");
     }
   }
 
-  async relations(params: GetRelationsRequest, options?: CallOptions) {
+  async deleteRelation(
+    params: DeleteRelationRequest,
+    options?: CallOptions,
+  ): Promise<DeleteRelationResponse> {
     try {
-      const response = await this.ReaderClient.getRelations(params, options);
-
-      return response;
+      return await this.WriterClient.deleteRelation(
+        create(DeleteRelationRequestSchema, params),
+        options,
+      );
     } catch (error) {
-      handleError(error, "relations");
+      throw handleError(error, "deleteRelation");
     }
   }
 
-  async graph(params: GetGraphRequest, options?: CallOptions) {
+  async relations(
+    params: GetRelationsRequest,
+    options?: CallOptions,
+  ): Promise<GetRelationsResponse> {
     try {
-      const response = await this.ReaderClient.getGraph(params, options);
+      if (params.page) {
+        params.page.size ||= 100;
+      }
 
-      return response;
+      return await this.ReaderClient.getRelations(params, options);
     } catch (error) {
-      handleError(error, "graph");
+      throw handleError(error, "relations");
+    }
+  }
+
+  async graph(
+    params: GetGraphRequest,
+    options?: CallOptions,
+  ): Promise<GetGraphResponse> {
+    try {
+      return await this.ReaderClient.getGraph(
+        create(GetGraphRequestSchema, params),
+        options,
+      );
+    } catch (error) {
+      throw handleError(error, "graph");
     }
   }
 
   async import(
-    params: AsyncIterable<PartialMessage<ImportRequest>>,
+    params: AsyncIterable<ImportRequest>,
     options?: CallOptions,
-  ) {
+  ): Promise<AsyncIterable<ImportResponse>> {
     try {
       return this.ImporterClient.import(params, options);
     } catch (error) {
-      handleError(error, "import");
-      return createAsyncIterable([]);
+      throw handleError(error, "import");
     }
   }
 
-  async export(params: { options: DATA_TYPE_OPTIONS }, options?: CallOptions) {
+  async export(
+    params: { options: DATA_TYPE_OPTIONS },
+    options?: CallOptions,
+  ): Promise<AsyncIterable<ExportResponse>> {
     try {
       return this.ExporterClient.export(
-        new ExportRequest({
+        create(ExportRequestSchema, {
           options: ExportOptions[params.options],
         }),
         options,
       );
     } catch (error) {
-      handleError(error, "export");
-      return createAsyncIterable([]);
+      throw handleError(error, "export");
     }
   }
 
   async getManifest(
-    params?: PlainMessage<GetManifestRequest>,
+    params?: GetManifestRequest,
     options?: CallOptions,
-  ) {
+  ): Promise<GetManifestResponse> {
     try {
       const response = this.ModelClient.getManifest(params!, options);
-      if (!response) {
-        return;
-      }
 
       const data = (await readAsyncIterable(response))
         .map((el) => el.msg)
@@ -459,15 +503,18 @@ export class DirectoryV3 {
         etag: metadata?.etag,
       };
     } catch (error) {
-      handleError(error, "getManifest");
+      throw handleError(error, "getManifest");
     }
   }
 
-  async setManifest(params: { body: string }, options?: CallOptions) {
+  async setManifest(
+    params: { body: string },
+    options?: CallOptions,
+  ): Promise<SetManifestResponse> {
     try {
-      const response = await this.ModelClient.setManifest(
-        createAsyncIterable([
-          new SetManifestRequest({
+      return await this.ModelClient.setManifest(
+        createAsyncIterable$([
+          create(SetManifestRequestSchema, {
             msg: {
               case: "body",
               value: { data: new TextEncoder().encode(params.body) },
@@ -476,29 +523,29 @@ export class DirectoryV3 {
         ]),
         options,
       );
-
-      return response;
     } catch (error) {
-      handleError(error, "setManifest");
+      throw handleError(error, "setManifest");
     }
   }
 
   async deleteManifest(
-    params?: PlainMessage<DeleteManifestRequest>,
+    params?: DeleteManifestRequest,
     options?: CallOptions,
-  ) {
+  ): Promise<DeleteManifestResponse> {
     try {
-      const response = this.ModelClient.deleteManifest(params!, options);
-
-      return response;
+      return await this.ModelClient.deleteManifest(params!, options);
     } catch (error) {
-      handleError(error, "deleteManifest");
+      throw handleError(error, "deleteManifest");
     }
   }
 }
 
 /**
- * Read an asynchronous iterable into an array.
+ * Reads all elements from an AsyncIterable and returns them as an array.
+ *
+ * @template T - The type of elements in the AsyncIterable.
+ * @param {AsyncIterable<T>} gen - The AsyncIterable to read from.
+ * @returns {Promise<T[]>} A promise that resolves to an array containing all elements from the AsyncIterable.
  */
 export async function readAsyncIterable<T>(
   gen: AsyncIterable<T>,
@@ -511,20 +558,46 @@ export async function readAsyncIterable<T>(
 }
 
 /**
- * Create an asynchronous iterable from an array.
+ * Creates an asynchronous iterable of import requests.
+ *
+ * @param { ImportRequest$[]} params - An array of ImportRequest to be converted into ImportRequest objects.
+ * @yields ImportRequest objects created from the provided parameters.
  */
-export async function* createAsyncIterable<T>(items: T[]): AsyncIterable<T> {
-  yield* items;
+export async function* createImportRequest(params: ImportRequest$[]) {
+  yield* createAsyncIterable$(
+    params.map((param) => create(ImportRequestSchema, param as ImportRequest)),
+  );
 }
 
 /**
- * Converts a JSON object to a Protobuf Struct.
+ * Asynchronously iterates over an array of items, yielding each item.
+ *
+ * @deprecated Use `createImportRequest` instead.
+ *
+ * @template T
+ * @param {T[]} items - The array of items to iterate over.
+ */
+export async function* createAsyncIterable<T>(items: T[]) {
+  log("[Deprecated]: please use `createImportRequest`");
+  yield* createImportRequest(items as ImportRequest$[]);
+}
+
+/**
+ * Old Implementation: Converts a JSON object to a Protobuf Struct.
+ *
+ * Current Implementation: noop. Returns the input object
+ *
+ * * @deprecated This function is deprecated as the SDK no longer requires
+ * conversion from JSON to Struct. Use the value directly.
  *
  * @param value - The JSON object to convert.
  * @returns The converted Protobuf Struct.
  */
-export function objectPropertiesAsStruct(value: JsonObject): Struct {
-  return Struct.fromJson(value);
+export function objectPropertiesAsStruct(value: JsonObject): JsonObject {
+  log(
+    "[Deprecated]: This version of SDK does not require conversion from JSON to Struct. Use the value directly",
+  );
+  return value;
 }
 
 function mergeUint8Arrays(...arrays: Uint8Array[]): Uint8Array {
@@ -539,6 +612,12 @@ function mergeUint8Arrays(...arrays: Uint8Array[]): Uint8Array {
   return merged;
 }
 
+/**
+ * Creates a new instance of the DirectoryV3 class.
+ *
+ * @param {DirectoryV3Config} config - The configuration object for initializing the DirectoryV3 instance.
+ * @returns {DirectoryV3} A new instance of the DirectoryV3 class.
+ */
 export const DirectoryServiceV3 = (config: DirectoryV3Config): DirectoryV3 => {
   return new DirectoryV3(config);
 };

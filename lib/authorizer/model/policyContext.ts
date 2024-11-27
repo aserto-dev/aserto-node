@@ -1,10 +1,11 @@
-import { PolicyContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/policy_context_pb";
+import { PolicyContextSchema } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/policy_context_pb";
+import { create } from "@bufbuild/protobuf";
 
 const policyContext = (
   policyPath: string = "",
   decisionsList: Array<string> = ["allowed"],
 ) => {
-  const policyContext = new PolicyContext({
+  const policyContext = create(PolicyContextSchema, {
     path: policyPath,
     decisions: decisionsList,
   });

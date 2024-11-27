@@ -1,15 +1,13 @@
-import {
-  DecisionTreeResponse,
-  IsResponse,
-  ListPoliciesResponse,
-  QueryResponse,
-} from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/authorizer_pb";
-import { Struct } from "@bufbuild/protobuf";
+import { create } from "@bufbuild/protobuf";
 import { Code, ConnectError } from "@connectrpc/connect";
 
 import {
   decisionTreeOptions,
+  DecisionTreeResponseSchema,
+  IsResponseSchema,
+  ListPoliciesResponseSchema,
   queryOptions,
+  QueryResponseSchema,
   UnauthenticatedError,
 } from "../../lib";
 import { Authorizer } from "../../lib/authorizer";
@@ -24,7 +22,9 @@ describe("Is", () => {
   it("returns true when policy allows access", async () => {
     const mock = jest
       .spyOn(authorizer.AuthClient, "is")
-      .mockResolvedValue(new IsResponse({ decisions: [{ is: true }] }));
+      .mockResolvedValue(
+        create(IsResponseSchema, { decisions: [{ is: true }] }),
+      );
 
     const params = {
       policyContext: {
@@ -44,10 +44,19 @@ describe("Is", () => {
 
     expect(authorizer.AuthClient.is).toHaveBeenCalledWith(
       {
-        ...params,
-        policyInstance: { ...params.policyInstance, instanceLabel: "todo" },
+        $typeName: "aserto.authorizer.v2.IsRequest",
+        policyContext: {
+          $typeName: "aserto.authorizer.v2.api.PolicyContext",
+          path: "a.b.c",
+          decisions: ["allowed"],
+        },
+        policyInstance: {
+          ...params.policyInstance,
+          $typeName: "aserto.authorizer.v2.api.PolicyInstance",
+          instanceLabel: "todo",
+        },
       },
-      options
+      options,
     );
 
     expect(result).toBe(true);
@@ -58,7 +67,9 @@ describe("Is", () => {
   it("handles resource context", async () => {
     const mock = jest
       .spyOn(authorizer.AuthClient, "is")
-      .mockResolvedValue(new IsResponse({ decisions: [{ is: true }] }));
+      .mockResolvedValue(
+        create(IsResponseSchema, { decisions: [{ is: true }] }),
+      );
 
     const params = {
       policyContext: {
@@ -76,11 +87,20 @@ describe("Is", () => {
 
     expect(authorizer.AuthClient.is).toHaveBeenCalledWith(
       {
-        ...params,
-        resourceContext: Struct.fromJson(params.resourceContext),
-        policyInstance: { ...params.policyInstance, instanceLabel: "todo" },
+        $typeName: "aserto.authorizer.v2.IsRequest",
+        policyContext: {
+          $typeName: "aserto.authorizer.v2.api.PolicyContext",
+          path: "a.b.c",
+          decisions: ["allowed"],
+        },
+        resourceContext: params.resourceContext,
+        policyInstance: {
+          ...params.policyInstance,
+          $typeName: "aserto.authorizer.v2.api.PolicyInstance",
+          instanceLabel: "todo",
+        },
       },
-      undefined
+      undefined,
     );
 
     expect(result).toBe(true);
@@ -91,7 +111,9 @@ describe("Is", () => {
   it("handles nested resource context", async () => {
     const mock = jest
       .spyOn(authorizer.AuthClient, "is")
-      .mockResolvedValue(new IsResponse({ decisions: [{ is: true }] }));
+      .mockResolvedValue(
+        create(IsResponseSchema, { decisions: [{ is: true }] }),
+      );
 
     const params = {
       policyContext: {
@@ -109,11 +131,20 @@ describe("Is", () => {
 
     expect(authorizer.AuthClient.is).toHaveBeenCalledWith(
       {
-        ...params,
-        resourceContext: Struct.fromJson(params.resourceContext),
-        policyInstance: { ...params.policyInstance, instanceLabel: "todo" },
+        $typeName: "aserto.authorizer.v2.IsRequest",
+        policyContext: {
+          $typeName: "aserto.authorizer.v2.api.PolicyContext",
+          path: "a.b.c",
+          decisions: ["allowed"],
+        },
+        resourceContext: params.resourceContext,
+        policyInstance: {
+          ...params.policyInstance,
+          $typeName: "aserto.authorizer.v2.api.PolicyInstance",
+          instanceLabel: "todo",
+        },
       },
-      undefined
+      undefined,
     );
     expect(result).toBe(true);
 
@@ -123,7 +154,9 @@ describe("Is", () => {
   it("returns false when policy allows access", async () => {
     const mock = jest
       .spyOn(authorizer.AuthClient, "is")
-      .mockResolvedValue(new IsResponse({ decisions: [{ is: false }] }));
+      .mockResolvedValue(
+        create(IsResponseSchema, { decisions: [{ is: false }] }),
+      );
 
     const params = {
       policyContext: {
@@ -137,7 +170,22 @@ describe("Is", () => {
     };
     const result = await authorizer.Is(params);
 
-    expect(authorizer.AuthClient.is).toHaveBeenCalledWith(params, undefined);
+    expect(authorizer.AuthClient.is).toHaveBeenCalledWith(
+      {
+        policyContext: {
+          $typeName: "aserto.authorizer.v2.api.PolicyContext",
+          path: "a.b.c",
+          decisions: ["allowed"],
+        },
+        policyInstance: {
+          $typeName: "aserto.authorizer.v2.api.PolicyInstance",
+          name: "todo",
+          instanceLabel: "todo",
+        },
+        $typeName: "aserto.authorizer.v2.IsRequest",
+      },
+      undefined,
+    );
 
     expect(result).toBe(false);
 
@@ -147,7 +195,9 @@ describe("Is", () => {
   it("handles undefined policyInstance, policyContext, and resourceContext", async () => {
     const mock = jest
       .spyOn(authorizer.AuthClient, "is")
-      .mockResolvedValue(new IsResponse({ decisions: [{ is: false }] }));
+      .mockResolvedValue(
+        create(IsResponseSchema, { decisions: [{ is: false }] }),
+      );
 
     const result = await authorizer.Is({});
 
@@ -176,7 +226,7 @@ describe("Is", () => {
 
     // error message
     await expect(authorizer.Is({})).rejects.toThrow(
-      '"Is" failed with code: 1, message: "Is" failed with code: 1, message: [canceled] connect error'
+      '"Is" failed with code: 1, message: "Is" failed with code: 1, message: [canceled] connect error',
     );
 
     mock.mockReset();
@@ -186,14 +236,14 @@ describe("Is", () => {
     const mock = jest
       .spyOn(authorizer.AuthClient, "is")
       .mockRejectedValue(
-        new ConnectError("Invalid credentials", Code.Unauthenticated)
+        new ConnectError("Invalid credentials", Code.Unauthenticated),
       );
 
     // error class
     await expect(authorizer.Is({})).rejects.toThrow(UnauthenticatedError);
     // error message
     await expect(authorizer.Is({})).rejects.toThrow(
-      "Authentication failed: [unauthenticated] Invalid credentials"
+      "Authentication failed: [unauthenticated] Invalid credentials",
     );
 
     mock.mockReset();
@@ -209,9 +259,9 @@ describe("Query", () => {
 
   it("returns the expected result when all parameters are valid", async () => {
     const mock = jest.spyOn(authorizer.AuthClient, "query").mockResolvedValue(
-      new QueryResponse({
-        response: Struct.fromJson({ key1: "value1", key2: 2 }),
-      })
+      create(QueryResponseSchema, {
+        response: { key1: "value1", key2: 2 },
+      }),
     );
 
     const result = await authorizer.Query({
@@ -227,7 +277,7 @@ describe("Query", () => {
   it("returns empty object when the response is empty", async () => {
     const mock = jest
       .spyOn(authorizer.AuthClient, "query")
-      .mockResolvedValue(new QueryResponse({}));
+      .mockResolvedValue(create(QueryResponseSchema, {}));
 
     const result = await authorizer.Query({
       query: "query",
@@ -241,9 +291,9 @@ describe("Query", () => {
 
   it("accepts queryOptions", async () => {
     const mock = jest.spyOn(authorizer.AuthClient, "query").mockResolvedValue(
-      new QueryResponse({
-        response: Struct.fromJson({ key1: "value1", key2: 2 }),
-      })
+      create(QueryResponseSchema, {
+        response: { key1: "value1", key2: 2 },
+      }),
     );
 
     const result = await authorizer.Query({
@@ -259,6 +309,7 @@ describe("Query", () => {
       {
         query: "query",
         input: "input",
+        $typeName: "aserto.authorizer.v2.QueryRequest",
         options: queryOptions({
           metrics: true,
           instrument: false,
@@ -266,7 +317,7 @@ describe("Query", () => {
           traceSummary: false,
         }),
       },
-      undefined
+      undefined,
     );
 
     expect(result).toEqual({ key1: "value1", key2: 2 });
@@ -285,10 +336,10 @@ describe("DecisionTree", () => {
     const mock = jest
       .spyOn(authorizer.AuthClient, "decisionTree")
       .mockResolvedValue(
-        new DecisionTreeResponse({
+        create(DecisionTreeResponseSchema, {
           pathRoot: "root",
-          path: Struct.fromJson({ key1: "value1", key2: 2 }),
-        })
+          path: { key1: "value1", key2: 2 },
+        }),
       );
 
     const result = await authorizer.DecisionTree({
@@ -307,7 +358,7 @@ describe("DecisionTree", () => {
   it("returns an empty path object and path root string when no matching policy is found", async () => {
     const mock = jest
       .spyOn(authorizer.AuthClient, "decisionTree")
-      .mockResolvedValue(new DecisionTreeResponse());
+      .mockResolvedValue(create(DecisionTreeResponseSchema));
 
     const result = await authorizer.DecisionTree({
       options: decisionTreeOptions("SLASH"),
@@ -328,18 +379,19 @@ describe("ListPolicies", () => {
     const mock = jest
       .spyOn(authorizer.AuthClient, "listPolicies")
       .mockResolvedValue(
-        new ListPoliciesResponse({
+        create(ListPoliciesResponseSchema, {
           result: [
             {
               id: "1",
               packagePath: "a.b.c",
             },
           ],
-        })
+        }),
       );
     const result = await authorizer.ListPolicies({});
     expect(result).toEqual([
       {
+        $typeName: "aserto.authorizer.v2.api.Module",
         id: "1",
         packagePath: "a.b.c",
       },
@@ -351,9 +403,9 @@ describe("ListPolicies", () => {
     const mock = jest
       .spyOn(authorizer.AuthClient, "listPolicies")
       .mockResolvedValue(
-        new ListPoliciesResponse({
+        create(ListPoliciesResponseSchema, {
           result: [],
-        })
+        }),
       );
     const result = await authorizer.ListPolicies({});
     expect(result).toEqual([]);

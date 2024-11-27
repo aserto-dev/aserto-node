@@ -35,6 +35,9 @@ yarn add @aserto/aserto-node
 
 > `express@^4.0.0` is a peer dependency. Make sure it is installed in your project.
 
+## Migration from prior versions guides
+If you are migrating from older versions, check out our [migration guide](https://github.com/aserto-dev/aserto-node/blob/main/MIGRATING.md);
+
 ## Authorizer
 
 ### Authorizer Client
@@ -624,9 +627,9 @@ await directoryClient.deleteRelation({
 
 You can evaluate graph queries over the directory, to determine whether a subject (e.g. user) has a permission or a relation to an object instance.
 
-#### 'checkPermission' function
+#### 'check' function
 
-`checkPermission({ objectType: string, objectId: string, permission: string, subjectType: string, subjectId: string, trace: boolean }, options?: CallOptions)`:
+`check({ objectType: string, objectId: string, relation: string, subjectType: string, subjectId: string, trace: boolean }, options?: CallOptions)`:
 
 Check that an `user` object with the key `euang@acmecorp.com` has the `read` permission in the `admin` group:
 
@@ -639,10 +642,6 @@ const check = await directoryClient.checkPermission({
   objectId: 'admin',
 });
 ```
-
-#### 'checkRelation' function
-
-`checkRelation({ objectType: string, objectId: string, relation: string, subjectType: string, subjectId: string, trace: boolean }, options?: CallOptions)`:
 
 Check that `euang@acmecorp.com` has an `identifier` relation to an object with key `euang@acmecorp.com` and type `identity`:
 
@@ -731,9 +730,11 @@ await directoryClient.deleteManifest();
 
 ### Import
 
+`createAsyncIterable` has been deprecated, please use `createImportRequest`
+
 ```ts
-import { ImportMsgCase, ImportOpCode, objectPropertiesAsStruct } from "@aserto/aserto-node"
-const importRequest = createAsyncIterable([
+import { ImportMsgCase, ImportOpCode, createImportRequest } from "@aserto/aserto-node"
+const importRequest = createImportRequest([
   {
     opCode: ImportOpCode.SET,
     msg: {
@@ -741,7 +742,7 @@ const importRequest = createAsyncIterable([
       value: {
         id: "import-user",
         type: "user",
-        properties: objectPropertiesAsStruct({ foo: "bar" }),
+        properties: { foo: "bar" },
         displayName: "name1",
       },
     },
@@ -802,6 +803,19 @@ const user = await directoryClient.object(
     },
   }
 );
+```
+
+### Serializing data
+
+Use [Protocol Buffers](https://github.com/bufbuild/protobuf-es) to serialize data.
+
+
+```ts
+import { GetObjectsResponseSchema } from "@aserto/aserto-node";
+import { toJson } from "@bufbuild/protobuf";
+
+const objects = await directoryClient.objects({objectType: "user"});
+const json = toJson(GetObjectsResponseSchema, objects)
 ```
 
 

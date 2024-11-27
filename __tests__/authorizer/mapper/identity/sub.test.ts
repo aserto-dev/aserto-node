@@ -15,9 +15,7 @@ describe("SubIdentityMapper", () => {
     });
 
     await expect(subMapper(req)).rejects.toEqual(
-      new InvalidTokenError(
-        "Invalid token specified: missing part #2"
-      )
+      new InvalidTokenError("Invalid token specified: missing part #2"),
     );
   });
 
@@ -29,9 +27,7 @@ describe("SubIdentityMapper", () => {
     });
 
     await expect(subMapper(req)).rejects.toEqual(
-      new InvalidTokenError(
-        "Invalid token specified: missing part #2"
-      )
+      new InvalidTokenError("Invalid token specified: missing part #2"),
     );
   });
 
@@ -39,7 +35,7 @@ describe("SubIdentityMapper", () => {
     const req = httpMocks.createRequest({});
 
     await expect(subMapper(req)).rejects.toEqual(
-      new Error("Missing Authorization header")
+      new Error("Missing Authorization header"),
     );
   });
 

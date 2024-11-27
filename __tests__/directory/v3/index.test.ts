@@ -1,49 +1,34 @@
 import * as fs from "fs";
 import { describe } from "node:test";
-import { ExportResponse } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
-import { ImportResponse } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
-import {
-  DeleteManifestResponse,
-  GetManifestResponse,
-  SetManifestResponse,
-} from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
-import {
-  CheckPermissionResponse,
-  CheckRelationResponse,
-  CheckResponse,
-  GetGraphResponse,
-  GetObjectManyResponse,
-  GetObjectResponse,
-  GetObjectsResponse,
-  GetRelationResponse,
-  GetRelationsResponse,
-} from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_pb";
-import {
-  DeleteObjectResponse,
-  DeleteRelationResponse,
-  SetObjectResponse,
-  SetRelationResponse,
-} from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
+import { create } from "@bufbuild/protobuf";
 import { Code, ConnectError } from "@connectrpc/connect";
 import { createAsyncIterable } from "@connectrpc/connect/protocol";
 import * as connectNode from "@connectrpc/connect-node";
 
 import {
-  nullExporterProxy,
-  nullImporterProxy,
-  nullModelProxy,
-  nullReaderProxy,
-  nullWriterProxy,
-} from "../../../lib/directory/v3/null";
-import {
+  CheckResponseSchema,
   ConfigError,
+  createImportRequest,
+  DeleteManifestResponseSchema,
+  DeleteObjectResponseSchema,
+  DeleteRelationResponseSchema,
   DirectoryServiceV3,
   DirectoryV3,
   EtagMismatchError,
+  ExportResponseSchema,
+  GetGraphResponseSchema,
+  GetManifestResponseSchema,
+  GetObjectManyResponseSchema,
+  GetObjectResponseSchema,
+  GetObjectsResponseSchema,
+  GetRelationResponseSchema,
+  GetRelationsResponseSchema,
+  ImportResponseSchema,
   InvalidArgumentError,
   NotFoundError,
-  objectPropertiesAsStruct,
-  UnauthenticatedError,
+  SetManifestResponseSchema,
+  SetObjectResponseSchema,
+  SetRelationResponseSchema,
 } from "../../../lib/index";
 jest.mock("fs");
 
@@ -129,7 +114,6 @@ describe("DirectoryV3", () => {
       [
         expect.objectContaining({
           baseUrl: "https://directory.prod.aserto.com:8443",
-          httpVersion: "2",
           interceptors: [expect.any(Function)],
           nodeOptions: {
             ca: "caFile",
@@ -140,7 +124,6 @@ describe("DirectoryV3", () => {
       [
         expect.objectContaining({
           baseUrl: "https://readerUrl",
-          httpVersion: "2",
           interceptors: [expect.any(Function), expect.any(Function)],
           nodeOptions: {
             ca: "readerCaFile",
@@ -151,7 +134,6 @@ describe("DirectoryV3", () => {
       [
         expect.objectContaining({
           baseUrl: "https://writerUrl",
-          httpVersion: "2",
           interceptors: [expect.any(Function), expect.any(Function)],
           nodeOptions: {
             ca: "caFile",
@@ -162,7 +144,6 @@ describe("DirectoryV3", () => {
       [
         expect.objectContaining({
           baseUrl: "https://importerUrl",
-          httpVersion: "2",
           interceptors: [expect.any(Function), expect.any(Function)],
           nodeOptions: {
             ca: "caFile",
@@ -173,7 +154,6 @@ describe("DirectoryV3", () => {
       [
         expect.objectContaining({
           baseUrl: "https://directory.prod.aserto.com:8443",
-          httpVersion: "2",
           interceptors: [expect.any(Function), expect.any(Function)],
           nodeOptions: {
             ca: "exporterCaFile",
@@ -184,7 +164,6 @@ describe("DirectoryV3", () => {
       [
         expect.objectContaining({
           baseUrl: "https://directory.prod.aserto.com:8443",
-          httpVersion: "2",
           interceptors: [expect.any(Function), expect.any(Function)],
           nodeOptions: {
             ca: "caFile",
@@ -281,7 +260,6 @@ describe("DirectoryV3", () => {
         [
           expect.objectContaining({
             baseUrl: "https://directory.prod.aserto.com:8443",
-            httpVersion: "2",
             nodeOptions: { rejectUnauthorized: true },
           }),
         ],
@@ -312,7 +290,6 @@ describe("DirectoryV3", () => {
         [
           expect.objectContaining({
             baseUrl: "https://readerurl",
-            httpVersion: "2",
             nodeOptions: { rejectUnauthorized: true },
           }),
         ],
@@ -328,17 +305,13 @@ describe("DirectoryV3", () => {
         },
       });
 
-      it("is defined as a proxy", () => {
-        expect(directory.ReaderClient).toBe(nullReaderProxy);
-      });
-
       it("throws ClientNotConfigured Error when called", async () => {
         await expect(directory.objects({ objectType: "" })).rejects.toThrow(
-          ConfigError
+          ConfigError,
         );
 
         await expect(directory.objects({ objectType: "" })).rejects.toThrow(
-          `Cannot call 'getObjects', 'Reader' is not configured.`
+          `Cannot call 'getObjects', 'Reader' is not configured.`,
         );
       });
     });
@@ -363,15 +336,11 @@ describe("DirectoryV3", () => {
         },
       });
 
-      it("is defined as a proxy", () => {
-        expect(directory.WriterClient).toBe(nullWriterProxy);
-      });
-
       it("throws ClientNotConfigured Error when called", async () => {
         await expect(directory.setObject({})).rejects.toThrow(ConfigError);
 
         await expect(directory.setObject({})).rejects.toThrow(
-          `Cannot call 'setObject', 'Writer' is not configured.`
+          `Cannot call 'setObject', 'Writer' is not configured.`,
         );
       });
     });
@@ -396,17 +365,13 @@ describe("DirectoryV3", () => {
         },
       });
 
-      it("is defined as a proxy", () => {
-        expect(directory.ImporterClient).toBe(nullImporterProxy);
-      });
-
       it("throws ClientNotConfigured Error when called", async () => {
-        await expect(directory.import(createAsyncIterable([]))).rejects.toThrow(
-          ConfigError
+        await expect(directory.import(createImportRequest([]))).rejects.toThrow(
+          ConfigError,
         );
 
-        await expect(directory.import(createAsyncIterable([]))).rejects.toThrow(
-          `Cannot call 'import', 'Importer' is not configured.`
+        await expect(directory.import(createImportRequest([]))).rejects.toThrow(
+          `Cannot call 'import', 'Importer' is not configured.`,
         );
       });
     });
@@ -431,17 +396,13 @@ describe("DirectoryV3", () => {
         },
       });
 
-      it("is defined as a proxy", () => {
-        expect(directory.ExporterClient).toBe(nullExporterProxy);
-      });
-
       it("throws ClientNotConfigured Error when called", async () => {
         await expect(directory.export({ options: "DATA" })).rejects.toThrow(
-          ConfigError
+          ConfigError,
         );
 
         await expect(directory.export({ options: "DATA" })).rejects.toThrow(
-          `Cannot call 'export', 'Exporter' is not configured.`
+          `Cannot call 'export', 'Exporter' is not configured.`,
         );
       });
     });
@@ -466,168 +427,13 @@ describe("DirectoryV3", () => {
         },
       });
 
-      it("is defined as a proxy", () => {
-        expect(directory.ModelClient).toBe(nullModelProxy);
-      });
-
       it("throws ClientNotConfigured Error when called", async () => {
         await expect(directory.deleteManifest()).rejects.toThrow(ConfigError);
 
         await expect(directory.deleteManifest()).rejects.toThrow(
-          `Cannot call 'deleteManifest', 'Model' is not configured.`
+          `Cannot call 'deleteManifest', 'Model' is not configured.`,
         );
       });
-    });
-  });
-
-  describe("checkPermission", () => {
-    it("calls checkPermission with valid params", async () => {
-      const mockCheckPermission = jest
-        .spyOn(directory.ReaderClient, "checkPermission")
-        .mockResolvedValue(
-          new CheckPermissionResponse({ check: true, trace: [] })
-        );
-
-      const params = {
-        subjectId: "euang@acmecorp.com",
-        subjectType: "user",
-        permission: "read",
-        objectType: "group",
-        objectId: "admin",
-      };
-      const options = {
-        headers: {
-          customKey: "customValue",
-        },
-      };
-      const result = await directory.checkPermission(params, options);
-
-      expect(directory.ReaderClient.checkPermission).toHaveBeenCalledWith(
-        params,
-        options
-      );
-
-      expect(result?.check).toBe(true);
-
-      mockCheckPermission.mockReset();
-    });
-
-    it("handles errors returned by the directory service", async () => {
-      const mockCheckPermission = jest
-        .spyOn(directory.ReaderClient, "checkPermission")
-        .mockRejectedValue(new Error("Directory service error"));
-
-      const params = {
-        subjectId: "euang@acmecorp.com",
-        subjectType: "user",
-        permission: "read",
-        objectType: "group",
-        objectId: "admin",
-      };
-      await expect(directory.checkPermission(params)).rejects.toThrow(
-        "Directory service error"
-      );
-
-      mockCheckPermission.mockReset();
-    });
-
-    it("handles ConnectError", async () => {
-      const mockCheckPermission = jest
-        .spyOn(directory.ReaderClient, "checkPermission")
-        .mockRejectedValue(new ConnectError("connect error", Code.Canceled));
-
-      const params = {
-        subjectId: "euang@acmecorp.com",
-        subjectType: "user",
-        permission: "read",
-        objectType: "group",
-        objectId: "admin",
-      };
-
-      // error class
-      await expect(directory.checkPermission(params)).rejects.toThrow(
-        ConnectError
-      );
-
-      // error message
-      await expect(directory.checkPermission(params)).rejects.toThrow(
-        '"checkPermission" failed with code: 1, message: [canceled] connect error'
-      );
-
-      mockCheckPermission.mockReset();
-    });
-
-    it("handles Unauthenticated Error", async () => {
-      const mockCheckPermission = jest
-        .spyOn(directory.ReaderClient, "checkPermission")
-        .mockRejectedValue(
-          new ConnectError("Invalid credentials", Code.Unauthenticated)
-        );
-
-      const params = {
-        subjectId: "euang@acmecorp.com",
-        subjectType: "user",
-        permission: "read",
-        objectType: "group",
-        objectId: "admin",
-      };
-
-      // error class
-      await expect(directory.checkPermission(params)).rejects.toThrow(
-        UnauthenticatedError
-      );
-      // error message
-      await expect(directory.checkPermission(params)).rejects.toThrow(
-        "Authentication failed: [unauthenticated] Invalid credentials"
-      );
-
-      mockCheckPermission.mockReset();
-    });
-  });
-
-  describe("checkRelation", () => {
-    it("calls checkRelation with valid params", async () => {
-      const mockCheckRelation = jest
-        .spyOn(directory.ReaderClient, "checkRelation")
-        .mockResolvedValue(
-          new CheckRelationResponse({ check: true, trace: [] })
-        );
-
-      const params = {
-        subjectId: "euang@acmecorp.com",
-        subjectType: "user",
-        relation: "read",
-        objectType: "group",
-        objectId: "admin",
-      };
-      const result = await directory.checkRelation(params);
-
-      expect(directory.ReaderClient.checkRelation).toHaveBeenCalledWith(
-        params,
-        undefined
-      );
-      expect(result?.check).toBe(true);
-
-      mockCheckRelation.mockReset();
-    });
-
-    it("handles errors returned by the directory service", async () => {
-      const mockCheckRelation = jest
-        .spyOn(directory.ReaderClient, "checkRelation")
-        .mockRejectedValue(new Error("Directory service error"));
-
-      const params = {
-        subjectId: "euang@acmecorp.com",
-        subjectType: "user",
-        relation: "read",
-        objectType: "group",
-        objectId: "admin",
-      };
-      await expect(directory.checkRelation(params)).rejects.toThrow(
-        "Directory service error"
-      );
-
-      mockCheckRelation.mockReset();
     });
   });
 
@@ -635,7 +441,9 @@ describe("DirectoryV3", () => {
     it("calls check with valid params", async () => {
       const mockCheck = jest
         .spyOn(directory.ReaderClient, "check")
-        .mockResolvedValue(new CheckResponse({ check: true, trace: [] }));
+        .mockResolvedValue(
+          create(CheckResponseSchema, { check: true, trace: [] }),
+        );
 
       const params = {
         subjectId: "euang@acmecorp.com",
@@ -647,10 +455,18 @@ describe("DirectoryV3", () => {
       const result = await directory.check(params);
 
       expect(directory.ReaderClient.check).toHaveBeenCalledWith(
-        params,
-        undefined
+        {
+          $typeName: "aserto.directory.reader.v3.CheckRequest",
+          ...params,
+          trace: false,
+        },
+        undefined,
       );
-      expect(result?.check).toBe(true);
+      expect(result).toEqual({
+        $typeName: "aserto.directory.reader.v3.CheckResponse",
+        check: true,
+        trace: [],
+      });
 
       mockCheck.mockReset();
     });
@@ -668,7 +484,7 @@ describe("DirectoryV3", () => {
         objectId: "admin",
       };
       await expect(directory.check(params)).rejects.toThrow(
-        "Directory service error"
+        "Directory service error",
       );
 
       mockCheck.mockReset();
@@ -680,21 +496,26 @@ describe("DirectoryV3", () => {
       const mockGetObject = jest
         .spyOn(directory.ReaderClient, "getObject")
         .mockResolvedValue(
-          new GetObjectResponse({
+          create(GetObjectResponseSchema, {
             result: {
               id: "123",
             },
-          })
+          }),
         );
 
       const params = { objectId: "123", objectType: "user" };
       const result = await directory.object(params);
 
       expect(result).toEqual({
-        displayName: "",
-        etag: "",
-        id: "123",
-        type: "",
+        $typeName: "aserto.directory.reader.v3.GetObjectResponse",
+        relations: [],
+        result: {
+          $typeName: "aserto.directory.common.v3.Object",
+          displayName: "",
+          etag: "",
+          id: "123",
+          type: "",
+        },
       });
 
       mockGetObject.mockReset();
@@ -707,7 +528,7 @@ describe("DirectoryV3", () => {
 
       const params = { objectId: "123", objectType: "user" };
       await expect(directory.object(params)).rejects.toThrow(
-        "Directory service error"
+        "Directory service error",
       );
 
       mockGetObject.mockReset();
@@ -724,7 +545,7 @@ describe("DirectoryV3", () => {
       await expect(directory.object(params)).rejects.toThrow(NotFoundError);
       // error message
       await expect(directory.object(params)).rejects.toThrow(
-        "object not found"
+        "object not found",
       );
 
       mockGetObject.mockReset();
@@ -735,7 +556,7 @@ describe("DirectoryV3", () => {
     it("returns objects of a given objectType", async () => {
       const mockGetObjects = jest
         .spyOn(directory.ReaderClient, "getObjects")
-        .mockResolvedValue(new GetObjectsResponse());
+        .mockResolvedValue(create(GetObjectsResponseSchema, {}));
 
       const params = {
         objectType: "user",
@@ -743,10 +564,128 @@ describe("DirectoryV3", () => {
 
       await directory.objects(params);
 
-      expect(mockGetObjects).toHaveBeenCalledWith(params, undefined);
+      expect(mockGetObjects).toHaveBeenCalledWith(
+        {
+          $typeName: "aserto.directory.reader.v3.GetObjectsRequest",
+          ...params,
+        },
+        undefined,
+      );
       const result = await directory.objects(params);
 
-      expect(result).toEqual({ results: [] });
+      expect(result).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
+        results: [],
+      });
+
+      mockGetObjects.mockReset();
+    });
+
+    it("sets default page size", async () => {
+      const mockGetObjects = jest
+        .spyOn(directory.ReaderClient, "getObjects")
+        .mockResolvedValue(create(GetObjectsResponseSchema, {}));
+
+      const params = {
+        objectType: "user",
+        page: {
+          token: "",
+        },
+      };
+
+      await directory.objects(params);
+
+      expect(mockGetObjects).toHaveBeenCalledWith(
+        {
+          ...params,
+          $typeName: "aserto.directory.reader.v3.GetObjectsRequest",
+          page: {
+            $typeName: "aserto.directory.common.v3.PaginationRequest",
+            token: "",
+            size: 100,
+          },
+        },
+        undefined,
+      );
+      const result = await directory.objects(params);
+
+      expect(result).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
+        results: [],
+      });
+
+      mockGetObjects.mockReset();
+    });
+
+    it("sets default page token", async () => {
+      const mockGetObjects = jest
+        .spyOn(directory.ReaderClient, "getObjects")
+        .mockResolvedValue(create(GetObjectsResponseSchema, {}));
+
+      const params = {
+        objectType: "user",
+        page: {
+          size: 45,
+        },
+      };
+
+      await directory.objects(params);
+
+      expect(mockGetObjects).toHaveBeenCalledWith(
+        {
+          ...params,
+          $typeName: "aserto.directory.reader.v3.GetObjectsRequest",
+          page: {
+            $typeName: "aserto.directory.common.v3.PaginationRequest",
+            token: "",
+            size: 45,
+          },
+        },
+        undefined,
+      );
+      const result = await directory.objects(params);
+
+      expect(result).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
+        results: [],
+      });
+
+      mockGetObjects.mockReset();
+    });
+
+    it("respects page size", async () => {
+      const mockGetObjects = jest
+        .spyOn(directory.ReaderClient, "getObjects")
+        .mockResolvedValue(create(GetObjectsResponseSchema, {}));
+
+      const params = {
+        objectType: "user",
+        page: {
+          token: "1234",
+          size: 1,
+        },
+      };
+
+      await directory.objects(params);
+
+      expect(mockGetObjects).toHaveBeenCalledWith(
+        {
+          ...params,
+          $typeName: "aserto.directory.reader.v3.GetObjectsRequest",
+          page: {
+            $typeName: "aserto.directory.common.v3.PaginationRequest",
+            token: "1234",
+            size: 1,
+          },
+        },
+        undefined,
+      );
+      const result = await directory.objects(params);
+
+      expect(result).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
+        results: [],
+      });
 
       mockGetObjects.mockReset();
     });
@@ -758,7 +697,7 @@ describe("DirectoryV3", () => {
 
       const params = { objectType: "user" };
       await expect(directory.objects(params)).rejects.toThrow(
-        "Directory service error"
+        "Directory service error",
       );
 
       mockGetObjects.mockReset();
@@ -769,7 +708,7 @@ describe("DirectoryV3", () => {
     it("sets the object with the given parameters when calling setObject with valid parameters", async () => {
       const mockSetObject = jest
         .spyOn(directory.WriterClient, "setObject")
-        .mockResolvedValue(new SetObjectResponse());
+        .mockResolvedValue(create(SetObjectResponseSchema, {}));
 
       const params = {
         object: {
@@ -787,17 +726,17 @@ describe("DirectoryV3", () => {
 
       expect(mockSetObject).toHaveBeenCalledWith(
         {
+          $typeName: "aserto.directory.writer.v3.SetObjectRequest",
           object: {
+            $typeName: "aserto.directory.common.v3.Object",
             id: "123",
             type: "user",
             displayName: "test",
             etag: "",
-            properties: objectPropertiesAsStruct(
-              params.object?.properties || {}
-            ),
+            properties: params.object?.properties || {},
           },
         },
-        undefined
+        undefined,
       );
 
       mockSetObject.mockReset();
@@ -817,7 +756,7 @@ describe("DirectoryV3", () => {
         },
       };
       await expect(directory.setObject(params)).rejects.toThrow(
-        "Directory service error"
+        "Directory service error",
       );
 
       mockSetObject.mockReset();
@@ -827,7 +766,7 @@ describe("DirectoryV3", () => {
       const mockSetObject = jest
         .spyOn(directory.WriterClient, "setObject")
         .mockRejectedValue(
-          new ConnectError("Invalid argument", Code.InvalidArgument)
+          new ConnectError("Invalid argument", Code.InvalidArgument),
         );
 
       const params = {
@@ -842,11 +781,11 @@ describe("DirectoryV3", () => {
 
       // error class
       await expect(directory.setObject(params)).rejects.toThrow(
-        InvalidArgumentError
+        InvalidArgumentError,
       );
       // error message
       await expect(directory.setObject(params)).rejects.toThrow(
-        "setObject: [invalid_argument] Invalid argument"
+        "setObject: [invalid_argument] Invalid argument",
       );
 
       mockSetObject.mockReset();
@@ -856,7 +795,7 @@ describe("DirectoryV3", () => {
       const mockSetObject = jest
         .spyOn(directory.WriterClient, "setObject")
         .mockRejectedValue(
-          new ConnectError("Invalid argument", Code.FailedPrecondition)
+          new ConnectError("Invalid argument", Code.FailedPrecondition),
         );
 
       const params = {
@@ -871,11 +810,11 @@ describe("DirectoryV3", () => {
 
       // error class
       await expect(directory.setObject(params)).rejects.toThrow(
-        EtagMismatchError
+        EtagMismatchError,
       );
       // error message
       await expect(directory.setObject(params)).rejects.toThrow(
-        "invalid etag in setObject request"
+        "invalid etag in setObject request",
       );
 
       mockSetObject.mockReset();
@@ -886,12 +825,15 @@ describe("DirectoryV3", () => {
     it("returns the expected object data when calling objectMany with valid params", async () => {
       const mockGetObjectMany = jest
         .spyOn(directory.ReaderClient, "getObjectMany")
-        .mockResolvedValue(new GetObjectManyResponse());
+        .mockResolvedValue(create(GetObjectManyResponseSchema, {}));
 
       const params = { param: [{ objectType: "user", objectId: "123" }] };
       const result = await directory.objectMany(params);
 
-      expect(result).toEqual([]);
+      expect(result).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetObjectManyResponse",
+        results: [],
+      });
 
       mockGetObjectMany.mockReset();
     });
@@ -903,7 +845,7 @@ describe("DirectoryV3", () => {
 
       const params = { param: [{ objectType: "user", objectId: "123" }] };
       await expect(directory.objectMany(params)).rejects.toThrow(
-        "Directory service error"
+        "Directory service error",
       );
 
       mockGetObjectMany.mockReset();
@@ -914,7 +856,7 @@ describe("DirectoryV3", () => {
     it("calls graph with valid params and return expected response", async () => {
       const mockGetGraph = jest
         .spyOn(directory.ReaderClient, "getGraph")
-        .mockResolvedValue(new GetGraphResponse());
+        .mockResolvedValue(create(GetGraphResponseSchema, {}));
 
       const params = {
         objectId: "1234",
@@ -925,8 +867,21 @@ describe("DirectoryV3", () => {
       };
       const result = await directory.graph(params);
 
-      expect(mockGetGraph).toHaveBeenCalledWith(params, undefined);
-      expect(result).toEqual({ results: [], trace: [] });
+      expect(mockGetGraph).toHaveBeenCalledWith(
+        {
+          $typeName: "aserto.directory.reader.v3.GetGraphRequest",
+          subjectId: "",
+          subjectRelation: "",
+          subjectType: "",
+          ...params,
+        },
+        undefined,
+      );
+      expect(result).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetGraphResponse",
+        results: [],
+        trace: [],
+      });
 
       mockGetGraph.mockReset();
     });
@@ -937,12 +892,12 @@ describe("DirectoryV3", () => {
         .mockRejectedValue(new Error("Directory service error"));
 
       const params = {
-        obbjectId: "1234",
+        objectId: "1234",
         objectType: "user",
         relation: "member",
       };
       await expect(directory.graph(params)).rejects.toThrow(
-        "Directory service error"
+        "Directory service error",
       );
 
       mockGetGraph.mockReset();
@@ -953,14 +908,18 @@ describe("DirectoryV3", () => {
     it("deletes object when valid parameters are provided", async () => {
       const mockDeleteObject = jest
         .spyOn(directory.WriterClient, "deleteObject")
-        .mockResolvedValue(new DeleteObjectResponse());
+        .mockResolvedValue(create(DeleteObjectResponseSchema, {}));
 
       const params = { objectId: "123", objectType: "user" };
       await directory.deleteObject(params);
 
       expect(directory.WriterClient.deleteObject).toHaveBeenCalledWith(
-        params,
-        undefined
+        {
+          $typeName: "aserto.directory.writer.v3.DeleteObjectRequest",
+          ...params,
+          withRelations: false,
+        },
+        undefined,
       );
 
       mockDeleteObject.mockReset();
@@ -973,7 +932,7 @@ describe("DirectoryV3", () => {
 
       const params = { objectId: "123", objectType: "user" };
       await expect(directory.deleteObject(params)).rejects.toThrow(
-        "Directory service error"
+        "Directory service error",
       );
 
       mockDeleteObject.mockReset();
@@ -985,7 +944,7 @@ describe("DirectoryV3", () => {
       const mockGetRelation = jest
         .spyOn(directory.ReaderClient, "getRelation")
         .mockResolvedValue(
-          new GetRelationResponse({
+          create(GetRelationResponseSchema, {
             result: {
               subjectType: "user",
               subjectId: "123",
@@ -993,7 +952,7 @@ describe("DirectoryV3", () => {
               objectId: "identity",
               relation: "identifier",
             },
-          })
+          }),
         );
 
       const params = {
@@ -1006,7 +965,9 @@ describe("DirectoryV3", () => {
       const result = await directory.relation(params);
 
       expect(result).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetRelationResponse",
         result: {
+          $typeName: "aserto.directory.common.v3.Relation",
           subjectType: "user",
           subjectId: "123",
           objectType: "identity",
@@ -1034,7 +995,7 @@ describe("DirectoryV3", () => {
         relation: "identifier",
       };
       await expect(directory.relation(params)).rejects.toThrow(
-        "Directory service error"
+        "Directory service error",
       );
 
       mockGetRelation.mockReset();
@@ -1045,7 +1006,7 @@ describe("DirectoryV3", () => {
     it("returns relations", async () => {
       const mockGetRelations = jest
         .spyOn(directory.ReaderClient, "getRelations")
-        .mockResolvedValue(new GetRelationsResponse());
+        .mockResolvedValue(create(GetRelationsResponseSchema, {}));
 
       const params = {
         subjectType: "user",
@@ -1060,10 +1021,19 @@ describe("DirectoryV3", () => {
 
       await directory.relations(params);
 
-      expect(mockGetRelations).toHaveBeenCalledWith(params, undefined);
+      expect(mockGetRelations).toHaveBeenCalledWith(
+        {
+          ...params,
+        },
+        undefined,
+      );
       const result = await directory.relations(params);
 
-      expect(result).toEqual({ results: [], objects: {} });
+      expect(result).toEqual({
+        $typeName: "aserto.directory.reader.v3.GetRelationsResponse",
+        results: [],
+        objects: {},
+      });
 
       mockGetRelations.mockReset();
     });
@@ -1081,7 +1051,7 @@ describe("DirectoryV3", () => {
         relation: "identifier",
       };
       await expect(directory.relations(params)).rejects.toThrow(
-        "Directory service error"
+        "Directory service error",
       );
 
       mockGetRelations.mockReset();
@@ -1092,7 +1062,7 @@ describe("DirectoryV3", () => {
     it("sets the relation with the given parameters when calling setRelation with valid parameters", async () => {
       const mockSetRelation = jest
         .spyOn(directory.WriterClient, "setRelation")
-        .mockResolvedValue(new SetRelationResponse());
+        .mockResolvedValue(create(SetRelationResponseSchema, {}));
 
       const params = {
         relation: {
@@ -1108,15 +1078,19 @@ describe("DirectoryV3", () => {
 
       expect(mockSetRelation).toHaveBeenCalledWith(
         {
+          $typeName: "aserto.directory.writer.v3.SetRelationRequest",
           relation: {
-            subjectType: "user",
-            subjectId: "123",
-            objectType: "identity",
+            $typeName: "aserto.directory.common.v3.Relation",
+            etag: "",
             objectId: "identity",
+            objectType: "identity",
             relation: "identifier",
+            subjectId: "123",
+            subjectRelation: "",
+            subjectType: "user",
           },
         },
-        undefined
+        undefined,
       );
 
       mockSetRelation.mockReset();
@@ -1126,9 +1100,17 @@ describe("DirectoryV3", () => {
         .spyOn(directory.WriterClient, "setRelation")
         .mockRejectedValue(new Error("Directory service error"));
 
-      const params = { objectType: "user" };
+      const params = {
+        relation: {
+          subjectType: "user",
+          subjectId: "123",
+          objectType: "identity",
+          objectId: "identity",
+          relation: "identifier",
+        },
+      };
       await expect(directory.setRelation(params)).rejects.toThrow(
-        "Directory service error"
+        "Directory service error",
       );
 
       mockSetRelation.mockReset();
@@ -1139,7 +1121,9 @@ describe("DirectoryV3", () => {
     it("deletes relation when valid parameters are provided", async () => {
       const mockDeleteRelation = jest
         .spyOn(directory.WriterClient, "deleteRelation")
-        .mockResolvedValue(new DeleteRelationResponse({ result: {} }));
+        .mockResolvedValue(
+          create(DeleteRelationResponseSchema, { result: {} }),
+        );
 
       const params = {
         subjectType: "user",
@@ -1151,10 +1135,17 @@ describe("DirectoryV3", () => {
       const result = await directory.deleteRelation(params);
 
       expect(directory.WriterClient.deleteRelation).toHaveBeenCalledWith(
-        params,
-        undefined
+        {
+          $typeName: "aserto.directory.writer.v3.DeleteRelationRequest",
+          ...params,
+          subjectRelation: "",
+        },
+        undefined,
       );
-      expect(result).toEqual({});
+      expect(result).toEqual({
+        $typeName: "aserto.directory.writer.v3.DeleteRelationResponse",
+        result: { $typeName: "google.protobuf.Empty" },
+      });
 
       mockDeleteRelation.mockReset();
     });
@@ -1172,7 +1163,7 @@ describe("DirectoryV3", () => {
         relation: "identifier",
       };
       await expect(directory.deleteRelation(params)).rejects.toThrow(
-        "Directory service error"
+        "Directory service error",
       );
 
       mockDeleteRelation.mockReset();
@@ -1185,13 +1176,13 @@ describe("DirectoryV3", () => {
         .spyOn(directory.ModelClient, "getManifest")
         .mockReturnValue(
           createAsyncIterable([
-            new GetManifestResponse({
+            create(GetManifestResponseSchema, {
               msg: {
                 case: "metadata",
                 value: {},
               },
             }),
-            new GetManifestResponse({
+            create(GetManifestResponseSchema, {
               msg: {
                 case: "body",
                 value: {
@@ -1199,7 +1190,7 @@ describe("DirectoryV3", () => {
                 },
               },
             }),
-          ])
+          ]),
         );
 
       const result = await directory.getManifest();
@@ -1220,7 +1211,7 @@ describe("DirectoryV3", () => {
         });
 
       await expect(directory.getManifest()).rejects.toThrow(
-        "Directory service error"
+        "Directory service error",
       );
 
       getManifestMock.mockReset();
@@ -1231,10 +1222,13 @@ describe("DirectoryV3", () => {
     it("sets a new Manifest", async () => {
       const mockSetManifest = jest
         .spyOn(directory.ModelClient, "setManifest")
-        .mockResolvedValue(new SetManifestResponse({ result: {} }));
+        .mockResolvedValue(create(SetManifestResponseSchema, { result: {} }));
 
       const result = await directory.setManifest({ body: `a:\n b` });
-      expect(result).toEqual({ result: {} });
+      expect(result).toEqual({
+        $typeName: "aserto.directory.model.v3.SetManifestResponse",
+        result: { $typeName: "google.protobuf.Empty" },
+      });
 
       mockSetManifest.mockReset();
     });
@@ -1245,7 +1239,7 @@ describe("DirectoryV3", () => {
         .mockRejectedValue(new Error("Directory service error"));
 
       await expect(directory.setManifest({ body: "" })).rejects.toThrow(
-        "Directory service error"
+        "Directory service error",
       );
 
       mockSetManifest.mockReset();
@@ -1256,10 +1250,12 @@ describe("DirectoryV3", () => {
     it("deletes a Manifest", async () => {
       const mockDeleteManifest = jest
         .spyOn(directory.ModelClient, "deleteManifest")
-        .mockResolvedValue(new DeleteManifestResponse());
+        .mockResolvedValue(create(DeleteManifestResponseSchema, {}));
 
       const result = await directory.deleteManifest();
-      expect(result).toEqual({});
+      expect(result).toEqual({
+        $typeName: "aserto.directory.model.v3.DeleteManifestResponse",
+      });
 
       mockDeleteManifest.mockReset();
     });
@@ -1270,7 +1266,7 @@ describe("DirectoryV3", () => {
         .mockRejectedValue(new Error("Directory service error"));
 
       await expect(directory.deleteManifest()).rejects.toThrow(
-        "Directory service error"
+        "Directory service error",
       );
 
       mockDeleteManifest.mockReset();
@@ -1281,12 +1277,16 @@ describe("DirectoryV3", () => {
     it("calls import with valid params and return expected response", async () => {
       const mockImport = jest
         .spyOn(directory.ImporterClient, "import")
-        .mockReturnValue(createAsyncIterable([new ImportResponse({})]));
+        .mockReturnValue(
+          createAsyncIterable([create(ImportResponseSchema, {})]),
+        );
 
-      const params = createAsyncIterable([]);
-      await directory.import(params);
+      await directory.import(createImportRequest([]));
 
-      expect(mockImport).toHaveBeenCalledWith(params, undefined);
+      expect(mockImport).toHaveBeenCalledWith(
+        expect.objectContaining({}),
+        undefined,
+      );
 
       mockImport.mockReset();
     });
@@ -1298,8 +1298,8 @@ describe("DirectoryV3", () => {
           throw new Error("Directory service error");
         });
 
-      await expect(directory.import(createAsyncIterable([]))).rejects.toThrow(
-        "Directory service error"
+      await expect(directory.import(createImportRequest([]))).rejects.toThrow(
+        "Directory service error",
       );
 
       mockImport.mockReset();
@@ -1310,11 +1310,19 @@ describe("DirectoryV3", () => {
     it("calls export with valid params and return expected response", async () => {
       const mockExport = jest
         .spyOn(directory.ExporterClient, "export")
-        .mockReturnValue(createAsyncIterable([new ExportResponse()]));
+        .mockReturnValue(
+          createAsyncIterable([create(ExportResponseSchema, {})]),
+        );
 
       await directory.export({ options: "DATA" });
 
-      expect(mockExport).toHaveBeenCalledWith({ options: 24 }, undefined);
+      expect(mockExport).toHaveBeenCalledWith(
+        {
+          $typeName: "aserto.directory.exporter.v3.ExportRequest",
+          options: 24,
+        },
+        undefined,
+      );
 
       mockExport.mockReset();
     });
@@ -1327,7 +1335,7 @@ describe("DirectoryV3", () => {
         });
 
       await expect(directory.export({ options: "DATA" })).rejects.toThrow(
-        "Directory service error"
+        "Directory service error",
       );
 
       mockExport.mockReset();

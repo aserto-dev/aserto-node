@@ -13,13 +13,8 @@ import policyContext from "./authorizer/model/policyContext";
 import policyInstance from "./authorizer/model/policyInstance";
 import queryOptions from "./authorizer/model/queryOptions";
 import {
-  Directory,
-  DirectoryConfig,
-  DirectoryServiceV2,
-  ds,
-} from "./directory/v2";
-import {
   createAsyncIterable,
+  createImportRequest,
   DirectoryServiceV3,
   DirectoryV3,
   ImportMsgCase,
@@ -36,33 +31,31 @@ export {
   authz,
   AuthzOptions,
   createAsyncIterable,
+  createImportRequest,
   CustomHeaders,
   decisionTreeOptions,
-  Directory,
-  DirectoryConfig as ServiceConfig,
-  DirectoryConfig,
-  DirectoryServiceV2,
   DirectoryServiceV3,
   DirectoryV3,
   DirectoryV3Config,
   displayStateMap,
-  ds,
   identityContext,
+  ImportMsgCase,
   is,
   jwtAuthz,
   JWTIdentityMapper,
   ManualIdentityMapper,
   Middleware,
   ObjectIDFromVar,
+  objectPropertiesAsStruct,
+  Opcode as ImportOpCode,
   policyContext,
   policyInstance,
   PolicyPathMapper,
   queryOptions,
   readAsyncIterable,
   SubIdentityMapper,
-  ImportMsgCase,
-  Opcode as ImportOpCode,
-  objectPropertiesAsStruct,
 };
 
 export * from "./errors";
+export * from "./authorizer/types";
+export * from "./directory/v3/types";
