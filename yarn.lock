@@ -19,8 +19,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@aserto/aserto-node@workspace:."
   dependencies:
-    "@aserto/node-authorizer": "https://github.com/aserto-dev/node-authorizer#connect_2"
-    "@aserto/node-directory": "https://github.com/aserto-dev/node-directory#connect_2"
+    "@aserto/node-authorizer": "npm:^0.21.0"
+    "@aserto/node-directory": "npm:^0.32.0"
     "@babel/core": "npm:^7.25.2"
     "@bufbuild/protobuf": "npm:^2.2.2"
     "@connectrpc/connect": "npm:^2.0.0"
@@ -54,21 +54,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@aserto/node-authorizer@https://github.com/aserto-dev/node-authorizer#connect_2":
-  version: 0.20.10
-  resolution: "@aserto/node-authorizer@https://github.com/aserto-dev/node-authorizer.git#commit=aa3451233b5c939af1b94a64bdcf15746751d46d"
+"@aserto/node-authorizer@npm:^0.21.0":
+  version: 0.21.0
+  resolution: "@aserto/node-authorizer@npm:0.21.0"
   dependencies:
     "@bufbuild/protobuf": "npm:^2.2.2"
-  checksum: 10/af9290cab19fe1d8ecbafe199839374d0584221476f10e7544b3aa01a9bf5646c608afb88933a66ec5f5df8e4ec36c5288a05318b0680906d7d70f9106a0c5f1
+  checksum: 10/915b818b399c82101d7f57d3bc2bbf738953b43c70342322ca81739756adf3fe7858d1938905071493a7a7dcdeccbc56e9862017496324428d06ff9b39489a55
   languageName: node
   linkType: hard
 
-"@aserto/node-directory@https://github.com/aserto-dev/node-directory#connect_2":
-  version: 0.31.4
-  resolution: "@aserto/node-directory@https://github.com/aserto-dev/node-directory.git#commit=5f1bf5bfae4603aa89b69bb461d72d87d521cb5e"
+"@aserto/node-directory@npm:^0.32.0":
+  version: 0.32.0
+  resolution: "@aserto/node-directory@npm:0.32.0"
   dependencies:
     "@bufbuild/protobuf": "npm:^2.2.2"
-  checksum: 10/50ef70083c8d36fe663114054d4599bdc548dec168d72c048ff4b8971cb3c680106f4d1e3ddcfb138c0d1bbc257aae7b7d383cc20c018f2babc7d65a429d6785
+  checksum: 10/06f797b049d01fab3e826b63a908d99a970b738d2f1e4a9531cf6167744ca4482439f35c413686e2985bfd789a2979048b9299bee08f60cf2462613e2a0fbcf2
   languageName: node
   linkType: hard
 

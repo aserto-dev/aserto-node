@@ -44,8 +44,8 @@
   },
   "homepage": "https://github.com/aserto-dev/aserto-node#readme",
   "dependencies": {
-    "@aserto/node-authorizer": "https://github.com/aserto-dev/node-authorizer#connect_2",
-    "@aserto/node-directory": "https://github.com/aserto-dev/node-directory#connect_2",
+    "@aserto/node-authorizer": "^0.21.0",
+    "@aserto/node-directory": "^0.32.0",
     "@bufbuild/protobuf": "^2.2.2",
     "@connectrpc/connect": "^2.0.0",
     "@connectrpc/connect-node": "^2.0.0",
@@ -79,5 +79,5 @@
     "ts-prune": "^0.10.3",
     "typescript": "5.6.3"
   },
-  "packageManager": "yarn@4.5.1"
+  "packageManager": "yarn@4.5.3"
 }
