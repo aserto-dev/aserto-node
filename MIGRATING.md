@@ -12,9 +12,9 @@ it makes use of all the [enhancements of Protobuf-ES v2](https://buf.build/blog/
 
 ## Deprecations
 
-### `objectPropertiesAsStruct` has been deprecated. The new SDK allows passing JSON objects directly as properties
+#### `objectPropertiesAsStruct` has been deprecated. The new SDK allows passing JSON objects directly as properties
 
-### Usage of `createAsyncIterable` in the context of creating import requests has been deprecated and will be replaced with `createImportRequest`.
+#### Usage of `createAsyncIterable` in the context of creating import requests has been deprecated and will be replaced with `createImportRequest`.
 
 ```diff
 -import { ImportMsgCase, ImportOpCode, objectPropertiesAsStruct, createAsyncIterable } from "@aserto/aserto-node"
@@ -40,7 +40,7 @@ it makes use of all the [enhancements of Protobuf-ES v2](https://buf.build/blog/
 
 ## Changes
 
-### `.object` returns a Promise<GetObjectResponse> instead of a custom type.
+#### `.object` returns a `Promise<GetObjectResponse>` instead of a custom type.
 ```ts
 type GetObjectResponse = Message<"aserto.directory.reader.v3.GetObjectResponse"> & {
     result?: Object$;
@@ -57,7 +57,7 @@ const userResponse = await directoryClient.object({ objectType: 'user', objectId
 const userObject = userResponse.result
 ```
 
-### `.objectMany` returns a Promise<GetObjectManyResponse> instead of a custom type.
+#### `.objectMany` returns a `Promise<GetObjectManyResponse>` instead of a custom type.
 
 ```ts
 type GetObjectManyResponse = Message<"aserto.directory.reader.v3.GetObjectManyResponse"> & {
@@ -88,7 +88,7 @@ The same applies to the methods `equals`, `clone`, `toJson`, and `toJsonString`,
 
 ## Troubleshooting
 
-### Express.js
+#### Express.js
 ```ts
 app.get("/api/users/:id", async (req, res) => {
   const id = req.params.id;
