@@ -18,6 +18,7 @@ import {
   DirectoryServiceV3,
   DirectoryV3,
   ImportMsgCase,
+  objectPropertiesAsStruct,
   readAsyncIterable,
 } from "./directory/v3";
 import { CustomHeaders, DirectoryV3Config } from "./directory/v3/types";
@@ -45,6 +46,7 @@ export {
   ManualIdentityMapper,
   Middleware,
   ObjectIDFromVar,
+  objectPropertiesAsStruct,
   Opcode as ImportOpCode,
   policyContext,
   policyInstance,

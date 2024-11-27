@@ -53,24 +53,24 @@ export const handleError = (error: unknown, method: string) => {
   if (error instanceof ConnectError) {
     switch (error.code) {
       case Code.Unauthenticated: {
-        throw new UnauthenticatedError(
+        return new UnauthenticatedError(
           `Authentication failed: ${error.message}`,
         );
       }
       case Code.NotFound: {
-        throw new NotFoundError(`${method} not found: ${error.message}`);
+        return new NotFoundError(`${method} not found: ${error.message}`);
       }
       case Code.InvalidArgument: {
-        throw new InvalidArgumentError(`${method}: ${error.message}`);
+        return new InvalidArgumentError(`${method}: ${error.message}`);
       }
       case Code.FailedPrecondition: {
-        throw new EtagMismatchError(
+        return new EtagMismatchError(
           `invalid etag in ${method} request: ${error.message}`,
         );
       }
       default: {
         error.message = `"${method}" failed with code: ${error.code}, message: ${error.message}`;
-        throw error;
+        return error;
       }
     }
   } else {

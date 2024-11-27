@@ -113,7 +113,7 @@ types:
 
     it("reads a manifest", async () => {
       const manifestData = await directoryClient.getManifest();
-      expect(manifestData?.body).toEqual(manifest);
+      expect(manifestData.body).toEqual(manifest);
     });
 
     it("sets a new object", async () => {
@@ -150,7 +150,7 @@ types:
           objectType: "user",
           objectId: "test-user",
         })
-      )?.result;
+      ).result;
 
       expect(user?.id).toEqual("test-user");
       expect(user?.properties).toEqual({ displayName: "test user" });
@@ -162,7 +162,7 @@ types:
           objectType: "group",
           objectId: "test-group",
         })
-      )?.result;
+      ).result;
 
       expect(user?.id).toEqual("test-group");
       expect(user?.properties).toEqual({ displayName: "test group" });
@@ -307,7 +307,7 @@ types:
         objectType: "user",
         page: { token: "" },
       });
-      expect(toJson(GetObjectsResponseSchema, response!)).toEqual({
+      expect(toJson(GetObjectsResponseSchema, response)).toEqual({
         page: {},
         results: expect.arrayContaining([
           expect.objectContaining({

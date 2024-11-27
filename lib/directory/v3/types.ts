@@ -21,6 +21,7 @@ import {
   SetObjectRequest as SetObjectRequest$,
   SetRelationRequest as SetRelationRequest$,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
+import { Timestamp } from "@bufbuild/protobuf/wkt";
 
 import { NestedOmit, NestedOptional, Optional } from "../../util/types";
 
@@ -163,3 +164,9 @@ export type ImportRequest = Omit<
   >,
   "$typeName"
 >;
+
+export type GetManifestResponse = {
+  body: string;
+  updatedAt: Timestamp | undefined;
+  etag: string;
+};

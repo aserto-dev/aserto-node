@@ -95,8 +95,7 @@ export class Authorizer {
       const allowed = response.decisions[0]?.is;
       return !!allowed;
     } catch (error) {
-      handleError(error, "Is");
-      return false;
+      throw handleError(error, "Is");
     }
   }
 
@@ -117,8 +116,7 @@ export class Authorizer {
 
       return query;
     } catch (error) {
-      handleError(error, "Query");
-      return {};
+      throw handleError(error, "Query");
     }
   }
 
@@ -143,11 +141,7 @@ export class Authorizer {
         pathRoot: response.pathRoot,
       };
     } catch (error) {
-      handleError(error, "DecissionTree");
-      return {
-        path: {},
-        pathRoot: "",
-      };
+      throw handleError(error, "DecissionTree");
     }
   }
   async ListPolicies(
@@ -159,12 +153,17 @@ export class Authorizer {
 
       return response.result;
     } catch (error) {
-      handleError(error, "ListPolicies");
-      return [];
+      throw handleError(error, "ListPolicies");
     }
   }
 }
 
+/**
+ * Creates a new instance of the Authorizer class using the provided configuration.
+ *
+ * @param {AuthorizerConfig} config - The configuration object for the Authorizer.
+ * @returns {Authorizer} A new Authorizer instance.
+ */
 export const authz = (config: AuthorizerConfig) => {
   return new Authorizer(config);
 };

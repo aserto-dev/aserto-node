@@ -2,15 +2,19 @@ import { readFileSync } from "fs";
 import {
   Exporter,
   ExportRequestSchema,
+  ExportResponse,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
 import {
   Importer,
   ImportRequest,
   ImportRequestSchema,
+  ImportResponse,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
 import {
+  DeleteManifestResponse,
   Model,
   SetManifestRequestSchema,
+  SetManifestResponse,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
 import {
   Body,
@@ -20,21 +24,32 @@ import {
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
 import {
   CheckRequestSchema,
+  CheckResponse,
   GetGraphRequestSchema,
+  GetGraphResponse,
   GetObjectManyRequestSchema,
+  GetObjectManyResponse,
   GetObjectRequestSchema,
+  GetObjectResponse,
   GetObjectsRequestSchema,
+  GetObjectsResponse,
   GetRelationRequestSchema,
+  GetRelationResponse,
+  GetRelationsResponse,
   Reader,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_pb";
 import {
   DeleteObjectRequestSchema,
+  DeleteObjectResponse,
   DeleteRelationRequestSchema,
+  DeleteRelationResponse,
   SetObjectRequestSchema,
+  SetObjectResponse,
   SetRelationRequestSchema,
+  SetRelationResponse,
   Writer,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
-import { create } from "@bufbuild/protobuf";
+import { create, JsonObject } from "@bufbuild/protobuf";
 import {
   CallOptions,
   Client,
@@ -66,6 +81,7 @@ import {
   DirectoryV3Config,
   ExportOptions,
   GetGraphRequest,
+  GetManifestResponse,
   GetObjectManyRequest,
   GetObjectRequest,
   GetObjectsRequest,
@@ -266,18 +282,24 @@ export class DirectoryV3 {
     this.CreateTransport = createTransport;
   }
 
-  async check(params: CheckRequest, options?: CallOptions) {
+  async check(
+    params: CheckRequest,
+    options?: CallOptions,
+  ): Promise<CheckResponse> {
     try {
       return await this.ReaderClient.check(
         create(CheckRequestSchema, params),
         options,
       );
     } catch (error) {
-      handleError(error, "check");
+      throw handleError(error, "check");
     }
   }
 
-  async object(params: GetObjectRequest, options?: CallOptions) {
+  async object(
+    params: GetObjectRequest,
+    options?: CallOptions,
+  ): Promise<GetObjectResponse> {
     try {
       if (params.page) {
         params.page.size ||= 100;
@@ -288,10 +310,13 @@ export class DirectoryV3 {
         options,
       );
     } catch (error) {
-      handleError(error, "object");
+      throw handleError(error, "object");
     }
   }
-  async objects(params: GetObjectsRequest, options?: CallOptions) {
+  async objects(
+    params: GetObjectsRequest,
+    options?: CallOptions,
+  ): Promise<GetObjectsResponse> {
     try {
       if (params.page) {
         params.page.size ||= 100;
@@ -302,77 +327,98 @@ export class DirectoryV3 {
         options,
       );
     } catch (error) {
-      handleError(error, "objects");
+      throw handleError(error, "objects");
     }
   }
 
-  async objectMany(params: GetObjectManyRequest, options?: CallOptions) {
+  async objectMany(
+    params: GetObjectManyRequest,
+    options?: CallOptions,
+  ): Promise<GetObjectManyResponse> {
     try {
       return await this.ReaderClient.getObjectMany(
         create(GetObjectManyRequestSchema, params),
         options,
       );
     } catch (error) {
-      handleError(error, "objectMany");
+      throw handleError(error, "objectMany");
     }
   }
 
-  async setObject(params: SetObjectRequest, options?: CallOptions) {
+  async setObject(
+    params: SetObjectRequest,
+    options?: CallOptions,
+  ): Promise<SetObjectResponse> {
     try {
       return await this.WriterClient.setObject(
         create(SetObjectRequestSchema, params),
         options,
       );
     } catch (error) {
-      handleError(error, "setObject");
+      throw handleError(error, "setObject");
     }
   }
 
-  async deleteObject(params: DeleteObjectRequest, options?: CallOptions) {
+  async deleteObject(
+    params: DeleteObjectRequest,
+    options?: CallOptions,
+  ): Promise<DeleteObjectResponse> {
     try {
       return await this.WriterClient.deleteObject(
         create(DeleteObjectRequestSchema, params),
         options,
       );
     } catch (error) {
-      handleError(error, "deleteObject");
+      throw handleError(error, "deleteObject");
     }
   }
 
-  async relation(params: GetRelationRequest, options?: CallOptions) {
+  async relation(
+    params: GetRelationRequest,
+    options?: CallOptions,
+  ): Promise<GetRelationResponse> {
     try {
       return await this.ReaderClient.getRelation(
         create(GetRelationRequestSchema, params),
         options,
       );
     } catch (error) {
-      handleError(error, "relation");
+      throw handleError(error, "relation");
     }
   }
 
-  async setRelation(params: SetRelationRequest, options?: CallOptions) {
+  async setRelation(
+    params: SetRelationRequest,
+    options?: CallOptions,
+  ): Promise<SetRelationResponse> {
     try {
       return this.WriterClient.setRelation(
         create(SetRelationRequestSchema, params),
         options,
       );
     } catch (error) {
-      handleError(error, "setRelation");
+      throw handleError(error, "setRelation");
     }
   }
 
-  async deleteRelation(params: DeleteRelationRequest, options?: CallOptions) {
+  async deleteRelation(
+    params: DeleteRelationRequest,
+    options?: CallOptions,
+  ): Promise<DeleteRelationResponse> {
     try {
       return await this.WriterClient.deleteRelation(
         create(DeleteRelationRequestSchema, params),
         options,
       );
     } catch (error) {
-      handleError(error, "deleteRelation");
+      throw handleError(error, "deleteRelation");
     }
   }
 
-  async relations(params: GetRelationsRequest, options?: CallOptions) {
+  async relations(
+    params: GetRelationsRequest,
+    options?: CallOptions,
+  ): Promise<GetRelationsResponse> {
     try {
       if (params.page) {
         params.page.size ||= 100;
@@ -380,31 +426,39 @@ export class DirectoryV3 {
 
       return await this.ReaderClient.getRelations(params, options);
     } catch (error) {
-      handleError(error, "relations");
+      throw handleError(error, "relations");
     }
   }
 
-  async graph(params: GetGraphRequest, options?: CallOptions) {
+  async graph(
+    params: GetGraphRequest,
+    options?: CallOptions,
+  ): Promise<GetGraphResponse> {
     try {
       return await this.ReaderClient.getGraph(
         create(GetGraphRequestSchema, params),
         options,
       );
     } catch (error) {
-      handleError(error, "graph");
+      throw handleError(error, "graph");
     }
   }
 
-  async import(params: AsyncIterable<ImportRequest>, options?: CallOptions) {
+  async import(
+    params: AsyncIterable<ImportRequest>,
+    options?: CallOptions,
+  ): Promise<AsyncIterable<ImportResponse>> {
     try {
       return this.ImporterClient.import(params, options);
     } catch (error) {
-      handleError(error, "import");
-      return createAsyncIterable$([]);
+      throw handleError(error, "import");
     }
   }
 
-  async export(params: { options: DATA_TYPE_OPTIONS }, options?: CallOptions) {
+  async export(
+    params: { options: DATA_TYPE_OPTIONS },
+    options?: CallOptions,
+  ): Promise<AsyncIterable<ExportResponse>> {
     try {
       return this.ExporterClient.export(
         create(ExportRequestSchema, {
@@ -413,17 +467,16 @@ export class DirectoryV3 {
         options,
       );
     } catch (error) {
-      handleError(error, "export");
-      return createAsyncIterable$([]);
+      throw handleError(error, "export");
     }
   }
 
-  async getManifest(params?: GetManifestRequest, options?: CallOptions) {
+  async getManifest(
+    params?: GetManifestRequest,
+    options?: CallOptions,
+  ): Promise<GetManifestResponse> {
     try {
       const response = this.ModelClient.getManifest(params!, options);
-      if (!response) {
-        return;
-      }
 
       const data = (await readAsyncIterable(response))
         .map((el) => el.msg)
@@ -450,11 +503,14 @@ export class DirectoryV3 {
         etag: metadata?.etag,
       };
     } catch (error) {
-      handleError(error, "getManifest");
+      throw handleError(error, "getManifest");
     }
   }
 
-  async setManifest(params: { body: string }, options?: CallOptions) {
+  async setManifest(
+    params: { body: string },
+    options?: CallOptions,
+  ): Promise<SetManifestResponse> {
     try {
       return await this.ModelClient.setManifest(
         createAsyncIterable$([
@@ -468,21 +524,28 @@ export class DirectoryV3 {
         options,
       );
     } catch (error) {
-      handleError(error, "setManifest");
+      throw handleError(error, "setManifest");
     }
   }
 
-  async deleteManifest(params?: DeleteManifestRequest, options?: CallOptions) {
+  async deleteManifest(
+    params?: DeleteManifestRequest,
+    options?: CallOptions,
+  ): Promise<DeleteManifestResponse> {
     try {
       return await this.ModelClient.deleteManifest(params!, options);
     } catch (error) {
-      handleError(error, "deleteManifest");
+      throw handleError(error, "deleteManifest");
     }
   }
 }
 
 /**
- * Read an asynchronous iterable into an array.
+ * Reads all elements from an AsyncIterable and returns them as an array.
+ *
+ * @template T - The type of elements in the AsyncIterable.
+ * @param {AsyncIterable<T>} gen - The AsyncIterable to read from.
+ * @returns {Promise<T[]>} A promise that resolves to an array containing all elements from the AsyncIterable.
  */
 export async function readAsyncIterable<T>(
   gen: AsyncIterable<T>,
@@ -494,23 +557,48 @@ export async function readAsyncIterable<T>(
   return out;
 }
 
+/**
+ * Creates an asynchronous iterable of import requests.
+ *
+ * @param { ImportRequest$[]} params - An array of ImportRequest to be converted into ImportRequest objects.
+ * @yields ImportRequest objects created from the provided parameters.
+ */
 export async function* createImportRequest(params: ImportRequest$[]) {
   yield* createAsyncIterable$(
     params.map((param) => create(ImportRequestSchema, param as ImportRequest)),
   );
 }
 
+/**
+ * Asynchronously iterates over an array of items, yielding each item.
+ *
+ * @deprecated Use `createImportRequest` instead.
+ *
+ * @template T
+ * @param {T[]} items - The array of items to iterate over.
+ */
 export async function* createAsyncIterable<T>(items: T[]) {
   log("[Deprecated]: please use `createImportRequest`");
   yield* createImportRequest(items as ImportRequest$[]);
 }
 
 /**
- * Converts a JSON object to a Protobuf Struct.
+ * Old Implementation: Converts a JSON object to a Protobuf Struct.
+ *
+ * Current Implementation: noop. Returns the input object
+ *
+ * * @deprecated This function is deprecated as the SDK no longer requires
+ * conversion from JSON to Struct. Use the value directly.
  *
  * @param value - The JSON object to convert.
  * @returns The converted Protobuf Struct.
  */
+export function objectPropertiesAsStruct(value: JsonObject): JsonObject {
+  log(
+    "[Deprecated]: This version of SDK does not require conversion from JSON to Struct. Use the value directly",
+  );
+  return value;
+}
 
 function mergeUint8Arrays(...arrays: Uint8Array[]): Uint8Array {
   const totalSize = arrays.reduce((acc, e) => acc + e.length, 0);
@@ -524,6 +612,12 @@ function mergeUint8Arrays(...arrays: Uint8Array[]): Uint8Array {
   return merged;
 }
 
+/**
+ * Creates a new instance of the DirectoryV3 class.
+ *
+ * @param {DirectoryV3Config} config - The configuration object for initializing the DirectoryV3 instance.
+ * @returns {DirectoryV3} A new instance of the DirectoryV3 class.
+ */
 export const DirectoryServiceV3 = (config: DirectoryV3Config): DirectoryV3 => {
   return new DirectoryV3(config);
 };
