@@ -35,6 +35,9 @@ yarn add @aserto/aserto-node
 
 > `express@^4.0.0` is a peer dependency. Make sure it is installed in your project.
 
+## Migration from prior versions guides
+If you are migrating from older versions, check out our [migration guide](https://github.com/aserto-dev/aserto-node/blob/main/MIGRATING.md);
+
 ## Authorizer
 
 ### Authorizer Client
