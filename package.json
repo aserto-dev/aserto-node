@@ -18,7 +18,7 @@
     "push": "scripts/publish.sh",
     "release_prep": "scripts/release_prep.sh",
     "release": "scripts/release.sh",
-    "test": "jest test --coverage --verbose"
+    "test": "jest test --coverage --verbose --collectCoverageFrom='./lib/**'"
   },
   "files": [
     "lib",
