@@ -634,10 +634,10 @@ You can evaluate graph queries over the directory, to determine whether a subjec
 Check that an `user` object with the key `euang@acmecorp.com` has the `read` permission in the `admin` group:
 
 ```typescript
-const check = await directoryClient.checkPermission({
+const check = await directoryClient.check({
   subjectId: 'euang@acmecorp.com',
   subjectType: 'user',
-  permission: 'read',
+  relation: 'read',
   objectType: 'group',
   objectId: 'admin',
 });
@@ -646,10 +646,10 @@ const check = await directoryClient.checkPermission({
 Check that `euang@acmecorp.com` has an `identifier` relation to an object with key `euang@acmecorp.com` and type `identity`:
 
 ```typescript
-const check = directoryClient.checkRelation({
+const check = directoryClient.check({
   subjectId: 'euang@acmecorp.com',
   subjectType: 'user',
-  name: 'identifier',
+  relation: 'identifier',
   objectType: 'identity',
   objectId: 'euang@acmecorp.com',
 });
