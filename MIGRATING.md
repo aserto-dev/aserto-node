@@ -95,7 +95,7 @@ m
 +const check = directoryClient.check({
    subjectId: 'euang@acmecorp.com',
    subjectType: 'user',
-    relation: 'identifier',
+   relation: 'identifier',
    objectType: 'identity',
    objectId: 'euang@acmecorp.com',
  });
