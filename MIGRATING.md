@@ -17,7 +17,9 @@ it makes use of all the [enhancements of Protobuf-ES v2](https://buf.build/blog/
  `objectPropertiesAsStruct` has been deprecated. The new SDK allows passing JSON objects directly as properties
 
 #### createAsyncIterable
-Usage of `createAsyncIterable` in the context of creating import requests has been deprecated and will be replaced with `createImportRequest`.
+Usage of `createAsyncIterable` in the context of creating import requests has been deprecated and is replaced with `createImportRequest`.
+
+If you want to use the old implementation of `createAsyncIterable` you can import it directly from  `import { createAsyncIterable } from "@connectrpc/connect/protocol";`
 
 #### Example:
 ```diff
@@ -71,6 +73,34 @@ type GetObjectManyResponse = Message<"aserto.directory.reader.v3.GetObjectManyRe
 
 This requires reading the `results` property from the response to get the actual object.
 
+#### `checkPermission` and `checkRelation` are replaced by a single `check` function that can evaluate both permissions and relations.
+
+```diff
+ Check that an `user` object with the key `euang@acmecorp.com` has the `read` permission in the `admin` group:
+
+-const check = await directoryClient.checkPermission({
++const check = await directoryClient.check({
+   subjectId: 'euang@acmecorp.com',
+   subjectType: 'user',
+-  permission: 'read',
++  relation: 'read',
+   objectType: 'group',
+   objectId: 'admin',
+ });
+```
+ Check that `euang@acmecorp.com` has an `identifier` relation to an object with key `euang@acmecorp.com` and type `identity`:
+m
+```diff
+-const check = directoryClient.checkRelation({
++const check = directoryClient.check({
+   subjectId: 'euang@acmecorp.com',
+   subjectType: 'user',
+   relation: 'identifier',
+   objectType: 'identity',
+   objectId: 'euang@acmecorp.com',
+ });
+```
+
 ## Serialization and deserialization of data
 
 Response Messages no longer implement the magic toJSON method, which serializes a message with the Protobuf JSON format when it's passed to `JSON.stringify`. Make sure to always serializes to JSON with the toJson or toJsonString function.
@@ -89,6 +119,13 @@ const json = toJson(GetObjectsResponseSchema, response)
 
 The same applies to the methods `equals`, `clone`, `toJson`, and `toJsonString`, and to the static methods `fromBinary`, `fromJson`, `fromJsonString`.
 
+
+#### Reading object properties is now simplified, enabling direct access.
+```diff
+const object = await directoryClient.object({objectType: 'user', objectId: "key"});
+-  const owner = object?.properties?.fields?.owner?.kind?.value as string
++  const { owner } = object.result.properties
+```
 
 ## Troubleshooting
 
