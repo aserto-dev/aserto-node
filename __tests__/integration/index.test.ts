@@ -1,8 +1,7 @@
-import express, { Express } from "express";
+import express, { Express, Request, Response } from "express";
 import nJwt from "njwt";
 import { describe } from "node:test";
 import request from "supertest";
-import { toJson } from "@bufbuild/protobuf";
 
 import {
   AnonymousIdentityMapper,
@@ -20,6 +19,7 @@ import {
   policyContext,
   policyInstance,
   readAsyncIterable,
+  toJson,
 } from "../../lib";
 import { Topaz, TOPAZ_TIMEOUT } from "../topaz";
 
@@ -41,6 +41,42 @@ describe("Integration", () => {
 
   afterAll(async () => {
     await topaz.stop();
+  });
+
+  describe("express", () => {
+    const app = express();
+    app.use(express.json());
+
+    it("serializes response to json", async () => {
+      const ListUsers = async (_req: Request, res: Response) => {
+        try {
+          const users = await directoryClient.objects({ objectType: "user" });
+          const usersJson = toJson(GetObjectsResponseSchema, users);
+
+          res.status(200).send(usersJson);
+        } catch (error) {
+          console.error(error);
+          res.status(500).send(error);
+        }
+      };
+      app.get("/users", ListUsers);
+
+      const res = await request(app)
+        .get("/users")
+        .set("Content-type", "application/json");
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          results: expect.arrayContaining([
+            expect.objectContaining({ id: "beth@the-smiths.com" }),
+            expect.objectContaining({ id: "jerry@the-smiths.com" }),
+            expect.objectContaining({ id: "morty@the-citadel.com" }),
+            expect.objectContaining({ id: "rick@the-citadel.com" }),
+            expect.objectContaining({ id: "summer@the-smiths.com" }),
+          ]),
+        }),
+      );
+    });
   });
 
   describe("Directory Reader", () => {

@@ -106,8 +106,7 @@ m
 Response Messages no longer implement the magic toJSON method, which serializes a message with the Protobuf JSON format when it's passed to `JSON.stringify`. Make sure to always serializes to JSON with the toJson or toJsonString function.
 
 ```ts
-import { GetObjectsResponseSchema } from '@aserto/aserto-node'
-import { toJson } from "@bufbuild/protobuf";
+import { GetObjectsResponseSchema, toJson } from '@aserto/aserto-node'
 
 const response = await directoryClient.objects({
   objectType: "user",
@@ -150,8 +149,7 @@ TypeError: Do not know how to serialize a BigInt
 This requires [data serialization](#serialization-and-deserialization-of-data):
 
 ```ts
-import { GetObjectsResponseSchema } from '@aserto/aserto-node'
-import { toJson } from "@bufbuild/protobuf";
+import { GetObjectsResponseSchema, toJson } from '@aserto/aserto-node'
 
 app.get("/api/users/:id", async (req, res) => {
   const id = req.params.id;

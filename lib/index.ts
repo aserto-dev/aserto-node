@@ -59,3 +59,4 @@ export {
 export * from "./errors";
 export * from "./authorizer/types";
 export * from "./directory/v3/types";
+export * from "@bufbuild/protobuf";

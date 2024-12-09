@@ -811,8 +811,7 @@ Use [Protocol Buffers](https://github.com/bufbuild/protobuf-es) to serialize dat
 
 
 ```ts
-import { GetObjectsResponseSchema } from "@aserto/aserto-node";
-import { toJson } from "@bufbuild/protobuf";
+import { GetObjectsResponseSchema, toJson } from "@aserto/aserto-node";
 
 const objects = await directoryClient.objects({objectType: "user"});
 const json = toJson(GetObjectsResponseSchema, objects)
