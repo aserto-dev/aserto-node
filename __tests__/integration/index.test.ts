@@ -206,6 +206,102 @@ describe("Integration", () => {
       });
     });
 
+    it("get and object and update it serializes to json", async () => {
+      const GetObject = async (_req: Request, res: Response) => {
+        try {
+          const object = await directoryClient.object({
+            objectId: "object-1",
+            objectType: "user",
+          });
+          res.status(200).send(object);
+        } catch (error) {
+          console.error(error);
+          res.status(500).send(error);
+        }
+      };
+      app.get("/object_update", GetObject);
+
+      const SetObject = async (req: Request, res: Response) => {
+        try {
+          const setObject = await directoryClient.setObject({
+            object: req.body,
+          });
+          res.status(200).send(setObject);
+        } catch (error) {
+          console.error(error);
+          res.status(500).send(error);
+        }
+      };
+      app.post("/object_update", SetObject);
+
+      const setObjectRes = await request(app)
+        .post("/object_update")
+        .set("Content-type", "application/json")
+        .send(
+          JSON.stringify({
+            id: "object-1",
+            type: "user",
+          }),
+        );
+
+      expect(setObjectRes.status).toBe(200);
+      expect(setObjectRes.body).toEqual({
+        result: expect.objectContaining({
+          id: "object-1",
+          type: "user",
+          properties: {},
+        }),
+      });
+
+      const getObjectRes = await request(app)
+        .get("/object_update")
+        .set("Content-type", "application/json");
+
+      expect(getObjectRes.status).toBe(200);
+      expect(getObjectRes.body).toEqual({
+        result: expect.objectContaining({
+          id: "object-1",
+          type: "user",
+          properties: {},
+        }),
+        page: {},
+      });
+
+      const setEditObjectRes = await request(app)
+        .post("/object_update")
+        .set("Content-type", "application/json")
+        .send(
+          JSON.stringify({
+            ...getObjectRes.body.result,
+            displayName: "edited user",
+          }),
+        );
+      expect(setEditObjectRes.status).toBe(200);
+      expect(setEditObjectRes.body).toEqual({
+        result: expect.objectContaining({
+          id: "object-1",
+          type: "user",
+          displayName: "edited user",
+          properties: {},
+        }),
+      });
+
+      const getEditedObjectRes = await request(app)
+        .get("/object_update")
+        .set("Content-type", "application/json");
+
+      expect(getEditedObjectRes.status).toBe(200);
+      expect(getEditedObjectRes.body).toEqual({
+        result: expect.objectContaining({
+          id: "object-1",
+          type: "user",
+          displayName: "edited user",
+          properties: {},
+        }),
+        page: {},
+      });
+    });
+
     it("delete object serializes to json", async () => {
       const DeleteObject = async (_req: Request, res: Response) => {
         try {
@@ -1031,6 +1127,7 @@ types:
           object: {
             type: "user",
             id: "test-user",
+            displayName: "test user",
             properties: {
               displayName: "test user",
             },
@@ -1063,6 +1160,35 @@ types:
 
       expect(user?.id).toEqual("test-user");
       expect(user?.properties).toEqual({ displayName: "test user" });
+    });
+
+    it("updates an object", async () => {
+      const user = (
+        await directoryClient.object({
+          objectType: "user",
+          objectId: "test-user",
+        })
+      ).result;
+
+      user!.displayName = "edited test user";
+      await directoryClient.setObject({
+        object: user,
+      });
+
+      const updatedUser = (
+        await directoryClient.object({
+          objectType: "user",
+          objectId: "test-user",
+        })
+      ).result;
+
+      expect(updatedUser?.id).toEqual("test-user");
+      expect(updatedUser?.displayName).toEqual("edited test user");
+
+      updatedUser!.displayName = "test user";
+      await directoryClient.setObject({
+        object: updatedUser,
+      });
     });
 
     it("gets another object", async () => {
@@ -1208,7 +1334,7 @@ types:
           expect.objectContaining({
             id: "test-user",
             type: "user",
-            displayName: "",
+            displayName: "test user",
           }),
         ]),
       });

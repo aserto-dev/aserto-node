@@ -384,6 +384,9 @@ export class DirectoryV3 {
     options?: CallOptions,
   ): Promise<SetObjectResponse> {
     try {
+      delete params.object?.updatedAt;
+      delete params.object?.createdAt;
+
       const response = await this.WriterClient.setObject(
         create(SetObjectRequestSchema, params),
         options,
@@ -441,6 +444,9 @@ export class DirectoryV3 {
     options?: CallOptions,
   ): Promise<SetRelationResponse> {
     try {
+      delete params.relation?.updatedAt;
+      delete params.relation?.createdAt;
+
       const response = await this.WriterClient.setRelation(
         create(SetRelationRequestSchema, params),
         options,
