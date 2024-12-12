@@ -1733,7 +1733,7 @@ types:
           policyContext: policyContext(),
         });
 
-        expect(response).toEqual({
+        const expectedResult = {
           path: {
             "rebac.check": {
               allowed: false,
@@ -1745,7 +1745,102 @@ types:
             "todoApp.PUT.todos.__id": { allowed: false },
           },
           pathRoot: "",
+        };
+
+        expect(response).toEqual(expectedResult);
+        expect(JSON.parse(JSON.stringify(response))).toEqual(expectedResult);
+      });
+    });
+
+    describe("Is", () => {
+      it("returns the correct data structure", async () => {
+        const response = await authorizerClient.Is({
+          identityContext: await AnonymousIdentityMapper(),
+          policyInstance: policyInstance("todo", "todo"),
+          policyContext: policyContext("todoApp.GET.todos"),
         });
+
+        const expectedResult = true;
+
+        expect(response).toEqual(expectedResult);
+        expect(JSON.parse(JSON.stringify(response))).toEqual(expectedResult);
+      });
+    });
+
+    describe("Query", () => {
+      it("returns the correct data structure", async () => {
+        const response = await authorizerClient.Query({
+          query: "x=data",
+          input: '{"foo": "bar"}',
+        });
+
+        const expectedResult = {
+          result: [
+            {
+              bindings: {
+                x: {
+                  rebac: { check: { allowed: false } },
+                  todoApp: {
+                    DELETE: { todos: { __id: { allowed: false } } },
+                    GET: {
+                      todos: { allowed: true },
+                      users: { __userID: { allowed: true } },
+                    },
+                    POST: { todos: { allowed: false } },
+                    PUT: { todos: { __id: { allowed: false } } },
+                    common: {},
+                  },
+                },
+              },
+              expressions: [
+                { location: { col: 1, row: 1 }, text: "x=data", value: true },
+              ],
+            },
+          ],
+        };
+
+        expect(response).toEqual(expectedResult);
+        expect(JSON.parse(JSON.stringify(response))).toEqual(expectedResult);
+      });
+    });
+
+    describe("ListPolicies", () => {
+      it("returns the correct data structure", async () => {
+        const response = await authorizerClient.ListPolicies({
+          policyInstance: {
+            name: "todo",
+          },
+          fieldMask: {
+            paths: ["id"],
+          },
+        });
+
+        const expectedResult = [
+          {
+            id: "todo/github/workspace/content/src/policies/todoApp.DELETE.todos.__id.rego",
+          },
+          {
+            id: "todo/github/workspace/content/src/policies/todoApp.GET.todos.rego",
+          },
+          {
+            id: "todo/github/workspace/content/src/policies/todoApp.GET.users.__userID.rego",
+          },
+          {
+            id: "todo/github/workspace/content/src/policies/todoApp.POST.todos.rego",
+          },
+          {
+            id: "todo/github/workspace/content/src/policies/todoApp.PUT.todos.__id.rego",
+          },
+          {
+            id: "todo/github/workspace/content/src/policies/todoApp.common.rego",
+          },
+          { id: "todo/github/workspace/content/src/policies/rebac.check.rego" },
+        ];
+
+        expect(response).toEqual(expect.arrayContaining(expectedResult));
+        expect(JSON.parse(JSON.stringify(response))).toEqual(
+          expect.arrayContaining(expectedResult),
+        );
       });
     });
   });
