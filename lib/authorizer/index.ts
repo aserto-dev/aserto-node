@@ -1,5 +1,4 @@
 import { readFileSync } from "fs";
-import { Module } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/module_pb";
 import {
   Authorizer as AuthorizerClient,
   DecisionTreeRequestSchema,
@@ -26,6 +25,7 @@ import {
   DecisionTreeRequest,
   IsRequest,
   ListPoliciesRequest,
+  Module,
   QueryRequest,
 } from "./types";
 
@@ -151,7 +151,10 @@ export class Authorizer {
     try {
       const response = await this.AuthClient.listPolicies(params, options);
 
-      return response.result;
+      return response.result.map((res) => {
+        const { $typeName: _t, ...result } = res;
+        return result;
+      });
     } catch (error) {
       throw handleError(error, "ListPolicies");
     }

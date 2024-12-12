@@ -1,7 +1,7 @@
-import { create } from "@bufbuild/protobuf";
 import { Code, ConnectError } from "@connectrpc/connect";
 
 import {
+  create,
   decisionTreeOptions,
   DecisionTreeResponseSchema,
   IsResponseSchema,
@@ -391,7 +391,6 @@ describe("ListPolicies", () => {
     const result = await authorizer.ListPolicies({});
     expect(result).toEqual([
       {
-        $typeName: "aserto.authorizer.v2.api.Module",
         id: "1",
         packagePath: "a.b.c",
       },

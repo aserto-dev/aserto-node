@@ -5,22 +5,42 @@ import {
   Relation as Relation$,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v3/common_pb";
 import { Option } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
-import { ImportRequest as ImportRequest$ } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
+import { ExportResponse as ExportResponse$ } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
+import {
+  ImportRequest as ImportRequest$,
+  ImportResponse as ImportResponse$,
+} from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
+import {
+  DeleteManifestResponse as DeleteManifestResponse$,
+  SetManifestResponse as SetManifestResponse$,
+} from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
 import {
   CheckRequest as CheckRequest$,
+  CheckResponse as CheckResponse$,
   GetGraphRequest as GetGraphRequest$,
+  GetGraphResponse as GetGraphResponse$,
   GetObjectManyRequest as GetObjectManyRequest$,
+  GetObjectManyResponse as GetObjectManyResponse$,
   GetObjectRequest as GetObjectRequest$,
+  GetObjectResponse as GetObjectResponse$,
   GetObjectsRequest as GetObjectsRequest$,
+  GetObjectsResponse as GetObjectsResponse$,
   GetRelationRequest as GetRelationRequest$,
+  GetRelationResponse as GetRelationResponse$,
   GetRelationsRequest as GetRelationsRequest$,
+  GetRelationsResponse as GetRelationsResponse$,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_pb";
 import {
   DeleteObjectRequest as DeleteObjectRequest$,
+  DeleteObjectResponse as DeleteObjectResponse$,
   DeleteRelationRequest as DeleteRelationRequest$,
+  DeleteRelationResponse as DeleteRelationResponse$,
   SetObjectRequest as SetObjectRequest$,
+  SetObjectResponse as SetObjectResponse$,
   SetRelationRequest as SetRelationRequest$,
+  SetRelationResponse as SetRelationResponse$,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
+import { JsonValue } from "@bufbuild/protobuf";
 import { Timestamp } from "@bufbuild/protobuf/wkt";
 
 import { NestedOmit, NestedOptional, Optional } from "../../util/types";
@@ -169,4 +189,53 @@ export type GetManifestResponse = {
   body: string;
   updatedAt: Timestamp | undefined;
   etag: string;
+  toJSON: () => JsonValue;
+};
+
+export type CheckResponse = CheckResponse$ & { toJSON: () => JsonValue };
+export type GetGraphResponse = GetGraphResponse$ & { toJSON: () => JsonValue };
+export type GetObjectManyResponse = GetObjectManyResponse$ & {
+  toJSON: () => JsonValue;
+};
+export type GetObjectResponse = GetObjectResponse$ & {
+  toJSON: () => JsonValue;
+};
+export type GetObjectsResponse = GetObjectsResponse$ & {
+  toJSON: () => JsonValue;
+};
+
+export type GetRelationResponse = GetRelationResponse$ & {
+  toJSON: () => JsonValue;
+};
+export type GetRelationsResponse = GetRelationsResponse$ & {
+  toJSON: () => JsonValue;
+};
+
+export type DeleteObjectResponse = DeleteObjectResponse$ & {
+  toJSON: () => JsonValue;
+};
+export type DeleteRelationResponse = DeleteRelationResponse$ & {
+  toJSON: () => JsonValue;
+};
+export type SetObjectResponse = SetObjectResponse$ & {
+  toJSON: () => JsonValue;
+};
+export type SetRelationResponse = SetRelationResponse$ & {
+  toJSON: () => JsonValue;
+};
+
+export type ImportResponse = AsyncIterable<ImportResponse$> & {
+  toJSON: () => Promise<JsonValue[]>;
+};
+
+export type ExportResponse = AsyncIterable<ExportResponse$> & {
+  toJSON: () => Promise<JsonValue[]>;
+};
+
+export type DeleteManifestResponse = DeleteManifestResponse$ & {
+  toJSON: () => JsonValue;
+};
+
+export type SetManifestResponse = SetManifestResponse$ & {
+  toJSON: () => JsonValue;
 };
