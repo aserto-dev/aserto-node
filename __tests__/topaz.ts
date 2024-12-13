@@ -1,6 +1,5 @@
 import fs from "fs";
 import util from "node:util";
-import path from "path";
 
 import { DirectoryServiceV3 } from "../lib";
 import { log } from "../lib/log";
@@ -13,8 +12,7 @@ export const TOPAZ_TIMEOUT =
 
 export class Topaz {
   async start() {
-    await this.backup();
-    await execute("topaz templates install todo -f --no-console");
+    await execute("topaz templates install todo -f --no-console -i");
 
     const certsDir = await this.caCert();
 
@@ -37,7 +35,6 @@ export class Topaz {
 
   async stop() {
     await execute("topaz stop");
-    await this.restore();
   }
 
   async caCert() {
@@ -56,32 +53,6 @@ export class Topaz {
     return `${(
       await execute("topaz config info | jq -r '.config.topaz_cfg_dir'")
     ).replace(/(\r\n|\n|\r)/gm, "")}`;
-  }
-
-  async backup() {
-    fs.rename(
-      path.join(await this.dbDir(), "directory.db"),
-      path.join(await this.dbDir(), "directory.bak"),
-      () => {},
-    );
-    fs.rename(
-      path.join(await this.configDir(), "todo.yaml"),
-      path.join(await this.configDir(), "todo.bak"),
-      () => {},
-    );
-  }
-
-  async restore() {
-    fs.rename(
-      path.join(await this.dbDir(), "directory.bak"),
-      path.join(await this.dbDir(), "directory.db"),
-      () => {},
-    );
-    fs.rename(
-      path.join(await this.configDir(), "todo.bak"),
-      path.join(await this.configDir(), "todo.yaml"),
-      () => {},
-    );
   }
 }
 

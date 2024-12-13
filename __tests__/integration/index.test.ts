@@ -29,7 +29,6 @@ describe("Integration", () => {
 
   beforeAll(async () => {
     topaz = new Topaz();
-    await topaz.stop();
     await topaz.start();
     const config = {
       url: "localhost:9292",
@@ -41,6 +40,7 @@ describe("Integration", () => {
 
   afterAll(async () => {
     jest.useRealTimers();
+    await topaz.stop();
   });
 
   describe("express", () => {
