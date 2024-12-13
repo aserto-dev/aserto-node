@@ -1,6 +1,5 @@
 import * as fs from "fs";
 import { describe } from "node:test";
-import { create } from "@bufbuild/protobuf";
 import { Code, ConnectError } from "@connectrpc/connect";
 import { createAsyncIterable } from "@connectrpc/connect/protocol";
 import * as connectNode from "@connectrpc/connect-node";
@@ -8,6 +7,7 @@ import * as connectNode from "@connectrpc/connect-node";
 import {
   CheckResponseSchema,
   ConfigError,
+  create,
   createImportRequest,
   DeleteManifestResponseSchema,
   DeleteObjectResponseSchema,
@@ -29,7 +29,7 @@ import {
   SetManifestResponseSchema,
   SetObjectResponseSchema,
   SetRelationResponseSchema,
-} from "../../../lib/index";
+} from "../../../lib";
 jest.mock("fs");
 
 describe("DirectoryV3", () => {
@@ -466,6 +466,7 @@ describe("DirectoryV3", () => {
         $typeName: "aserto.directory.reader.v3.CheckResponse",
         check: true,
         trace: [],
+        toJSON: expect.any(Function),
       });
 
       mockCheck.mockReset();
@@ -516,6 +517,7 @@ describe("DirectoryV3", () => {
           id: "123",
           type: "",
         },
+        toJSON: expect.any(Function),
       });
 
       mockGetObject.mockReset();
@@ -576,6 +578,7 @@ describe("DirectoryV3", () => {
       expect(result).toEqual({
         $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
         results: [],
+        toJSON: expect.any(Function),
       });
 
       mockGetObjects.mockReset();
@@ -612,6 +615,7 @@ describe("DirectoryV3", () => {
       expect(result).toEqual({
         $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
         results: [],
+        toJSON: expect.any(Function),
       });
 
       mockGetObjects.mockReset();
@@ -648,6 +652,7 @@ describe("DirectoryV3", () => {
       expect(result).toEqual({
         $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
         results: [],
+        toJSON: expect.any(Function),
       });
 
       mockGetObjects.mockReset();
@@ -685,6 +690,7 @@ describe("DirectoryV3", () => {
       expect(result).toEqual({
         $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
         results: [],
+        toJSON: expect.any(Function),
       });
 
       mockGetObjects.mockReset();
@@ -833,6 +839,7 @@ describe("DirectoryV3", () => {
       expect(result).toEqual({
         $typeName: "aserto.directory.reader.v3.GetObjectManyResponse",
         results: [],
+        toJSON: expect.any(Function),
       });
 
       mockGetObjectMany.mockReset();
@@ -881,6 +888,7 @@ describe("DirectoryV3", () => {
         $typeName: "aserto.directory.reader.v3.GetGraphResponse",
         results: [],
         trace: [],
+        toJSON: expect.any(Function),
       });
 
       mockGetGraph.mockReset();
@@ -977,6 +985,7 @@ describe("DirectoryV3", () => {
           etag: "",
         },
         objects: {},
+        toJSON: expect.any(Function),
       });
 
       mockGetRelation.mockReset();
@@ -1033,6 +1042,7 @@ describe("DirectoryV3", () => {
         $typeName: "aserto.directory.reader.v3.GetRelationsResponse",
         results: [],
         objects: {},
+        toJSON: expect.any(Function),
       });
 
       mockGetRelations.mockReset();
@@ -1145,6 +1155,7 @@ describe("DirectoryV3", () => {
       expect(result).toEqual({
         $typeName: "aserto.directory.writer.v3.DeleteRelationResponse",
         result: { $typeName: "google.protobuf.Empty" },
+        toJSON: expect.any(Function),
       });
 
       mockDeleteRelation.mockReset();
@@ -1198,6 +1209,7 @@ describe("DirectoryV3", () => {
         body: "test",
         etag: "",
         updatedAt: undefined,
+        toJSON: expect.any(Function),
       });
 
       getManifestMock.mockReset();
@@ -1228,6 +1240,7 @@ describe("DirectoryV3", () => {
       expect(result).toEqual({
         $typeName: "aserto.directory.model.v3.SetManifestResponse",
         result: { $typeName: "google.protobuf.Empty" },
+        toJSON: expect.any(Function),
       });
 
       mockSetManifest.mockReset();
@@ -1255,6 +1268,7 @@ describe("DirectoryV3", () => {
       const result = await directory.deleteManifest();
       expect(result).toEqual({
         $typeName: "aserto.directory.model.v3.DeleteManifestResponse",
+        toJSON: expect.any(Function),
       });
 
       mockDeleteManifest.mockReset();

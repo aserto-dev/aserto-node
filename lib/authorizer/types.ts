@@ -8,6 +8,7 @@ import {
   QueryOptions as QueryOptions$,
   QueryRequest as QueryRequest$,
 } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/authorizer_pb";
+import { FieldMask as FieldMask$ } from "@bufbuild/protobuf/wkt";
 
 import { Optional } from "../util/types";
 
@@ -16,6 +17,7 @@ export * from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/iden
 export * from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/policy_context_pb";
 export * from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/policy_instance_pb";
 export * from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/module_pb";
+import { Module as Module$ } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/module_pb";
 export {
   Decision as DecisionLog,
   DecisionSchema as DecisionLogSchema,
@@ -68,4 +70,13 @@ export type DecisionTreeRequest = Omit<
   identityContext?: IdentityContext;
 };
 
-export type ListPoliciesRequest = Omit<ListPoliciesRequest$, "$typeName">;
+export type FieldMask = Omit<FieldMask$, "$typeName">;
+export type ListPoliciesRequest = Omit<
+  ListPoliciesRequest$,
+  "$typeName" | "fieldMask" | "policyInstance"
+> & {
+  fieldMask?: FieldMask;
+  policyInstance?: PolicyInstance;
+};
+
+export type Module = Omit<Module$, "$typeName">;
