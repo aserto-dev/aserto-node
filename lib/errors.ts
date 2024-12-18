@@ -6,6 +6,8 @@
  * @extends Error
  */
 class ServiceError extends Error {}
+
+export class InvalidSchemaError extends Error {}
 export class ConfigError extends ServiceError {}
 /**
  * Object or Relation is not found.

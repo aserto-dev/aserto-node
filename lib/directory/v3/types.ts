@@ -40,7 +40,6 @@ import {
   SetRelationRequest as SetRelationRequest$,
   SetRelationResponse as SetRelationResponse$,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
-import { JsonValue } from "@bufbuild/protobuf";
 import { Timestamp } from "@bufbuild/protobuf/wkt";
 
 import { NestedOmit, NestedOptional, Optional } from "../../util/types";
@@ -189,53 +188,62 @@ export type GetManifestResponse = {
   body: string;
   updatedAt: Timestamp | undefined;
   etag: string;
-  toJSON: () => JsonValue;
 };
 
-export type CheckResponse = CheckResponse$ & { toJSON: () => JsonValue };
-export type GetGraphResponse = GetGraphResponse$ & { toJSON: () => JsonValue };
-export type GetObjectManyResponse = GetObjectManyResponse$ & {
-  toJSON: () => JsonValue;
-};
-export type GetObjectResponse = GetObjectResponse$ & {
-  toJSON: () => JsonValue;
-};
-export type GetObjectsResponse = GetObjectsResponse$ & {
-  toJSON: () => JsonValue;
-};
+export type CheckResponse = Omit<CheckResponse$, "$typeName" | "$unknown">;
+export type GetGraphResponse = Omit<
+  GetGraphResponse$,
+  "$typeName" | "$unknown"
+>;
+export type GetObjectManyResponse = Omit<
+  GetObjectManyResponse$,
+  "$typeName" | "$unknown"
+>;
+export type GetObjectResponse = Omit<
+  GetObjectResponse$,
+  "$typeName" | "$unknown"
+>;
+export type GetObjectsResponse = Omit<
+  GetObjectsResponse$,
+  "$typeName" | "$unknown"
+>;
 
-export type GetRelationResponse = GetRelationResponse$ & {
-  toJSON: () => JsonValue;
-};
-export type GetRelationsResponse = GetRelationsResponse$ & {
-  toJSON: () => JsonValue;
-};
+export type GetRelationResponse = Omit<
+  GetRelationResponse$,
+  "$typeName" | "$unknown"
+>;
+export type GetRelationsResponse = Omit<
+  GetRelationsResponse$,
+  "$typeName" | "$unknown"
+>;
 
-export type DeleteObjectResponse = DeleteObjectResponse$ & {
-  toJSON: () => JsonValue;
-};
-export type DeleteRelationResponse = DeleteRelationResponse$ & {
-  toJSON: () => JsonValue;
-};
-export type SetObjectResponse = SetObjectResponse$ & {
-  toJSON: () => JsonValue;
-};
-export type SetRelationResponse = SetRelationResponse$ & {
-  toJSON: () => JsonValue;
-};
+export type DeleteObjectResponse = Omit<
+  DeleteObjectResponse$,
+  "$typeName" | "$unknown"
+>;
+export type DeleteRelationResponse = Omit<
+  DeleteRelationResponse$,
+  "$typeName" | "$unknown"
+>;
+export type SetObjectResponse = Omit<
+  SetObjectResponse$,
+  "$typeName" | "$unknown"
+>;
+export type SetRelationResponse = Omit<
+  SetRelationResponse$,
+  "$typeName" | "$unknown"
+>;
 
-export type ImportResponse = AsyncIterable<ImportResponse$> & {
-  toJSON: () => Promise<JsonValue[]>;
-};
+export type ImportResponse = AsyncIterable<ImportResponse$>;
 
-export type ExportResponse = AsyncIterable<ExportResponse$> & {
-  toJSON: () => Promise<JsonValue[]>;
-};
+export type ExportResponse = AsyncIterable<ExportResponse$>;
 
-export type DeleteManifestResponse = DeleteManifestResponse$ & {
-  toJSON: () => JsonValue;
-};
+export type DeleteManifestResponse = Omit<
+  DeleteManifestResponse$,
+  "$typeName" | "$unknown"
+>;
 
-export type SetManifestResponse = SetManifestResponse$ & {
-  toJSON: () => JsonValue;
-};
+export type SetManifestResponse = Omit<
+  SetManifestResponse$,
+  "$typeName" | "$unknown"
+>;

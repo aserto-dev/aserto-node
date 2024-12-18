@@ -441,9 +441,7 @@ describe("DirectoryV3", () => {
     it("calls check with valid params", async () => {
       const mockCheck = jest
         .spyOn(directory.ReaderClient, "check")
-        .mockResolvedValue(
-          create(CheckResponseSchema, { check: true, trace: [] }),
-        );
+        .mockResolvedValue(create(CheckResponseSchema, { check: true }));
 
       const params = {
         subjectId: "euang@acmecorp.com",
@@ -463,10 +461,8 @@ describe("DirectoryV3", () => {
         undefined,
       );
       expect(result).toEqual({
-        $typeName: "aserto.directory.reader.v3.CheckResponse",
         check: true,
         trace: [],
-        toJSON: expect.any(Function),
       });
 
       mockCheck.mockReset();
@@ -500,6 +496,7 @@ describe("DirectoryV3", () => {
           create(GetObjectResponseSchema, {
             result: {
               id: "123",
+              type: "user",
             },
           }),
         );
@@ -508,16 +505,13 @@ describe("DirectoryV3", () => {
       const result = await directory.object(params);
 
       expect(result).toEqual({
-        $typeName: "aserto.directory.reader.v3.GetObjectResponse",
         relations: [],
         result: {
-          $typeName: "aserto.directory.common.v3.Object",
+          id: "123",
+          type: "user",
           displayName: "",
           etag: "",
-          id: "123",
-          type: "",
         },
-        toJSON: expect.any(Function),
       });
 
       mockGetObject.mockReset();
@@ -575,11 +569,7 @@ describe("DirectoryV3", () => {
       );
       const result = await directory.objects(params);
 
-      expect(result).toEqual({
-        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
-        results: [],
-        toJSON: expect.any(Function),
-      });
+      expect(result).toEqual({ results: [] });
 
       mockGetObjects.mockReset();
     });
@@ -612,11 +602,7 @@ describe("DirectoryV3", () => {
       );
       const result = await directory.objects(params);
 
-      expect(result).toEqual({
-        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
-        results: [],
-        toJSON: expect.any(Function),
-      });
+      expect(result).toEqual({ results: [] });
 
       mockGetObjects.mockReset();
     });
@@ -649,11 +635,7 @@ describe("DirectoryV3", () => {
       );
       const result = await directory.objects(params);
 
-      expect(result).toEqual({
-        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
-        results: [],
-        toJSON: expect.any(Function),
-      });
+      expect(result).toEqual({ results: [] });
 
       mockGetObjects.mockReset();
     });
@@ -687,11 +669,7 @@ describe("DirectoryV3", () => {
       );
       const result = await directory.objects(params);
 
-      expect(result).toEqual({
-        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
-        results: [],
-        toJSON: expect.any(Function),
-      });
+      expect(result).toEqual({ results: [] });
 
       mockGetObjects.mockReset();
     });
@@ -831,15 +809,17 @@ describe("DirectoryV3", () => {
     it("returns the expected object data when calling objectMany with valid params", async () => {
       const mockGetObjectMany = jest
         .spyOn(directory.ReaderClient, "getObjectMany")
-        .mockResolvedValue(create(GetObjectManyResponseSchema, {}));
+        .mockResolvedValue(
+          create(GetObjectManyResponseSchema, {
+            results: [{ type: "user", id: "123" }],
+          }),
+        );
 
       const params = { param: [{ objectType: "user", objectId: "123" }] };
       const result = await directory.objectMany(params);
 
       expect(result).toEqual({
-        $typeName: "aserto.directory.reader.v3.GetObjectManyResponse",
-        results: [],
-        toJSON: expect.any(Function),
+        results: [{ type: "user", id: "123", displayName: "", etag: "" }],
       });
 
       mockGetObjectMany.mockReset();
@@ -863,7 +843,12 @@ describe("DirectoryV3", () => {
     it("calls graph with valid params and return expected response", async () => {
       const mockGetGraph = jest
         .spyOn(directory.ReaderClient, "getGraph")
-        .mockResolvedValue(create(GetGraphResponseSchema, {}));
+        .mockResolvedValue(
+          create(GetGraphResponseSchema, {
+            results: [{ objectId: "1234", objectType: "user" }],
+            trace: [],
+          }),
+        );
 
       const params = {
         objectId: "1234",
@@ -885,10 +870,8 @@ describe("DirectoryV3", () => {
         undefined,
       );
       expect(result).toEqual({
-        $typeName: "aserto.directory.reader.v3.GetGraphResponse",
-        results: [],
+        results: [{ objectId: "1234", objectType: "user" }],
         trace: [],
-        toJSON: expect.any(Function),
       });
 
       mockGetGraph.mockReset();
@@ -973,9 +956,7 @@ describe("DirectoryV3", () => {
       const result = await directory.relation(params);
 
       expect(result).toEqual({
-        $typeName: "aserto.directory.reader.v3.GetRelationResponse",
         result: {
-          $typeName: "aserto.directory.common.v3.Relation",
           subjectType: "user",
           subjectId: "123",
           objectType: "identity",
@@ -985,7 +966,6 @@ describe("DirectoryV3", () => {
           etag: "",
         },
         objects: {},
-        toJSON: expect.any(Function),
       });
 
       mockGetRelation.mockReset();
@@ -1038,12 +1018,7 @@ describe("DirectoryV3", () => {
       );
       const result = await directory.relations(params);
 
-      expect(result).toEqual({
-        $typeName: "aserto.directory.reader.v3.GetRelationsResponse",
-        results: [],
-        objects: {},
-        toJSON: expect.any(Function),
-      });
+      expect(result).toEqual({ objects: {}, results: [] });
 
       mockGetRelations.mockReset();
     });
@@ -1153,9 +1128,7 @@ describe("DirectoryV3", () => {
         undefined,
       );
       expect(result).toEqual({
-        $typeName: "aserto.directory.writer.v3.DeleteRelationResponse",
-        result: { $typeName: "google.protobuf.Empty" },
-        toJSON: expect.any(Function),
+        result: {},
       });
 
       mockDeleteRelation.mockReset();
@@ -1209,7 +1182,6 @@ describe("DirectoryV3", () => {
         body: "test",
         etag: "",
         updatedAt: undefined,
-        toJSON: expect.any(Function),
       });
 
       getManifestMock.mockReset();
@@ -1238,9 +1210,7 @@ describe("DirectoryV3", () => {
 
       const result = await directory.setManifest({ body: `a:\n b` });
       expect(result).toEqual({
-        $typeName: "aserto.directory.model.v3.SetManifestResponse",
-        result: { $typeName: "google.protobuf.Empty" },
-        toJSON: expect.any(Function),
+        result: {},
       });
 
       mockSetManifest.mockReset();
@@ -1266,10 +1236,7 @@ describe("DirectoryV3", () => {
         .mockResolvedValue(create(DeleteManifestResponseSchema, {}));
 
       const result = await directory.deleteManifest();
-      expect(result).toEqual({
-        $typeName: "aserto.directory.model.v3.DeleteManifestResponse",
-        toJSON: expect.any(Function),
-      });
+      expect(result).toEqual({});
 
       mockDeleteManifest.mockReset();
     });
