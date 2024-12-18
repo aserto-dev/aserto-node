@@ -1,58 +1,35 @@
-import { ExportResponseSchema } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
-import { ImportResponseSchema } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
+import { file_aserto_directory_common_v3_common } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v3/common_pb";
+import { file_aserto_directory_exporter_v3_exporter } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
+import { file_aserto_directory_importer_v3_importer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
+import { file_aserto_directory_model_v3_model } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
+import { file_aserto_directory_reader_v3_reader } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_pb";
+import { file_aserto_directory_writer_v3_writer } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
+import type { Registry } from "@bufbuild/protobuf";
 import {
-  DeleteManifestResponseSchema,
-  GetManifestResponseSchema,
-  SetManifestResponseSchema,
-} from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
-import {
-  CheckResponseSchema,
-  GetGraphResponseSchema,
-  GetObjectManyResponseSchema,
-  GetObjectResponseSchema,
-  GetObjectsResponseSchema,
-  GetRelationResponseSchema,
-  GetRelationsResponseSchema,
-} from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_pb";
-import {
-  DeleteObjectResponseSchema,
-  DeleteRelationResponseSchema,
-  SetObjectResponseSchema,
-  SetRelationResponseSchema,
-} from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
-import { DescMessage, Message, MessageShape, toJson } from "@bufbuild/protobuf";
+  createRegistry,
+  Message,
+  MessageShape,
+  toJson,
+} from "@bufbuild/protobuf";
 import { GenMessage } from "@bufbuild/protobuf/codegenv1";
-import { TimestampSchema } from "@bufbuild/protobuf/wkt";
+import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 
 import { InvalidSchemaError } from "../../errors";
 
-const schemaMap: { [key: string]: DescMessage } = {
-  "aserto.directory.reader.v3.CheckResponse": CheckResponseSchema,
-  "aserto.directory.reader.v3.GetObjectResponse": GetObjectResponseSchema,
-  "aserto.directory.reader.v3.GetObjectsResponse": GetObjectsResponseSchema,
-  "aserto.directory.reader.v3.GetObjectManyResponse":
-    GetObjectManyResponseSchema,
-  "aserto.directory.reader.v3.GetRelationResponse": GetRelationResponseSchema,
-  "aserto.directory.reader.v3.GetRelationsResponse": GetRelationsResponseSchema,
-  "aserto.directory.reader.v3.GetGraphResponse": GetGraphResponseSchema,
-  "aserto.directory.writer.v3.SetObjectResponse": SetObjectResponseSchema,
-  "aserto.directory.writer.v3.DeleteObjectResponse": DeleteObjectResponseSchema,
-  "aserto.directory.writer.v3.SetRelationResponse": SetRelationResponseSchema,
-  "aserto.directory.writer.v3.DeleteRelationResponse":
-    DeleteRelationResponseSchema,
-  "aserto.directory.importer.v3.ImportResponse": ImportResponseSchema,
-  "aserto.directory.exporter.v3.ExportResponse": ExportResponseSchema,
-  "aserto.directory.model.v3.GetManifestResponse": GetManifestResponseSchema,
-  "aserto.directory.model.v3.SetManifestResponse": SetManifestResponseSchema,
-  "aserto.directory.model.v3.DeleteManifestResponse":
-    DeleteManifestResponseSchema,
-  "google.protobuf.Timestamp": TimestampSchema,
-};
+const registry: Registry = createRegistry(
+  file_aserto_directory_common_v3_common,
+  file_aserto_directory_reader_v3_reader,
+  file_aserto_directory_writer_v3_writer,
+  file_aserto_directory_exporter_v3_exporter,
+  file_aserto_directory_importer_v3_importer,
+  file_aserto_directory_model_v3_model,
+  file_google_protobuf_timestamp,
+);
 
 export function serializeResponse<T extends Message>(
   response: MessageShape<GenMessage<T>>,
 ): T {
-  const schema = schemaMap[response.$typeName];
+  const schema = registry.getMessage(response.$typeName);
   if (!schema) {
     throw new InvalidSchemaError(
       `invalid schema for type: [${response.$typeName}]`,
