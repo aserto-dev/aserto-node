@@ -20,6 +20,7 @@ import {
   ImportMsgCase,
   objectPropertiesAsStruct,
   readAsyncIterable,
+  serializeAsyncIterable,
 } from "./directory/v3";
 import { CustomHeaders, DirectoryV3Config } from "./directory/v3/types";
 import { displayStateMap } from "./displayStateMap";
@@ -52,6 +53,7 @@ export {
   policyInstance,
   PolicyPathMapper,
   queryOptions,
+  serializeAsyncIterable,
   readAsyncIterable,
   SubIdentityMapper,
 };

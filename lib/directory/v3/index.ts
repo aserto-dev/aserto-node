@@ -2,19 +2,15 @@ import { readFileSync } from "fs";
 import {
   Exporter,
   ExportRequestSchema,
-  ExportResponseSchema,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
 import {
   Importer,
   ImportRequest,
   ImportRequestSchema,
-  ImportResponseSchema,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
 import {
-  DeleteManifestResponseSchema,
   Model,
   SetManifestRequestSchema,
-  SetManifestResponseSchema,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
 import {
   Body,
@@ -24,33 +20,21 @@ import {
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
 import {
   CheckRequestSchema,
-  CheckResponseSchema,
   GetGraphRequestSchema,
-  GetGraphResponseSchema,
   GetObjectManyRequestSchema,
-  GetObjectManyResponseSchema,
   GetObjectRequestSchema,
-  GetObjectResponseSchema,
   GetObjectsRequestSchema,
-  GetObjectsResponseSchema,
   GetRelationRequestSchema,
-  GetRelationResponseSchema,
-  GetRelationsResponseSchema,
   Reader,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/reader/v3/reader_pb";
 import {
   DeleteObjectRequestSchema,
-  DeleteObjectResponseSchema,
   DeleteRelationRequestSchema,
-  DeleteRelationResponseSchema,
   SetObjectRequestSchema,
-  SetObjectResponseSchema,
   SetRelationRequestSchema,
-  SetRelationResponseSchema,
   Writer,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
-import { create, JsonObject, toJson as toJson$ } from "@bufbuild/protobuf";
-import { TimestampSchema } from "@bufbuild/protobuf/wkt";
+import { create, JsonObject, Message } from "@bufbuild/protobuf";
 import {
   CallOptions,
   Client,
@@ -75,6 +59,7 @@ import {
   nullReaderProxy,
   nullWriterProxy,
 } from "./null";
+import { serializeResponse } from "./serializer";
 import {
   CheckRequest,
   CheckResponse,
@@ -308,10 +293,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return {
-        ...response,
-        toJSON: () => toJson$(CheckResponseSchema, response),
-      };
+      return serializeResponse(response);
     } catch (error) {
       throw handleError(error, "check");
     }
@@ -331,10 +313,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return {
-        ...response,
-        toJSON: () => toJson$(GetObjectResponseSchema, response),
-      };
+      return serializeResponse(response);
     } catch (error) {
       throw handleError(error, "object");
     }
@@ -351,10 +330,7 @@ export class DirectoryV3 {
         create(GetObjectsRequestSchema, params),
         options,
       );
-      return {
-        ...response,
-        toJSON: () => toJson$(GetObjectsResponseSchema, response),
-      };
+      return serializeResponse(response);
     } catch (error) {
       throw handleError(error, "objects");
     }
@@ -370,10 +346,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return {
-        ...response,
-        toJSON: () => toJson$(GetObjectManyResponseSchema, response),
-      };
+      return serializeResponse(response);
     } catch (error) {
       throw handleError(error, "objectMany");
     }
@@ -392,10 +365,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return {
-        ...response,
-        toJSON: () => toJson$(SetObjectResponseSchema, response),
-      };
+      return serializeResponse(response);
     } catch (error) {
       throw handleError(error, "setObject");
     }
@@ -411,10 +381,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return {
-        ...response,
-        toJSON: () => toJson$(DeleteObjectResponseSchema, response),
-      };
+      return serializeResponse(response);
     } catch (error) {
       throw handleError(error, "deleteObject");
     }
@@ -430,10 +397,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return {
-        ...response,
-        toJSON: () => toJson$(GetRelationResponseSchema, response),
-      };
+      return serializeResponse(response);
     } catch (error) {
       throw handleError(error, "relation");
     }
@@ -452,10 +416,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return {
-        ...response,
-        toJSON: () => toJson$(SetRelationResponseSchema, response),
-      };
+      return serializeResponse(response);
     } catch (error) {
       throw handleError(error, "setRelation");
     }
@@ -471,10 +432,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return {
-        ...response,
-        toJSON: () => toJson$(DeleteRelationResponseSchema, response),
-      };
+      return serializeResponse(response);
     } catch (error) {
       throw handleError(error, "deleteRelation");
     }
@@ -490,10 +448,7 @@ export class DirectoryV3 {
       }
 
       const response = await this.ReaderClient.getRelations(params, options);
-      return {
-        ...response,
-        toJSON: () => toJson$(GetRelationsResponseSchema, response),
-      };
+      return serializeResponse(response);
     } catch (error) {
       throw handleError(error, "relations");
     }
@@ -509,10 +464,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return {
-        ...response,
-        toJSON: () => toJson$(GetGraphResponseSchema, response),
-      };
+      return serializeResponse(response);
     } catch (error) {
       throw handleError(error, "graph");
     }
@@ -523,15 +475,7 @@ export class DirectoryV3 {
     options?: CallOptions,
   ): Promise<ImportResponse> {
     try {
-      const response = this.ImporterClient.import(params, options);
-
-      return {
-        ...response,
-        toJSON: async () => {
-          const data = await readAsyncIterable(response);
-          return data.map((d) => toJson$(ImportResponseSchema, d));
-        },
-      };
+      return this.ImporterClient.import(params, options);
     } catch (error) {
       throw handleError(error, "import");
     }
@@ -542,20 +486,12 @@ export class DirectoryV3 {
     options?: CallOptions,
   ): Promise<ExportResponse> {
     try {
-      const response = this.ExporterClient.export(
+      return this.ExporterClient.export(
         create(ExportRequestSchema, {
           options: ExportOptions[params.options],
         }),
         options,
       );
-
-      return {
-        ...response,
-        toJSON: async () => {
-          const data = await readAsyncIterable(response);
-          return data.map((d) => toJson$(ExportResponseSchema, d));
-        },
-      };
     } catch (error) {
       throw handleError(error, "export");
     }
@@ -587,19 +523,13 @@ export class DirectoryV3 {
 
       const body = new TextDecoder().decode(mergeUint8Arrays(...bodyData));
       const metadata = data[0]?.metadata as Metadata;
+
       return {
         body,
-        updatedAt: metadata?.updatedAt,
+        updatedAt: metadata?.updatedAt
+          ? serializeResponse(metadata?.updatedAt)
+          : undefined,
         etag: metadata?.etag,
-        toJSON: () => {
-          return {
-            body,
-            updatedAt: metadata?.updatedAt
-              ? toJson$(TimestampSchema, metadata?.updatedAt)
-              : "",
-            etag: metadata?.etag,
-          };
-        },
       };
     } catch (error) {
       throw handleError(error, "getManifest");
@@ -623,10 +553,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return {
-        ...response,
-        toJSON: () => toJson$(SetManifestResponseSchema, response),
-      };
+      return serializeResponse(response);
     } catch (error) {
       throw handleError(error, "setManifest");
     }
@@ -639,10 +566,7 @@ export class DirectoryV3 {
     try {
       const response = await this.ModelClient.deleteManifest(params!, options);
 
-      return {
-        ...response,
-        toJSON: () => toJson$(DeleteManifestResponseSchema, response),
-      };
+      return serializeResponse(response);
     } catch (error) {
       throw handleError(error, "deleteManifest");
     }
@@ -666,6 +590,22 @@ export async function readAsyncIterable<T>(
   return out;
 }
 
+/**
+ * Reads all elements from an AsyncIterable and serialize them as an JSON array.
+ *
+ * @template T - The type of elements in the AsyncIterable.
+ * @param {AsyncIterable<T>} gen - The AsyncIterable to read from.
+ * @returns {Promise<T[]>} A promise that resolves to an array containing all elements from the AsyncIterable.
+ */
+export async function serializeAsyncIterable<T extends Message>(
+  gen: AsyncIterable<T>,
+): Promise<T[]> {
+  const out: T[] = [];
+  for await (const x of gen) {
+    out.push(serializeResponse<T>(x));
+  }
+  return out;
+}
 /**
  * Creates an asynchronous iterable of import requests.
  *

@@ -12,14 +12,13 @@ import {
   DirectoryServiceV3,
   DirectoryV3,
   displayStateMap,
-  GetObjectsResponseSchema,
   ImportMsgCase,
   ImportOpCode,
   NotFoundError,
   policyContext,
   policyInstance,
   readAsyncIterable,
-  toJson,
+  serializeAsyncIterable,
 } from "../../lib";
 import { Topaz, TOPAZ_TIMEOUT } from "../topaz";
 
@@ -72,6 +71,7 @@ describe("Integration", () => {
       expect(res.status).toBe(200);
       expect(res.body).toEqual({
         check: true,
+        trace: [],
       });
     });
 
@@ -259,12 +259,13 @@ describe("Integration", () => {
 
       expect(getObjectRes.status).toBe(200);
       expect(getObjectRes.body).toEqual({
+        relations: [],
         result: expect.objectContaining({
           id: "object-1",
           type: "user",
           properties: {},
         }),
-        page: {},
+        page: { nextToken: "" },
       });
 
       const setEditObjectRes = await request(app)
@@ -292,13 +293,14 @@ describe("Integration", () => {
 
       expect(getEditedObjectRes.status).toBe(200);
       expect(getEditedObjectRes.body).toEqual({
+        relations: [],
         result: expect.objectContaining({
           id: "object-1",
           type: "user",
           displayName: "edited user",
           properties: {},
         }),
-        page: {},
+        page: { nextToken: "" },
       });
     });
 
@@ -466,6 +468,7 @@ describe("Integration", () => {
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual({
+        page: { nextToken: "" },
         results: [
           expect.objectContaining({
             subjectId: "rick@the-citadel.com",
@@ -494,7 +497,6 @@ describe("Integration", () => {
             },
           }),
         },
-        page: {},
       });
     });
 
@@ -585,7 +587,7 @@ describe("Integration", () => {
       const Import = async (_req: Request, res: Response) => {
         try {
           const response = await directoryClient.import(importRequest);
-          res.status(200).send(await response.toJSON());
+          res.status(200).send(await serializeAsyncIterable(response));
         } catch (error) {
           console.error(error);
           res.status(500).send(error);
@@ -601,7 +603,10 @@ describe("Integration", () => {
       expect(res.body).toEqual([
         {},
         {},
-        { object: { recv: "2", set: "2" }, relation: { recv: "1", set: "1" } },
+        {
+          object: { recv: "2", set: "2", delete: "0", error: "0" },
+          relation: { recv: "1", set: "1", delete: "0", error: "0" },
+        },
       ]);
     });
 
@@ -611,7 +616,7 @@ describe("Integration", () => {
           const response = await directoryClient.export({
             options: "DATA_OBJECTS",
           });
-          res.status(200).send(await response.toJSON());
+          res.status(200).send(await serializeAsyncIterable(response));
         } catch (error) {
           console.error(error);
           res.status(500).send(error);
@@ -684,6 +689,7 @@ describe("Integration", () => {
           object: {
             type: "identity",
             id: "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs",
+            displayName: "",
             properties: {
               kind: "IDENTITY_KIND_PID",
               provider: "local",
@@ -698,6 +704,7 @@ describe("Integration", () => {
           object: {
             type: "identity",
             id: "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs",
+            displayName: "",
             properties: {
               kind: "IDENTITY_KIND_PID",
               provider: "local",
@@ -712,6 +719,7 @@ describe("Integration", () => {
           object: {
             type: "identity",
             id: "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs",
+            displayName: "",
             properties: {
               kind: "IDENTITY_KIND_PID",
               provider: "local",
@@ -726,6 +734,7 @@ describe("Integration", () => {
           object: {
             type: "identity",
             id: "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs",
+            displayName: "",
             properties: {
               kind: "IDENTITY_KIND_PID",
               provider: "local",
@@ -740,6 +749,7 @@ describe("Integration", () => {
           object: {
             type: "identity",
             id: "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs",
+            displayName: "",
             properties: {
               kind: "IDENTITY_KIND_PID",
               provider: "local",
@@ -754,6 +764,7 @@ describe("Integration", () => {
           object: {
             type: "identity",
             id: "beth@the-smiths.com",
+            displayName: "",
             properties: {
               kind: "IDENTITY_KIND_EMAIL",
               provider: "local",
@@ -768,6 +779,7 @@ describe("Integration", () => {
           object: {
             type: "identity",
             id: "jerry@the-smiths.com",
+            displayName: "",
             properties: {
               kind: "IDENTITY_KIND_EMAIL",
               provider: "local",
@@ -782,6 +794,7 @@ describe("Integration", () => {
           object: {
             type: "identity",
             id: "morty@the-citadel.com",
+            displayName: "",
             properties: {
               kind: "IDENTITY_KIND_EMAIL",
               provider: "local",
@@ -796,6 +809,7 @@ describe("Integration", () => {
           object: {
             type: "identity",
             id: "rick@the-citadel.com",
+            displayName: "",
             properties: {
               verified: true,
               kind: "IDENTITY_KIND_EMAIL",
@@ -810,6 +824,7 @@ describe("Integration", () => {
           object: {
             type: "identity",
             id: "summer@the-smiths.com",
+            displayName: "",
             properties: {
               kind: "IDENTITY_KIND_EMAIL",
               provider: "local",
@@ -1227,7 +1242,6 @@ types:
           objectType: "group",
         }),
       ).toEqual({
-        $typeName: "aserto.directory.reader.v3.GetRelationResponse",
         objects: {},
         result: expect.objectContaining({
           subjectId: "test-user",
@@ -1236,7 +1250,6 @@ types:
           objectId: "test-group",
           objectType: "group",
         }),
-        toJSON: expect.any(Function),
       });
     });
 
@@ -1249,7 +1262,7 @@ types:
           objectId: "test-group",
           objectType: "group",
         }),
-      ).toMatchObject({ check: true, trace: [] });
+      ).toMatchObject({ check: true });
     });
 
     it("check(permission) betwen an user and group", async () => {
@@ -1261,7 +1274,7 @@ types:
           objectId: "test-group",
           objectType: "group",
         }),
-      ).toMatchObject({ check: true, trace: [] });
+      ).toMatchObject({ check: true });
     });
 
     it("lists the relations of an object", async () => {
@@ -1275,11 +1288,7 @@ types:
         }),
       ).toEqual({
         objects: {},
-        page: {
-          $typeName: "aserto.directory.common.v3.PaginationResponse",
-          nextToken: "",
-        },
-        $typeName: "aserto.directory.reader.v3.GetRelationsResponse",
+        page: { nextToken: "" },
         results: [
           expect.objectContaining({
             subjectId: "test-user",
@@ -1289,7 +1298,6 @@ types:
             objectType: "group",
           }),
         ],
-        toJSON: expect.any(Function),
       });
     });
 
@@ -1324,12 +1332,7 @@ types:
           page: { token: "" },
         }),
       ).toEqual({
-        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
-        page: {
-          $typeName: "aserto.directory.common.v3.PaginationResponse",
-          nextToken: "",
-        },
-        toJSON: expect.any(Function),
+        page: { nextToken: "" },
         results: expect.arrayContaining([
           expect.objectContaining({
             id: "test-user",
@@ -1340,35 +1343,13 @@ types:
       });
     });
 
-    it("can serialize to json objects", async () => {
-      const response = await directoryClient.objects({
-        objectType: "user",
-        page: { token: "" },
-      });
-      expect(toJson(GetObjectsResponseSchema, response)).toEqual({
-        page: {},
-        results: expect.arrayContaining([
-          expect.objectContaining({
-            id: "test-user",
-            type: "user",
-          }),
-        ]),
-      });
-    });
-
     it("list group objects", async () => {
       expect(await directoryClient.objects({ objectType: "group" })).toEqual({
-        page: {
-          $typeName: "aserto.directory.common.v3.PaginationResponse",
-          nextToken: "",
-        },
-        toJSON: expect.any(Function),
-        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
+        page: { nextToken: "" },
         results: expect.arrayContaining([
           expect.objectContaining({
             id: "test-group",
             type: "group",
-            displayName: "",
           }),
         ]),
       });
@@ -1406,13 +1387,8 @@ types:
 
     it("returns [] when  there are no objects", async () => {
       expect(await directoryClient.objects({ objectType: "user" })).toEqual({
-        $typeName: "aserto.directory.reader.v3.GetObjectsResponse",
+        page: { nextToken: "" },
         results: [],
-        page: {
-          $typeName: "aserto.directory.common.v3.PaginationResponse",
-          nextToken: "",
-        },
-        toJSON: expect.any(Function),
       });
     });
 
@@ -1501,35 +1477,27 @@ types:
         ).length,
       ).toEqual(2);
       expect(
-        await readAsyncIterable(
+        await serializeAsyncIterable(
           await directoryClient.export({ options: "DATA_OBJECTS" }),
         ),
-      ).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            msg: {
-              case: "object",
-              value: expect.objectContaining({
-                id: "import-user",
-                type: "user",
-                properties: { foo: "bar" },
-                displayName: "name1",
-              }),
-            },
+      ).toEqual([
+        {
+          object: expect.objectContaining({
+            displayName: "name2",
+            id: "import-group",
+            properties: {},
+            type: "group",
           }),
-          expect.objectContaining({
-            msg: {
-              case: "object",
-              value: expect.objectContaining({
-                id: "import-group",
-                type: "group",
-                properties: {},
-                displayName: "name2",
-              }),
-            },
+        },
+        {
+          object: expect.objectContaining({
+            displayName: "name1",
+            id: "import-user",
+            properties: { foo: "bar" },
+            type: "user",
           }),
-        ]),
-      );
+        },
+      ]);
     });
 
     it("exports relations", async () => {
@@ -1541,25 +1509,20 @@ types:
         ).length,
       ).toEqual(1);
       expect(
-        await readAsyncIterable(
+        await serializeAsyncIterable(
           await directoryClient.export({ options: "DATA_RELATIONS" }),
         ),
-      ).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            msg: {
-              case: "relation",
-              value: expect.objectContaining({
-                subjectId: "import-user",
-                subjectType: "user",
-                objectId: "import-group",
-                objectType: "group",
-                relation: "member",
-              }),
-            },
+      ).toEqual([
+        {
+          relation: expect.objectContaining({
+            objectId: "import-group",
+            objectType: "group",
+            relation: "member",
+            subjectId: "import-user",
+            subjectType: "user",
           }),
-        ]),
-      );
+        },
+      ]);
     });
 
     it("deletes an user object with relations", async () => {

@@ -101,60 +101,10 @@ m
  });
 ```
 
-## Serialization and deserialization of data
-
-Response Messages no longer implement the magic toJSON method, which serializes a message with the Protobuf JSON format when it's passed to `JSON.stringify`. Make sure to always serializes to JSON with the toJson or toJsonString function.
-
-```ts
-import { GetObjectsResponseSchema, toJson } from '@aserto/aserto-node'
-
-const response = await directoryClient.objects({
-  objectType: "user",
-  page: { token: "" },
-});
-
-const json = toJson(GetObjectsResponseSchema, response)
-```
-
-The same applies to the methods `equals`, `clone`, `toJson`, and `toJsonString`, and to the static methods `fromBinary`, `fromJson`, `fromJsonString`.
-
 
 #### Reading object properties is now simplified, enabling direct access.
 ```diff
 const object = await directoryClient.object({objectType: 'user', objectId: "key"});
 -  const owner = object?.properties?.fields?.owner?.kind?.value as string
 +  const { owner } = object.result.properties
-```
-
-## Troubleshooting
-
-#### Express.js
-```ts
-app.get("/api/users/:id", async (req, res) => {
-  const id = req.params.id;
-  const user = await directoryClient.object({objectType: 'user', objectId: "key"});
-  res.status(200).send(user);
-})
-```
-
-```
-express/lib/response.js:1160
-    : JSON.stringify(value);
-           ^
-TypeError: Do not know how to serialize a BigInt
-    at JSON.stringify (<anonymous>)
-    at stringify (express/lib/response.js:1160:12)
-```
-
-This requires [data serialization](#serialization-and-deserialization-of-data):
-
-```ts
-import { GetObjectsResponseSchema, toJson } from '@aserto/aserto-node'
-
-app.get("/api/users/:id", async (req, res) => {
-  const id = req.params.id;
-  const user = await directoryClient.object({objectType: 'user', objectId: "key"});
-  const data = toJson(GetObjectResponseSchema, user)
-  res.status(200).send(data);
-})
 ```
