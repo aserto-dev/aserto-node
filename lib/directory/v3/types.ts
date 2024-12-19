@@ -5,8 +5,10 @@ import {
   PaginationResponse as PaginationResponse$,
   Relation as Relation$,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v3/common_pb";
-import { Option } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
-import { ExportResponse as ExportResponse$ } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
+import {
+  ExportResponse as ExportResponse$,
+  Option,
+} from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
 import {
   ImportRequest as ImportRequest$,
   ImportResponse as ImportResponse$,
@@ -207,13 +209,12 @@ export type GetObjectManyResponse = Omit<
 >;
 export type GetObjectResponse = Omit<
   GetObjectResponse$,
-  "$typeName" | "$unknown"
->;
+  "$typeName" | "$unknown" | "page"
+> & { page?: PaginationResponse };
 export type GetObjectsResponse = Omit<
   GetObjectsResponse$,
-  "$typeName" | "$unknown"
->;
-
+  "$typeName" | "$unknown" | "page"
+> & { page?: PaginationResponse };
 export type GetRelationResponse = Omit<
   GetRelationResponse$,
   "$typeName" | "$unknown"
