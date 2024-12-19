@@ -100,3 +100,11 @@ m
    objectId: 'euang@acmecorp.com',
  });
 ```
+
+
+#### Reading object properties is now simplified, enabling direct access.
+```diff
+const object = await directoryClient.object({objectType: 'user', objectId: "key"});
+-  const owner = object?.properties?.fields?.owner?.kind?.value as string
++  const { owner } = object.result.properties
+```
