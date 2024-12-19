@@ -42,5 +42,5 @@ export function serializeResponse<T extends Message>(
       `schema not registered for type: [${response.$typeName}]`,
     );
   }
-  return toJson(schema, response) as unknown as T;
+  return toJson(schema, response, { alwaysEmitImplicit: true }) as unknown as T;
 }

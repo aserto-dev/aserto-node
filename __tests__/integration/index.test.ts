@@ -71,6 +71,7 @@ describe("Integration", () => {
       expect(res.status).toBe(200);
       expect(res.body).toEqual({
         check: true,
+        trace: [],
       });
     });
 
@@ -258,6 +259,7 @@ describe("Integration", () => {
 
       expect(getObjectRes.status).toBe(200);
       expect(getObjectRes.body).toEqual({
+        relations: [],
         result: expect.objectContaining({
           id: "object-1",
           type: "user",
@@ -291,6 +293,7 @@ describe("Integration", () => {
 
       expect(getEditedObjectRes.status).toBe(200);
       expect(getEditedObjectRes.body).toEqual({
+        relations: [],
         result: expect.objectContaining({
           id: "object-1",
           type: "user",
@@ -601,8 +604,8 @@ describe("Integration", () => {
         {},
         {},
         {
-          object: { recv: "2", set: "2" },
-          relation: { recv: "1", set: "1" },
+          object: { recv: "2", set: "2", delete: "0", error: "0" },
+          relation: { recv: "1", set: "1", delete: "0", error: "0" },
         },
       ]);
     });
@@ -686,6 +689,7 @@ describe("Integration", () => {
           object: {
             type: "identity",
             id: "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs",
+            displayName: "",
             properties: {
               kind: "IDENTITY_KIND_PID",
               provider: "local",
@@ -700,6 +704,7 @@ describe("Integration", () => {
           object: {
             type: "identity",
             id: "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs",
+            displayName: "",
             properties: {
               kind: "IDENTITY_KIND_PID",
               provider: "local",
@@ -714,6 +719,7 @@ describe("Integration", () => {
           object: {
             type: "identity",
             id: "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs",
+            displayName: "",
             properties: {
               kind: "IDENTITY_KIND_PID",
               provider: "local",
@@ -728,6 +734,7 @@ describe("Integration", () => {
           object: {
             type: "identity",
             id: "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs",
+            displayName: "",
             properties: {
               kind: "IDENTITY_KIND_PID",
               provider: "local",
@@ -742,6 +749,7 @@ describe("Integration", () => {
           object: {
             type: "identity",
             id: "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs",
+            displayName: "",
             properties: {
               kind: "IDENTITY_KIND_PID",
               provider: "local",
@@ -756,6 +764,7 @@ describe("Integration", () => {
           object: {
             type: "identity",
             id: "beth@the-smiths.com",
+            displayName: "",
             properties: {
               kind: "IDENTITY_KIND_EMAIL",
               provider: "local",
@@ -770,6 +779,7 @@ describe("Integration", () => {
           object: {
             type: "identity",
             id: "jerry@the-smiths.com",
+            displayName: "",
             properties: {
               kind: "IDENTITY_KIND_EMAIL",
               provider: "local",
@@ -784,6 +794,7 @@ describe("Integration", () => {
           object: {
             type: "identity",
             id: "morty@the-citadel.com",
+            displayName: "",
             properties: {
               kind: "IDENTITY_KIND_EMAIL",
               provider: "local",
@@ -798,6 +809,7 @@ describe("Integration", () => {
           object: {
             type: "identity",
             id: "rick@the-citadel.com",
+            displayName: "",
             properties: {
               verified: true,
               kind: "IDENTITY_KIND_EMAIL",
@@ -812,6 +824,7 @@ describe("Integration", () => {
           object: {
             type: "identity",
             id: "summer@the-smiths.com",
+            displayName: "",
             properties: {
               kind: "IDENTITY_KIND_EMAIL",
               provider: "local",
@@ -1229,6 +1242,7 @@ types:
           objectType: "group",
         }),
       ).toEqual({
+        objects: {},
         result: expect.objectContaining({
           subjectId: "test-user",
           subjectType: "user",
@@ -1273,6 +1287,7 @@ types:
           },
         }),
       ).toEqual({
+        objects: {},
         page: { nextToken: "" },
         results: [
           expect.objectContaining({
@@ -1373,6 +1388,7 @@ types:
     it("returns [] when  there are no objects", async () => {
       expect(await directoryClient.objects({ objectType: "user" })).toEqual({
         page: { nextToken: "" },
+        results: [],
       });
     });
 

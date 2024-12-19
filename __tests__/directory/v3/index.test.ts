@@ -462,6 +462,7 @@ describe("DirectoryV3", () => {
       );
       expect(result).toEqual({
         check: true,
+        trace: [],
       });
 
       mockCheck.mockReset();
@@ -504,9 +505,12 @@ describe("DirectoryV3", () => {
       const result = await directory.object(params);
 
       expect(result).toEqual({
+        relations: [],
         result: {
           id: "123",
           type: "user",
+          displayName: "",
+          etag: "",
         },
       });
 
@@ -565,7 +569,7 @@ describe("DirectoryV3", () => {
       );
       const result = await directory.objects(params);
 
-      expect(result).toEqual({});
+      expect(result).toEqual({ results: [] });
 
       mockGetObjects.mockReset();
     });
@@ -598,7 +602,7 @@ describe("DirectoryV3", () => {
       );
       const result = await directory.objects(params);
 
-      expect(result).toEqual({});
+      expect(result).toEqual({ results: [] });
 
       mockGetObjects.mockReset();
     });
@@ -631,7 +635,7 @@ describe("DirectoryV3", () => {
       );
       const result = await directory.objects(params);
 
-      expect(result).toEqual({});
+      expect(result).toEqual({ results: [] });
 
       mockGetObjects.mockReset();
     });
@@ -665,7 +669,7 @@ describe("DirectoryV3", () => {
       );
       const result = await directory.objects(params);
 
-      expect(result).toEqual({});
+      expect(result).toEqual({ results: [] });
 
       mockGetObjects.mockReset();
     });
@@ -815,7 +819,7 @@ describe("DirectoryV3", () => {
       const result = await directory.objectMany(params);
 
       expect(result).toEqual({
-        results: [{ type: "user", id: "123" }],
+        results: [{ type: "user", id: "123", displayName: "", etag: "" }],
       });
 
       mockGetObjectMany.mockReset();
@@ -866,6 +870,7 @@ describe("DirectoryV3", () => {
       );
       expect(result).toEqual({
         results: [{ objectId: "1234", objectType: "user" }],
+        trace: [],
       });
 
       mockGetGraph.mockReset();
@@ -950,12 +955,15 @@ describe("DirectoryV3", () => {
       const result = await directory.relation(params);
 
       expect(result).toEqual({
+        objects: {},
         result: {
+          etag: "",
           subjectType: "user",
           subjectId: "123",
           objectType: "identity",
           objectId: "identity",
           relation: "identifier",
+          subjectRelation: "",
         },
       });
 
@@ -1009,7 +1017,7 @@ describe("DirectoryV3", () => {
       );
       const result = await directory.relations(params);
 
-      expect(result).toEqual({});
+      expect(result).toEqual({ objects: {}, results: [] });
 
       mockGetRelations.mockReset();
     });

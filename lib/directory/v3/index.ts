@@ -308,17 +308,12 @@ export class DirectoryV3 {
         params.page.size ||= 100;
       }
 
-      const response = serializeResponse(
-        await this.ReaderClient.getObject(
-          create(GetObjectRequestSchema, params),
-          options,
-        ),
+      const response = await this.ReaderClient.getObject(
+        create(GetObjectRequestSchema, params),
+        options,
       );
 
-      if (response.page && response.page.nextToken === undefined) {
-        response.page.nextToken = "";
-      }
-      return response;
+      return serializeResponse(response);
     } catch (error) {
       throw handleError(error, "object");
     }
@@ -331,16 +326,11 @@ export class DirectoryV3 {
       if (params.page) {
         params.page.size ||= 100;
       }
-      const response = serializeResponse(
-        await this.ReaderClient.getObjects(
-          create(GetObjectsRequestSchema, params),
-          options,
-        ),
+      const response = await this.ReaderClient.getObjects(
+        create(GetObjectsRequestSchema, params),
+        options,
       );
-      if (response.page && response.page.nextToken === undefined) {
-        response.page.nextToken = "";
-      }
-      return response;
+      return serializeResponse(response);
     } catch (error) {
       throw handleError(error, "objects");
     }
@@ -457,15 +447,8 @@ export class DirectoryV3 {
         params.page.size ||= 100;
       }
 
-      const response = serializeResponse(
-        await this.ReaderClient.getRelations(params, options),
-      );
-
-      if (response.page && response.page.nextToken === undefined) {
-        response.page.nextToken = "";
-      }
-
-      return response;
+      const response = await this.ReaderClient.getRelations(params, options);
+      return serializeResponse(response);
     } catch (error) {
       throw handleError(error, "relations");
     }

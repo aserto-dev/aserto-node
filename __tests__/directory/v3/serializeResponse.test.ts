@@ -43,7 +43,7 @@ describe("serializeResponse() serializeResponse method", () => {
         type: "user",
         id: "123",
         displayName: "",
-        etag: "",
+        etag: "1234",
       },
       relations: [],
     };
@@ -51,9 +51,12 @@ describe("serializeResponse() serializeResponse method", () => {
     const result = serializeResponse(mockResponse);
 
     expect(result).toEqual({
+      relations: [],
       result: {
         id: "123",
         type: "user",
+        displayName: "",
+        etag: "1234",
       },
     });
   });
