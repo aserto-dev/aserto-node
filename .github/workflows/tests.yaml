@@ -18,20 +18,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Read Configuration
+        if: ${{ github.actor != 'dependabot[bot]' }}
         uses: hashicorp/vault-action@v3
         id: vault
         with:
           url: ${{ env.VAULT_ADDR }}
           token: ${{ secrets.VAULT_TOKEN }}
           secrets: |
-            kv/data/github "SSH_PRIVATE_KEY" | SSH_PRIVATE_KEY;
-
-      - name: Setup git
-        run: |
-          mkdir -p $HOME/.ssh
-          umask 0077 && echo -e "${SSH_PRIVATE_KEY}" > $HOME/.ssh/id_rsa
-          ssh-keyscan github.com >> $HOME/.ssh/known_hosts
-          git config --global url."git@github.com:".insteadOf https://github.com/
+            kv/data/codecov "aserto-node" | CODECOV_TOKEN;
 
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -65,7 +59,9 @@ jobs:
         run: yarn test
 
       - name: Upload coverage reports to Codecov
+        if: ${{ github.actor != 'dependabot[bot]' }}
         uses: codecov/codecov-action@v5
         with:
           files: ./coverage/coverage-final.json
+          token: ${{ steps.vault.outputs.CODECOV_TOKEN }}
 
