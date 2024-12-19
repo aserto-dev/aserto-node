@@ -2,6 +2,7 @@ import {
   Object$ as Object$$,
   ObjectIdentifier as ObjectIdentifier$,
   PaginationRequest as PaginationRequest$,
+  PaginationResponse as PaginationResponse$,
   Relation as Relation$,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/common/v3/common_pb";
 import { Option } from "@aserto/node-directory/src/gen/cjs/aserto/directory/exporter/v3/exporter_pb";
@@ -190,6 +191,11 @@ export type GetManifestResponse = {
   etag: string;
 };
 
+export type PaginationResponse = Omit<
+  PaginationResponse$,
+  "$typeName" | "$unknown"
+>;
+
 export type CheckResponse = Omit<CheckResponse$, "$typeName" | "$unknown">;
 export type GetGraphResponse = Omit<
   GetGraphResponse$,
@@ -214,8 +220,8 @@ export type GetRelationResponse = Omit<
 >;
 export type GetRelationsResponse = Omit<
   GetRelationsResponse$,
-  "$typeName" | "$unknown"
->;
+  "$typeName" | "$unknown" | "page"
+> & { page?: PaginationResponse };
 
 export type DeleteObjectResponse = Omit<
   DeleteObjectResponse$,

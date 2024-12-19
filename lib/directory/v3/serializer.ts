@@ -26,14 +26,21 @@ const registry: Registry = createRegistry(
   file_google_protobuf_timestamp,
 );
 
+/**
+ * Serializes a response message into JSON format based on its schema.
+ *
+ * @param response - The message object to be serialized, adhering to MessageShape.
+ * @returns The serialized message in JSON format.
+ * @throws InvalidSchemaError if the schema for the given message type is not registered.
+ */
 export function serializeResponse<T extends Message>(
   response: MessageShape<GenMessage<T>>,
 ): T {
   const schema = registry.getMessage(response.$typeName);
   if (!schema) {
     throw new InvalidSchemaError(
-      `invalid schema for type: [${response.$typeName}]`,
+      `schema not registered for type: [${response.$typeName}]`,
     );
   }
-  return toJson(schema, response, { alwaysEmitImplicit: true }) as unknown as T;
+  return toJson(schema, response) as unknown as T;
 }
