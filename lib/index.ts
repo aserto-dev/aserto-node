@@ -53,8 +53,8 @@ export {
   policyInstance,
   PolicyPathMapper,
   queryOptions,
-  serializeAsyncIterable,
   readAsyncIterable,
+  serializeAsyncIterable,
   SubIdentityMapper,
 };
 
