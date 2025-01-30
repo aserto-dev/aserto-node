@@ -187,8 +187,8 @@ export class DirectoryV3 {
     const getServiceUrl = (baseServiceUrl: string) => {
       const scheme = "https://";
 
-      const serviceUrlMath = baseServiceUrl?.match(ADDRESS_REGEX);
-      return serviceUrlMath ? baseServiceUrl : `${scheme}${baseServiceUrl}`;
+      const serviceUrlMatch = baseServiceUrl?.match(ADDRESS_REGEX);
+      return serviceUrlMatch ? baseServiceUrl : `${scheme}${baseServiceUrl}`;
     };
 
     const createTransport = (
