@@ -20,6 +20,8 @@ import {
 import {
   CheckRequest as CheckRequest$,
   CheckResponse as CheckResponse$,
+  ChecksRequest as ChecksRequest$,
+  ChecksResponse as ChecksResponse$,
   GetGraphRequest as GetGraphRequest$,
   GetGraphResponse as GetGraphResponse$,
   GetObjectManyRequest as GetObjectManyRequest$,
@@ -170,6 +172,13 @@ export type DeleteRelationRequest = Optional<
 >;
 
 export type CheckRequest = Optional<Omit<CheckRequest$, "$typeName">, "trace">;
+export type ChecksRequest = Omit<
+  ChecksRequest$,
+  "$typeName" | "default" | "checks"
+> & {
+  default?: CheckRequest;
+  checks: CheckRequest[];
+};
 
 export type GetGraphRequest = Optional<
   Omit<GetGraphRequest$, "$typeName">,
@@ -217,6 +226,13 @@ export type PaginationResponse = Omit<
 >;
 
 export type CheckResponse = Omit<CheckResponse$, "$typeName" | "$unknown">;
+export type ChecksResponse = Omit<
+  ChecksResponse$,
+  "$typeName" | "$unknown" | "checks"
+> & {
+  checks: CheckResponse[];
+};
+
 export type GetGraphResponse = Omit<
   GetGraphResponse$,
   "$typeName" | "$unknown"
