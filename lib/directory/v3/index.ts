@@ -20,6 +20,9 @@ import {
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
 import {
   CheckRequestSchema,
+  ChecksRequest,
+  ChecksRequestSchema,
+  ChecksResponse,
   GetGraphRequestSchema,
   GetObjectManyRequestSchema,
   GetObjectRequestSchema,
@@ -310,6 +313,22 @@ export class DirectoryV3 {
       return this.registry.serializeResponse(response);
     } catch (error) {
       throw handleError(error, "check");
+    }
+  }
+
+  async checks(
+    params: ChecksRequest,
+    options?: CallOptions,
+  ): Promise<ChecksResponse> {
+    try {
+      const response = await this.ReaderClient.checks(
+        create(ChecksRequestSchema, params),
+        options,
+      );
+
+      return this.registry.serializeResponse(response);
+    } catch (error) {
+      throw handleError(error, "checks");
     }
   }
 
