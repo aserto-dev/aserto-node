@@ -20,9 +20,7 @@ import {
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
 import {
   CheckRequestSchema,
-  ChecksRequest,
   ChecksRequestSchema,
-  ChecksResponse,
   GetGraphRequestSchema,
   GetObjectManyRequestSchema,
   GetObjectRequestSchema,
@@ -66,6 +64,8 @@ import { DsRegistry } from "./serializer";
 import {
   CheckRequest,
   CheckResponse,
+  ChecksRequest,
+  ChecksResponse,
   DeleteManifestResponse,
   DeleteObjectRequest,
   DeleteObjectResponse,
