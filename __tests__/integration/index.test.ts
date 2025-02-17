@@ -71,6 +71,7 @@ describe("Integration", () => {
       expect(res.status).toBe(200);
       expect(res.body).toEqual({
         check: true,
+        context: {},
         trace: [],
       });
     });
@@ -601,11 +602,39 @@ describe("Integration", () => {
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual([
-        {},
-        {},
         {
-          object: { recv: "2", set: "2", delete: "0", error: "0" },
-          relation: { recv: "1", set: "1", delete: "0", error: "0" },
+          counter: {
+            delete: "0",
+            error: "0",
+            recv: "2",
+            set: "2",
+            type: "object",
+          },
+        },
+        {
+          counter: {
+            delete: "0",
+            error: "0",
+            recv: "1",
+            set: "1",
+            type: "relation",
+          },
+        },
+        {
+          object: {
+            recv: "2",
+            set: "2",
+            delete: "0",
+            error: "0",
+            type: "object",
+          },
+          relation: {
+            recv: "1",
+            set: "1",
+            delete: "0",
+            error: "0",
+            type: "relation",
+          },
         },
       ]);
     });
@@ -1017,6 +1046,7 @@ types:
 
       expect(res.body).toEqual({
         body: expectedBody,
+        model: {},
         updatedAt: expect.any(String),
         etag: expect.any(String),
       });
