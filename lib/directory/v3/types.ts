@@ -51,6 +51,7 @@ import {
   DescFile,
   DescMessage,
   DescService,
+  JsonObject,
   Registry,
 } from "@bufbuild/protobuf";
 import { Timestamp } from "@bufbuild/protobuf/wkt";
@@ -216,6 +217,7 @@ export type ImportRequest = Omit<
 
 export type GetManifestResponse = {
   body: string;
+  model: JsonObject;
   updatedAt: Timestamp | undefined;
   etag: string;
 };

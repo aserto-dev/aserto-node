@@ -554,11 +554,22 @@ export class DirectoryV3 {
           return (el as Body)?.data;
         });
 
+      const modelData: JsonObject =
+        data
+          .map((el) => {
+            return el["model"];
+          })
+          .filter((el) => el !== undefined)
+          .map((el) => {
+            return el as JsonObject;
+          })?.[0] || {};
+
       const body = new TextDecoder().decode(mergeUint8Arrays(...bodyData));
       const metadata = data[0]?.metadata as Metadata;
 
       return {
         body,
+        model: modelData,
         updatedAt: metadata?.updatedAt
           ? this.registry.serializeResponse(metadata?.updatedAt)
           : undefined,
