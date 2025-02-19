@@ -12,8 +12,10 @@ import {
   DirectoryServiceV3,
   DirectoryV3,
   displayStateMap,
+  HEADER_ASERTO_MANIFEST_REQUEST,
   ImportMsgCase,
   ImportOpCode,
+  MANIFEST_REQUEST_DEFAULT,
   NotFoundError,
   policyContext,
   policyInstance,
@@ -977,7 +979,14 @@ describe("Integration", () => {
     it("get manifest serializes to json", async () => {
       const GetManifest = async (_req: Request, res: Response) => {
         try {
-          const manifest = await directoryClient.getManifest();
+          const manifest = await directoryClient.getManifest(
+            {},
+            {
+              headers: {
+                [HEADER_ASERTO_MANIFEST_REQUEST]: MANIFEST_REQUEST_DEFAULT,
+              },
+            },
+          );
           res.status(200).send(manifest);
         } catch (error) {
           console.error(error);

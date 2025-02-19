@@ -17,6 +17,7 @@ import {
   DeleteManifestResponse as DeleteManifestResponse$,
   SetManifestResponse as SetManifestResponse$,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
+import { GetManifestRequest as GetManifestRequest$ } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
 import {
   CheckRequest as CheckRequest$,
   CheckResponse as CheckResponse$,
@@ -213,6 +214,11 @@ export type ImportRequest = Omit<
     "msg.value.$typeName"
   >,
   "$typeName"
+>;
+
+export type GetManifestRequest = Omit<
+  GetManifestRequest$,
+  "$typeName" | "$unknown"
 >;
 
 export type GetManifestResponse = {

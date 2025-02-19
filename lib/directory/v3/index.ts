@@ -9,13 +9,13 @@ import {
   ImportRequestSchema,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
 import {
+  MetadataSchema,
   Model,
   SetManifestRequestSchema,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
 import {
   Body,
   DeleteManifestRequest,
-  GetManifestRequest,
   Metadata,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
 import {
@@ -76,6 +76,7 @@ import {
   ExportResponse,
   GetGraphRequest,
   GetGraphResponse,
+  GetManifestRequest,
   GetManifestResponse,
   GetObjectManyRequest,
   GetObjectManyResponse,
@@ -131,6 +132,18 @@ export enum ImportMsgCase {
 }
 
 const ADDRESS_REGEX = /https?:\/\//;
+
+export const HEADER_ASERTO_MANIFEST_REQUEST =
+  "Aserto-Manifest-Request" as const;
+
+// Return the manifest metadata and body.
+export const MANIFEST_REQUEST_DEFAULT = "" as const;
+// Only return the manifest metadata.
+export const MANIFEST_REQUEST_METADATA_ONLY = "metadata-only" as const;
+// Only return the manifest metadata and model.
+export const MANIFEST_REQUEST_MODEL_ONLY = "model-only" as const;
+// Return the manifest metadata, body, and model.
+export const MANIFEST_REQUEST_WITH_MODEL = "with-model" as const;
 
 export class DirectoryV3 {
   ReaderClient: Client<typeof Reader>;
@@ -545,39 +558,51 @@ export class DirectoryV3 {
           };
         });
 
-      const bodyData = data
-        .map((el) => {
-          return el["body"];
-        })
-        .filter((el) => el !== undefined)
-        .map((el) => {
-          return (el as Body)?.data;
-        });
-
-      const modelData: JsonObject =
-        data
-          .map((el) => {
-            return el["model"];
-          })
-          .filter((el) => el !== undefined)
-          .map((el) => {
-            return el as JsonObject;
-          })?.[0] || {};
-
-      const body = new TextDecoder().decode(mergeUint8Arrays(...bodyData));
-      const metadata = data[0]?.metadata as Metadata;
-
-      return {
-        body,
-        model: modelData,
-        updatedAt: metadata?.updatedAt
-          ? this.registry.serializeResponse(metadata?.updatedAt)
-          : undefined,
-        etag: metadata?.etag,
-      };
+      return this.buildManifestResponse(data);
     } catch (error) {
       throw handleError(error, "getManifest");
     }
+  }
+
+  private buildManifestResponse(
+    data: { [x: string]: JsonObject | Metadata | Body | undefined }[],
+  ) {
+    let bodyData: Uint8Array[] = [new Uint8Array()];
+    let modelData: JsonObject = {};
+    let metadata: Metadata = create(MetadataSchema, {});
+    let body: string = "";
+
+    metadata = data[0]?.metadata as Metadata;
+
+    bodyData = data
+      .map((el) => {
+        return el["body"];
+      })
+      .filter((el) => el !== undefined)
+      .map((el) => {
+        return (el as Body)?.data;
+      });
+
+    body = new TextDecoder().decode(mergeUint8Arrays(...bodyData));
+
+    modelData =
+      data
+        .map((el) => {
+          return el["model"];
+        })
+        .filter((el) => el !== undefined)
+        .map((el) => {
+          return el as JsonObject;
+        })?.[0] || {};
+
+    return {
+      body,
+      model: modelData,
+      updatedAt: metadata?.updatedAt
+        ? this.registry.serializeResponse(metadata?.updatedAt)
+        : undefined,
+      etag: metadata?.etag,
+    };
   }
 
   async setManifest(
