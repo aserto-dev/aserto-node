@@ -20,11 +20,11 @@ __metadata:
   resolution: "@aserto/aserto-node@workspace:."
   dependencies:
     "@aserto/node-authorizer": "npm:^0.21.0"
-    "@aserto/node-directory": "npm:^0.32.0"
+    "@aserto/node-directory": "npm:^0.33.0"
     "@babel/core": "npm:^7.25.2"
     "@bufbuild/protobuf": "npm:^2.2.3"
-    "@connectrpc/connect": "npm:^2.0.0"
-    "@connectrpc/connect-node": "npm:^2.0.0"
+    "@connectrpc/connect": "npm:^2.0.1"
+    "@connectrpc/connect-node": "npm:^2.0.1"
     "@eslint/compat": "npm:^1.2.2"
     "@eslint/eslintrc": "npm:^3.1.0"
     "@eslint/js": "npm:^9.13.0"
@@ -63,12 +63,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aserto/node-directory@npm:^0.32.0":
-  version: 0.32.0
-  resolution: "@aserto/node-directory@npm:0.32.0"
+"@aserto/node-directory@npm:^0.33.0":
+  version: 0.33.0
+  resolution: "@aserto/node-directory@npm:0.33.0"
   dependencies:
-    "@bufbuild/protobuf": "npm:^2.2.2"
-  checksum: 10/06f797b049d01fab3e826b63a908d99a970b738d2f1e4a9531cf6167744ca4482439f35c413686e2985bfd789a2979048b9299bee08f60cf2462613e2a0fbcf2
+    "@bufbuild/protobuf": "npm:^2.2.3"
+  checksum: 10/992e68f2857bca25b0a64b23ec23e2fa5d9ae93bbb26078a40e9ea71aad89154c427e89024d1ce1e7817f7ca1588b661f2a53ba499a89a579d8cf7e055f5eaff
   languageName: node
   linkType: hard
 
@@ -448,22 +448,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@connectrpc/connect-node@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@connectrpc/connect-node@npm:2.0.0"
+"@connectrpc/connect-node@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "@connectrpc/connect-node@npm:2.0.1"
   peerDependencies:
     "@bufbuild/protobuf": ^2.2.0
-    "@connectrpc/connect": 2.0.0
-  checksum: 10/439aa16bd016ed96577bb547d02d6abc4e2fa8e290f46fffbea6e000b932845fe9071d5c334b1398df8081d9373faca9f17ecb9f69292a4636496ab842e2c3b5
+    "@connectrpc/connect": 2.0.1
+  checksum: 10/7149540fb378e38dab9917133cb8282a5b2c90ef2b75bbfb2e2b67716a186e2b61b5ca429a57f96fbfba14b35b560d5ce3d0d911dd05be1ec5efe94c943f12d0
   languageName: node
   linkType: hard
 
-"@connectrpc/connect@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@connectrpc/connect@npm:2.0.0"
+"@connectrpc/connect@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "@connectrpc/connect@npm:2.0.1"
   peerDependencies:
     "@bufbuild/protobuf": ^2.2.0
-  checksum: 10/85c675cf76a1463f638c8fca696484d3d9a044f4e15b6800d1370ebdc0ff183a4960d11af93ea6bc84546fe3d122feee3a928d1a638617c0e327cfb30b7d63df
+  checksum: 10/6e1093e6d890af10c8497acfed3ad27e60dacc7f41511ff5824bac6f2b00bd4a6ede07d261ce8097bff314a1e0aebd27e1e01eb2fb83cfbdaafd273c8ae75ae3
   languageName: node
   linkType: hard
 

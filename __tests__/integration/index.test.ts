@@ -12,8 +12,10 @@ import {
   DirectoryServiceV3,
   DirectoryV3,
   displayStateMap,
+  HEADER_ASERTO_MANIFEST_REQUEST,
   ImportMsgCase,
   ImportOpCode,
+  MANIFEST_REQUEST_DEFAULT,
   NotFoundError,
   policyContext,
   policyInstance,
@@ -71,6 +73,7 @@ describe("Integration", () => {
       expect(res.status).toBe(200);
       expect(res.body).toEqual({
         check: true,
+        context: {},
         trace: [],
       });
     });
@@ -601,11 +604,39 @@ describe("Integration", () => {
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual([
-        {},
-        {},
         {
-          object: { recv: "2", set: "2", delete: "0", error: "0" },
-          relation: { recv: "1", set: "1", delete: "0", error: "0" },
+          counter: {
+            delete: "0",
+            error: "0",
+            recv: "2",
+            set: "2",
+            type: "object",
+          },
+        },
+        {
+          counter: {
+            delete: "0",
+            error: "0",
+            recv: "1",
+            set: "1",
+            type: "relation",
+          },
+        },
+        {
+          object: {
+            recv: "2",
+            set: "2",
+            delete: "0",
+            error: "0",
+            type: "object",
+          },
+          relation: {
+            recv: "1",
+            set: "1",
+            delete: "0",
+            error: "0",
+            type: "relation",
+          },
         },
       ]);
     });
@@ -948,7 +979,14 @@ describe("Integration", () => {
     it("get manifest serializes to json", async () => {
       const GetManifest = async (_req: Request, res: Response) => {
         try {
-          const manifest = await directoryClient.getManifest();
+          const manifest = await directoryClient.getManifest(
+            {},
+            {
+              headers: {
+                [HEADER_ASERTO_MANIFEST_REQUEST]: MANIFEST_REQUEST_DEFAULT,
+              },
+            },
+          );
           res.status(200).send(manifest);
         } catch (error) {
           console.error(error);
@@ -971,6 +1009,7 @@ model:
 
 # object type definitions
 types:
+  ### display_name: User ###
   # user represents a user that can be granted role(s)
   user:
     relations:
@@ -980,19 +1019,19 @@ types:
       ### display_name: user#in_management_chain ###
       in_management_chain: manager | manager->in_management_chain
 
-
+  ### display_name: Group ###
   # group represents a collection of users and/or (nested) groups
   group:
     relations:
       member: user | group#member
 
-
+  ### display_name: Identity ###
   # identity represents a collection of identities for users
   identity:
     relations:
       identifier: user
 
-
+  ### display_name: Resource Creator ###
   # resource creator represents a user type that can create new resources
   resource-creator:
     relations:
@@ -1017,6 +1056,7 @@ types:
 
       expect(res.body).toEqual({
         body: expectedBody,
+        model: {},
         updatedAt: expect.any(String),
         etag: expect.any(String),
       });

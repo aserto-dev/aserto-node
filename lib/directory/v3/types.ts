@@ -17,9 +17,12 @@ import {
   DeleteManifestResponse as DeleteManifestResponse$,
   SetManifestResponse as SetManifestResponse$,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
+import { GetManifestRequest as GetManifestRequest$ } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
 import {
   CheckRequest as CheckRequest$,
   CheckResponse as CheckResponse$,
+  ChecksRequest as ChecksRequest$,
+  ChecksResponse as ChecksResponse$,
   GetGraphRequest as GetGraphRequest$,
   GetGraphResponse as GetGraphResponse$,
   GetObjectManyRequest as GetObjectManyRequest$,
@@ -49,6 +52,7 @@ import {
   DescFile,
   DescMessage,
   DescService,
+  JsonObject,
   Registry,
 } from "@bufbuild/protobuf";
 import { Timestamp } from "@bufbuild/protobuf/wkt";
@@ -170,6 +174,13 @@ export type DeleteRelationRequest = Optional<
 >;
 
 export type CheckRequest = Optional<Omit<CheckRequest$, "$typeName">, "trace">;
+export type ChecksRequest = Omit<
+  ChecksRequest$,
+  "$typeName" | "default" | "checks"
+> & {
+  default?: CheckRequest;
+  checks: CheckRequest[];
+};
 
 export type GetGraphRequest = Optional<
   Omit<GetGraphRequest$, "$typeName">,
@@ -205,8 +216,14 @@ export type ImportRequest = Omit<
   "$typeName"
 >;
 
+export type GetManifestRequest = Omit<
+  GetManifestRequest$,
+  "$typeName" | "$unknown"
+>;
+
 export type GetManifestResponse = {
   body: string;
+  model: JsonObject;
   updatedAt: Timestamp | undefined;
   etag: string;
 };
@@ -217,6 +234,13 @@ export type PaginationResponse = Omit<
 >;
 
 export type CheckResponse = Omit<CheckResponse$, "$typeName" | "$unknown">;
+export type ChecksResponse = Omit<
+  ChecksResponse$,
+  "$typeName" | "$unknown" | "checks"
+> & {
+  checks: CheckResponse[];
+};
+
 export type GetGraphResponse = Omit<
   GetGraphResponse$,
   "$typeName" | "$unknown"
