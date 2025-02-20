@@ -17,6 +17,7 @@ import {
   DeleteManifestResponse as DeleteManifestResponse$,
   SetManifestResponse as SetManifestResponse$,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
+import { GetManifestRequest as GetManifestRequest$ } from "@aserto/node-directory/src/gen/cjs/aserto/directory/model/v3/model_pb";
 import {
   CheckRequest as CheckRequest$,
   CheckResponse as CheckResponse$,
@@ -51,6 +52,7 @@ import {
   DescFile,
   DescMessage,
   DescService,
+  JsonObject,
   Registry,
 } from "@bufbuild/protobuf";
 import { Timestamp } from "@bufbuild/protobuf/wkt";
@@ -214,8 +216,14 @@ export type ImportRequest = Omit<
   "$typeName"
 >;
 
+export type GetManifestRequest = Omit<
+  GetManifestRequest$,
+  "$typeName" | "$unknown"
+>;
+
 export type GetManifestResponse = {
   body: string;
+  model: JsonObject;
   updatedAt: Timestamp | undefined;
   etag: string;
 };

@@ -1179,6 +1179,7 @@ describe("DirectoryV3", () => {
       const result = await directory.getManifest();
       expect(result).toEqual({
         body: "test",
+        model: {},
         etag: "",
         updatedAt: undefined,
       });
