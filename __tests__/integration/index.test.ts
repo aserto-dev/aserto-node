@@ -1009,6 +1009,7 @@ model:
 
 # object type definitions
 types:
+  ### display_name: User ###
   # user represents a user that can be granted role(s)
   user:
     relations:
@@ -1018,19 +1019,19 @@ types:
       ### display_name: user#in_management_chain ###
       in_management_chain: manager | manager->in_management_chain
 
-
+  ### display_name: Group ###
   # group represents a collection of users and/or (nested) groups
   group:
     relations:
       member: user | group#member
 
-
+  ### display_name: Identity ###
   # identity represents a collection of identities for users
   identity:
     relations:
       identifier: user
 
-
+  ### display_name: Resource Creator ###
   # resource creator represents a user type that can create new resources
   resource-creator:
     relations:
