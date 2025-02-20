@@ -43,6 +43,14 @@ import {
   SetRelationRequest as SetRelationRequest$,
   SetRelationResponse as SetRelationResponse$,
 } from "@aserto/node-directory/src/gen/cjs/aserto/directory/writer/v3/writer_pb";
+import {
+  DescEnum,
+  DescExtension,
+  DescFile,
+  DescMessage,
+  DescService,
+  Registry,
+} from "@bufbuild/protobuf";
 import { Timestamp } from "@bufbuild/protobuf/wkt";
 
 import { NestedOmit, NestedOptional, Optional } from "../../util/types";
@@ -88,7 +96,17 @@ export type DirectoryV3Config = ServiceConfig & {
   importer?: ServiceConfig;
   exporter?: ServiceConfig;
   model?: ServiceConfig;
+} & {
+  additionalDescriptors?: (
+    | Registry
+    | DescFile
+    | DescMessage
+    | DescEnum
+    | DescExtension
+    | DescService
+  )[];
 };
+
 export type Object$ = Optional<
   Omit<Object$$, "$typeName">,
   "etag" | "displayName"

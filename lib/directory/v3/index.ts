@@ -59,7 +59,7 @@ import {
   nullReaderProxy,
   nullWriterProxy,
 } from "./null";
-import { serializeResponse } from "./serializer";
+import { DsRegistry } from "./serializer";
 import {
   CheckRequest,
   CheckResponse,
@@ -127,12 +127,16 @@ export enum ImportMsgCase {
   RELATION = "relation",
 }
 
+const ADDRESS_REGEX = /https?:\/\//;
+
 export class DirectoryV3 {
   ReaderClient: Client<typeof Reader>;
   WriterClient: Client<typeof Writer>;
   ImporterClient: Client<typeof Importer>;
   ExporterClient: Client<typeof Exporter>;
   ModelClient: Client<typeof Model>;
+  registry: DsRegistry;
+
   CreateTransport: (
     config: ServiceConfig | undefined,
     fallback: ServiceConfig | undefined,
@@ -180,6 +184,13 @@ export class DirectoryV3 {
       );
     };
 
+    const getServiceUrl = (baseServiceUrl: string) => {
+      const scheme = "https://";
+
+      const serviceUrlMatch = baseServiceUrl?.match(ADDRESS_REGEX);
+      return serviceUrlMatch ? baseServiceUrl : `${scheme}${baseServiceUrl}`;
+    };
+
     const createTransport = (
       config: ServiceConfig | undefined,
       fallback: ServiceConfig | undefined,
@@ -207,7 +218,9 @@ export class DirectoryV3 {
         }
         interceptors.push(setCustomHeaders(customHeaders));
         return createGrpcTransport({
-          baseUrl: `https://${serviceUrl || "directory.prod.aserto.com:8443"}`,
+          baseUrl: getServiceUrl(
+            serviceUrl || "directory.prod.aserto.com:8443",
+          ),
           interceptors: interceptors,
           nodeOptions: nodeOptions,
         });
@@ -232,6 +245,7 @@ export class DirectoryV3 {
     }
 
     const baseServiceUrl = config.url;
+
     const baseApiKey = config.apiKey;
     const baseTenantId = config.tenantId;
     const baseCaFile = !!config.caFile
@@ -250,7 +264,7 @@ export class DirectoryV3 {
     const baseGrpcTransport =
       !!config.url || (!!config.apiKey && !!config.tenantId)
         ? createGrpcTransport({
-            baseUrl: `https://${baseServiceUrl}`,
+            baseUrl: getServiceUrl(baseServiceUrl!),
             interceptors: interceptors,
             nodeOptions: baseNodeOptions,
           })
@@ -275,12 +289,12 @@ export class DirectoryV3 {
     this.ExporterClient = !!exporterGrpcTransport
       ? createClient(Exporter, exporterGrpcTransport)
       : nullExporterProxy();
-
     this.ModelClient = !!modelGrpcTransport
       ? createClient(Model, modelGrpcTransport)
       : nullModelProxy();
 
     this.CreateTransport = createTransport;
+    this.registry = new DsRegistry(...(config.additionalDescriptors || []));
   }
 
   async check(
@@ -293,7 +307,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return serializeResponse(response);
+      return this.registry.serializeResponse(response);
     } catch (error) {
       throw handleError(error, "check");
     }
@@ -313,7 +327,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return serializeResponse(response);
+      return this.registry.serializeResponse(response);
     } catch (error) {
       throw handleError(error, "object");
     }
@@ -330,7 +344,7 @@ export class DirectoryV3 {
         create(GetObjectsRequestSchema, params),
         options,
       );
-      return serializeResponse(response);
+      return this.registry.serializeResponse(response);
     } catch (error) {
       throw handleError(error, "objects");
     }
@@ -346,7 +360,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return serializeResponse(response);
+      return this.registry.serializeResponse(response);
     } catch (error) {
       throw handleError(error, "objectMany");
     }
@@ -365,7 +379,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return serializeResponse(response);
+      return this.registry.serializeResponse(response);
     } catch (error) {
       throw handleError(error, "setObject");
     }
@@ -381,7 +395,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return serializeResponse(response);
+      return this.registry.serializeResponse(response);
     } catch (error) {
       throw handleError(error, "deleteObject");
     }
@@ -397,7 +411,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return serializeResponse(response);
+      return this.registry.serializeResponse(response);
     } catch (error) {
       throw handleError(error, "relation");
     }
@@ -416,7 +430,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return serializeResponse(response);
+      return this.registry.serializeResponse(response);
     } catch (error) {
       throw handleError(error, "setRelation");
     }
@@ -432,7 +446,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return serializeResponse(response);
+      return this.registry.serializeResponse(response);
     } catch (error) {
       throw handleError(error, "deleteRelation");
     }
@@ -448,7 +462,7 @@ export class DirectoryV3 {
       }
 
       const response = await this.ReaderClient.getRelations(params, options);
-      return serializeResponse(response);
+      return this.registry.serializeResponse(response);
     } catch (error) {
       throw handleError(error, "relations");
     }
@@ -464,7 +478,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return serializeResponse(response);
+      return this.registry.serializeResponse(response);
     } catch (error) {
       throw handleError(error, "graph");
     }
@@ -527,7 +541,7 @@ export class DirectoryV3 {
       return {
         body,
         updatedAt: metadata?.updatedAt
-          ? serializeResponse(metadata?.updatedAt)
+          ? this.registry.serializeResponse(metadata?.updatedAt)
           : undefined,
         etag: metadata?.etag,
       };
@@ -553,7 +567,7 @@ export class DirectoryV3 {
         options,
       );
 
-      return serializeResponse(response);
+      return this.registry.serializeResponse(response);
     } catch (error) {
       throw handleError(error, "setManifest");
     }
@@ -566,7 +580,7 @@ export class DirectoryV3 {
     try {
       const response = await this.ModelClient.deleteManifest(params!, options);
 
-      return serializeResponse(response);
+      return this.registry.serializeResponse(response);
     } catch (error) {
       throw handleError(error, "deleteManifest");
     }
@@ -600,9 +614,10 @@ export async function readAsyncIterable<T>(
 export async function serializeAsyncIterable<T extends Message>(
   gen: AsyncIterable<T>,
 ): Promise<T[]> {
+  const registry = new DsRegistry();
   const out: T[] = [];
   for await (const x of gen) {
-    out.push(serializeResponse<T>(x));
+    out.push(registry.serializeResponse<T>(x));
   }
   return out;
 }
