@@ -8,11 +8,11 @@ import { Client } from "@connectrpc/connect";
 import { ConfigError } from "../../errors";
 
 type ConnectClient =
-  | typeof Reader
-  | typeof Writer
-  | typeof Importer
   | typeof Exporter
-  | typeof Model;
+  | typeof Importer
+  | typeof Model
+  | typeof Reader
+  | typeof Writer;
 
 const interceptCall = (
   target: ConnectClient,
@@ -62,9 +62,9 @@ const nullModelProxy = (): Client<typeof Model> => {
 };
 
 export {
+  nullExporterProxy,
+  nullImporterProxy,
+  nullModelProxy,
   nullReaderProxy,
   nullWriterProxy,
-  nullImporterProxy,
-  nullExporterProxy,
-  nullModelProxy,
 };

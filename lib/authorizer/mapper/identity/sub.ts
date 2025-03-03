@@ -1,5 +1,6 @@
 import { Request } from "express";
 import { jwtDecode, JwtPayload } from "jwt-decode";
+
 import { IdentityContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/identity_context_pb";
 
 import { IdentityMapper } from "../../middleware";
