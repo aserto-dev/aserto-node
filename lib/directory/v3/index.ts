@@ -291,7 +291,6 @@ export class DirectoryV3 {
     const writerGrpcTransport = createTransport(config.writer, config);
     const importerGrpcTransport = createTransport(config.importer, config);
     const exporterGrpcTransport = createTransport(config.exporter, config);
-
     const modelGrpcTransport = createTransport(config.model, config);
 
     this.ReaderClient = !!readerGrpcTransport

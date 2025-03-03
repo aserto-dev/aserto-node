@@ -33,32 +33,32 @@ const interceptCall = (
   );
 };
 
-function nullProxy(clientType: ConnectClient) {
+function nullProxy<T>(clientType: ConnectClient): T {
   return new Proxy<ConnectClient>(clientType, {
     get(target, prop, receiver) {
       return interceptCall(target, prop as string, receiver);
     },
-  });
+  }) as T;
 }
 
 const nullReaderProxy = (): Client<typeof Reader> => {
-  return nullProxy(Reader) as unknown as Client<typeof Reader>;
+  return nullProxy(Reader);
 };
 
 const nullWriterProxy = (): Client<typeof Writer> => {
-  return nullProxy(Writer) as unknown as Client<typeof Writer>;
+  return nullProxy(Writer);
 };
 
 const nullImporterProxy = (): Client<typeof Importer> => {
-  return nullProxy(Importer) as unknown as Client<typeof Importer>;
+  return nullProxy(Importer);
 };
 
 const nullExporterProxy = (): Client<typeof Exporter> => {
-  return nullProxy(Exporter) as unknown as Client<typeof Exporter>;
+  return nullProxy(Exporter);
 };
 
 const nullModelProxy = (): Client<typeof Model> => {
-  return nullProxy(Model) as unknown as Client<typeof Model>;
+  return nullProxy(Model);
 };
 
 export {
