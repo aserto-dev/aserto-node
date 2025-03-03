@@ -1,4 +1,5 @@
 import { readFileSync } from "fs";
+
 import {
   Exporter,
   ExportRequestSchema,
@@ -43,8 +44,8 @@ import {
   Interceptor,
   Transport,
 } from "@connectrpc/connect";
-import { createAsyncIterable as createAsyncIterable$ } from "@connectrpc/connect/protocol";
 import { createGrpcTransport } from "@connectrpc/connect-node";
+import { createAsyncIterable as createAsyncIterable$ } from "@connectrpc/connect/protocol";
 
 import { log } from "../../log";
 import {
@@ -99,6 +100,20 @@ import {
 } from "./types";
 
 /**
+ * Enum representing the different cases for importing data.
+ * The cases are "object" and "relation".
+ *
+ *  OBJECT = "object"
+ *
+ *  RELATION = "relation"
+ *
+ */
+export enum ImportMsgCase {
+  OBJECT = "object",
+  RELATION = "relation",
+}
+
+/**
  * "UNKNOWN" - nothing selected (default initialization value)
  *
  * "DATA_OBJECTS" - object instances
@@ -116,20 +131,6 @@ import {
  * "STATS_DATA" - all data stats = STATS | DATA
  */
 type DATA_TYPE_OPTIONS = keyof ExportOptions;
-
-/**
- * Enum representing the different cases for importing data.
- * The cases are "object" and "relation".
- *
- *  OBJECT = "object"
- *
- *  RELATION = "relation"
- *
- */
-export enum ImportMsgCase {
-  OBJECT = "object",
-  RELATION = "relation",
-}
 
 const ADDRESS_REGEX = /https?:\/\//;
 
@@ -565,7 +566,7 @@ export class DirectoryV3 {
   }
 
   private buildManifestResponse(
-    data: { [x: string]: JsonObject | Metadata | Body | undefined }[],
+    data: { [x: string]: Body | JsonObject | Metadata | undefined }[],
   ) {
     let bodyData: Uint8Array[] = [new Uint8Array()];
     let modelData: JsonObject = {};
@@ -643,6 +644,48 @@ export class DirectoryV3 {
 }
 
 /**
+ * Asynchronously iterates over an array of items, yielding each item.
+ *
+ * @deprecated Use `createImportRequest` instead.
+ *
+ * @template T
+ * @param {T[]} items - The array of items to iterate over.
+ */
+export async function* createAsyncIterable<T>(items: T[]) {
+  log("[Deprecated]: please use `createImportRequest`");
+  yield* createImportRequest(items as ImportRequest$[]);
+}
+
+/**
+ * Creates an asynchronous iterable of import requests.
+ *
+ * @param { ImportRequest$[]} params - An array of ImportRequest to be converted into ImportRequest objects.
+ * @yields ImportRequest objects created from the provided parameters.
+ */
+export async function* createImportRequest(params: ImportRequest$[]) {
+  yield* createAsyncIterable$(
+    params.map((param) => create(ImportRequestSchema, param as ImportRequest)),
+  );
+}
+/**
+ * Old Implementation: Converts a JSON object to a Protobuf Struct.
+ *
+ * Current Implementation: noop. Returns the input object
+ *
+ * * @deprecated This function is deprecated as the SDK no longer requires
+ * conversion from JSON to Struct. Use the value directly.
+ *
+ * @param value - The JSON object to convert.
+ * @returns The converted Protobuf Struct.
+ */
+export function objectPropertiesAsStruct(value: JsonObject): JsonObject {
+  log(
+    "[Deprecated]: This version of SDK does not require conversion from JSON to Struct. Use the value directly",
+  );
+  return value;
+}
+
+/**
  * Reads all elements from an AsyncIterable and returns them as an array.
  *
  * @template T - The type of elements in the AsyncIterable.
@@ -675,48 +718,6 @@ export async function serializeAsyncIterable<T extends Message>(
     out.push(registry.serializeResponse<T>(x));
   }
   return out;
-}
-/**
- * Creates an asynchronous iterable of import requests.
- *
- * @param { ImportRequest$[]} params - An array of ImportRequest to be converted into ImportRequest objects.
- * @yields ImportRequest objects created from the provided parameters.
- */
-export async function* createImportRequest(params: ImportRequest$[]) {
-  yield* createAsyncIterable$(
-    params.map((param) => create(ImportRequestSchema, param as ImportRequest)),
-  );
-}
-
-/**
- * Asynchronously iterates over an array of items, yielding each item.
- *
- * @deprecated Use `createImportRequest` instead.
- *
- * @template T
- * @param {T[]} items - The array of items to iterate over.
- */
-export async function* createAsyncIterable<T>(items: T[]) {
-  log("[Deprecated]: please use `createImportRequest`");
-  yield* createImportRequest(items as ImportRequest$[]);
-}
-
-/**
- * Old Implementation: Converts a JSON object to a Protobuf Struct.
- *
- * Current Implementation: noop. Returns the input object
- *
- * * @deprecated This function is deprecated as the SDK no longer requires
- * conversion from JSON to Struct. Use the value directly.
- *
- * @param value - The JSON object to convert.
- * @returns The converted Protobuf Struct.
- */
-export function objectPropertiesAsStruct(value: JsonObject): JsonObject {
-  log(
-    "[Deprecated]: This version of SDK does not require conversion from JSON to Struct. Use the value directly",
-  );
-  return value;
 }
 
 function mergeUint8Arrays(...arrays: Uint8Array[]): Uint8Array {
