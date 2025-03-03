@@ -1,7 +1,7 @@
-import simpleImportSort from "eslint-plugin-simple-import-sort";
-import typescriptSortKeys from "eslint-plugin-typescript-sort-keys";
+import perfectionist from "eslint-plugin-perfectionist";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
 import { fixupConfigRules } from "@eslint/compat";
 import { FlatCompat } from "@eslint/eslintrc";
 import js from "@eslint/js";
@@ -10,9 +10,9 @@ import tsParser from "@typescript-eslint/parser";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const compat = new FlatCompat({
+  allConfig: js.configs.all,
   baseDirectory: __dirname,
   recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
 });
 
 export default [
@@ -27,26 +27,17 @@ export default [
       "plugin:prettier/recommended",
     ),
   ),
+  perfectionist.configs["recommended-natural"],
   {
-    plugins: {
-      "simple-import-sort": simpleImportSort,
-      "typescript-sort-keys": typescriptSortKeys,
-    },
-
     languageOptions: {
-      parser: tsParser,
       ecmaVersion: 2018,
+      parser: tsParser,
       sourceType: "module",
     },
 
-    rules: {
-      curly: "error",
-      eqeqeq: ["error", "always"],
-      "no-console": "warn",
-      "no-debugger": "warn",
-      "no-duplicate-case": "error",
-      "no-use-before-define": "off",
+    plugins: {},
 
+    rules: {
       "@typescript-eslint/consistent-type-assertions": [
         "error",
         {
@@ -54,39 +45,28 @@ export default [
           objectLiteralTypeAssertions: "allow-as-parameter",
         },
       ],
-
       "@typescript-eslint/explicit-module-boundary-types": "off",
-
       "@typescript-eslint/naming-convention": [
         1,
         {
-          selector: "interface",
           format: ["PascalCase"],
+          selector: "interface",
         },
       ],
-
       "@typescript-eslint/no-empty-function": "off",
-      "@typescript-eslint/no-inferrable-types": "off",
-      "@typescript-eslint/no-non-null-asserted-nullish-coalescing": "error",
-      "@typescript-eslint/no-non-null-assertion": "off",
-      "@typescript-eslint/no-var-requires": "off",
-      "prettier/prettier": ["error"],
-
-      "simple-import-sort/imports": [
-        "warn",
-        {
-          groups: [["^\\u0000"], ["^\\w", "^@"], ["^"], ["^\\."]],
-        },
-      ],
-
-      "typescript-sort-keys/string-enum": [
+      "@typescript-eslint/no-empty-interface": "off",
+      "@typescript-eslint/no-explicit-any": [
         "error",
-        "asc",
         {
-          caseSensitive: false,
-          natural: true,
+          fixToUnknown: true,
         },
       ],
+
+      "@typescript-eslint/no-inferrable-types": "off",
+
+      "@typescript-eslint/no-non-null-asserted-nullish-coalescing": "error",
+
+      "@typescript-eslint/no-non-null-assertion": "off",
 
       "@typescript-eslint/no-unused-expressions": [
         "error",
@@ -95,18 +75,6 @@ export default [
           allowTernary: true,
         },
       ],
-
-      "@typescript-eslint/no-empty-interface": "off",
-
-      "@typescript-eslint/no-explicit-any": [
-        "error",
-        {
-          fixToUnknown: true,
-        },
-      ],
-
-      "no-unused-vars": "off",
-
       "@typescript-eslint/no-unused-vars": [
         "warn",
         {
@@ -114,6 +82,46 @@ export default [
           varsIgnorePattern: "^_",
         },
       ],
+      "@typescript-eslint/no-var-requires": "off",
+      curly: "error",
+      eqeqeq: ["error", "always"],
+      "no-console": "warn",
+
+      "no-debugger": "warn",
+
+      "no-duplicate-case": "error",
+
+      "no-unused-vars": "off",
+
+      "no-use-before-define": "off",
+      "perfectionist/sort-enums": [
+        "warn",
+        {
+          partitionByComment: true,
+          partitionByNewLine: true,
+        },
+      ],
+      "perfectionist/sort-imports": [
+        "warn",
+        {
+          internalPattern: ["^@"],
+          specialCharacters: "keep",
+        },
+      ],
+      "perfectionist/sort-maps": [
+        "warn",
+        {
+          partitionByComment: true,
+          partitionByNewLine: true,
+        },
+      ],
+      "perfectionist/sort-objects": "off",
+      "perfectionist/sort-object-types": "off",
+      "perfectionist/sort-interfaces": "off",
+      "perfectionist/sort-classes": "off",
+      "perfectionist/sort-enums": "off",
+
+      "prettier/prettier": ["error"],
     },
   },
 ];

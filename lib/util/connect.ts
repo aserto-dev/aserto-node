@@ -18,8 +18,8 @@ import { log } from "../log";
 
 export const setHeader = (
   req:
-    | UnaryRequest<DescMessage, DescMessage>
-    | StreamRequest<DescMessage, DescMessage>,
+    | StreamRequest<DescMessage, DescMessage>
+    | UnaryRequest<DescMessage, DescMessage>,
   key: string,
   value: string,
 ) => {
@@ -52,20 +52,20 @@ export const setCustomHeaders = (headers: CustomHeaders) => {
 export const handleError = (error: unknown, method: string) => {
   if (error instanceof ConnectError) {
     switch (error.code) {
-      case Code.Unauthenticated: {
-        return new UnauthenticatedError(
-          `Authentication failed: ${error.message}`,
+      case Code.FailedPrecondition: {
+        return new EtagMismatchError(
+          `invalid etag in ${method} request: ${error.message}`,
         );
-      }
-      case Code.NotFound: {
-        return new NotFoundError(`${method} not found: ${error.message}`);
       }
       case Code.InvalidArgument: {
         return new InvalidArgumentError(`${method}: ${error.message}`);
       }
-      case Code.FailedPrecondition: {
-        return new EtagMismatchError(
-          `invalid etag in ${method} request: ${error.message}`,
+      case Code.NotFound: {
+        return new NotFoundError(`${method} not found: ${error.message}`);
+      }
+      case Code.Unauthenticated: {
+        return new UnauthenticatedError(
+          `Authentication failed: ${error.message}`,
         );
       }
       default: {
