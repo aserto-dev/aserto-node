@@ -138,7 +138,13 @@ export type GetObjectsRequest = Omit<
 
 export type GetRelationRequest = Optional<
   Omit<GetRelationRequest$, "$typeName">,
-  "subjectRelation" | "withObjects" | "subjectId"
+  | "objectId"
+  | "objectType"
+  | "relation"
+  | "subjectId"
+  | "subjectRelation"
+  | "subjectType"
+  | "withObjects"
 >;
 
 export type GetRelationsRequest = Optional<
