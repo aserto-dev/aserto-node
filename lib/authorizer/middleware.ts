@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response } from "express";
+
 import { IdentityContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/identity_context_pb";
 import { PolicyContext } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/policy_context_pb";
 import { PolicyInstance } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/policy_instance_pb";
 import { CallOptions } from "@connectrpc/connect";
 
-import { errorHandler } from "../errorHandler";
 import { Authorizer } from ".";
+import { errorHandler } from "../errorHandler";
 import JWTIdentityMapper from "./mapper/identity/jwt";
 import PolicyPathMapper from "./mapper/policy/path";
 import checkResourceMapper from "./mapper/resource/check";
@@ -13,14 +14,6 @@ import ParamsResourceMapper from "./mapper/resource/params";
 import policyContext from "./model/policyContext";
 import policyInstance from "./model/policyInstance";
 import { ResourceContext } from "./model/resourceContext";
-
-type Policy = {
-  root: string;
-  name?: string;
-  instanceLabel?: string;
-  decision?: string;
-  path?: string;
-};
 
 export type CheckOptions = {
   object?: ObjectMapper;
@@ -30,16 +23,24 @@ export type CheckOptions = {
   subjectType?: string;
 };
 
-export type ResourceMapper =
-  | ResourceContext
-  | ((req?: Request) => Promise<ResourceContext>);
-
 export type IdentityMapper = (req: Request) => Promise<IdentityContext>;
+
 export type PolicyMapper = (req?: Request) => Promise<PolicyContext>;
 
+export type ResourceMapper =
+  | ((req?: Request) => Promise<ResourceContext>)
+  | ResourceContext;
 type ObjectMapper = (
   req?: Request,
 ) => Promise<{ objectId: string; objectType: string }>;
+
+type Policy = {
+  root: string;
+  name?: string;
+  instanceLabel?: string;
+  decision?: string;
+  path?: string;
+};
 type StringMapper = (req?: Request) => Promise<string>;
 
 export class Middleware {

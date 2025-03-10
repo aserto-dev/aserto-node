@@ -47,6 +47,7 @@ export {
   HEADER_ASERTO_MANIFEST_REQUEST,
   identityContext,
   ImportMsgCase,
+  Opcode as ImportOpCode,
   is,
   jwtAuthz,
   JWTIdentityMapper,
@@ -58,7 +59,6 @@ export {
   Middleware,
   ObjectIDFromVar,
   objectPropertiesAsStruct,
-  Opcode as ImportOpCode,
   policyContext,
   policyInstance,
   PolicyPathMapper,
@@ -68,7 +68,7 @@ export {
   SubIdentityMapper,
 };
 
-export * from "./errors";
 export * from "./authorizer/types";
 export * from "./directory/v3/types";
+export * from "./errors";
 export * from "@bufbuild/protobuf";

@@ -1,6 +1,7 @@
 // create identity context
 import express from "express";
 import { jwtDecode } from "jwt-decode";
+
 import { IdentityType } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/identity_context_pb";
 
 import identityContext from "./authorizer/model/identityContext";
