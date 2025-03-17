@@ -20,7 +20,7 @@ __metadata:
   resolution: "@aserto/aserto-node@workspace:."
   dependencies:
     "@aserto/node-authorizer": "npm:^0.21.0"
-    "@aserto/node-directory": "npm:^0.33.0"
+    "@aserto/node-directory": "npm:^0.33.1"
     "@babel/core": "npm:^7.26.9"
     "@bufbuild/protobuf": "npm:^2.2.3"
     "@connectrpc/connect": "npm:^2.0.2"
@@ -62,12 +62,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aserto/node-directory@npm:^0.33.0":
-  version: 0.33.0
-  resolution: "@aserto/node-directory@npm:0.33.0"
+"@aserto/node-directory@npm:^0.33.1":
+  version: 0.33.1
+  resolution: "@aserto/node-directory@npm:0.33.1"
   dependencies:
     "@bufbuild/protobuf": "npm:^2.2.3"
-  checksum: 10/992e68f2857bca25b0a64b23ec23e2fa5d9ae93bbb26078a40e9ea71aad89154c427e89024d1ce1e7817f7ca1588b661f2a53ba499a89a579d8cf7e055f5eaff
+  checksum: 10/d4b4cf70988f145d18fee108a30d8b007623d6625104a2362318803e28f48c2df5deaa064573a019f3a765f9ff50e720607715c9a00a81c8d49ff04e43420bc3
   languageName: node
   linkType: hard
 
