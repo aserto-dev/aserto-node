@@ -105,7 +105,7 @@ describe("Integration", () => {
             properties: {
               email: "rick@the-citadel.com",
               picture:
-                "https://www.topaz.sh/assets/templates/citadel/img/Rick%20Sanchez.jpg",
+                "https://www.topaz.sh/assets/templates/v32/citadel/img/Rick%20Sanchez.jpg",
               roles: ["admin", "evil_genius"],
               status: "USER_STATUS_ACTIVE",
             },
@@ -375,7 +375,7 @@ describe("Integration", () => {
             properties: {
               email: "rick@the-citadel.com",
               picture:
-                "https://www.topaz.sh/assets/templates/citadel/img/Rick%20Sanchez.jpg",
+                "https://www.topaz.sh/assets/templates/v32/citadel/img/Rick%20Sanchez.jpg",
               roles: ["admin", "evil_genius"],
               status: "USER_STATUS_ACTIVE",
             },
@@ -494,7 +494,7 @@ describe("Integration", () => {
             properties: {
               email: "rick@the-citadel.com",
               picture:
-                "https://www.topaz.sh/assets/templates/citadel/img/Rick%20Sanchez.jpg",
+                "https://www.topaz.sh/assets/templates/v32/citadel/img/Rick%20Sanchez.jpg",
               roles: ["admin", "evil_genius"],
               status: "USER_STATUS_ACTIVE",
             },
@@ -885,7 +885,7 @@ describe("Integration", () => {
             properties: {
               email: "beth@the-smiths.com",
               picture:
-                "https://www.topaz.sh/assets/templates/citadel/img/Beth%20Smith.jpg",
+                "https://www.topaz.sh/assets/templates/v32/citadel/img/Beth%20Smith.jpg",
               roles: ["viewer"],
               status: "USER_STATUS_ACTIVE",
             },
@@ -913,7 +913,7 @@ describe("Integration", () => {
             properties: {
               email: "jerry@the-smiths.com",
               picture:
-                "https://www.topaz.sh/assets/templates/citadel/img/Jerry%20Smith.jpg",
+                "https://www.topaz.sh/assets/templates/v32/citadel/img/Jerry%20Smith.jpg",
               roles: ["viewer"],
               status: "USER_STATUS_ACTIVE",
             },
@@ -930,7 +930,7 @@ describe("Integration", () => {
             properties: {
               email: "morty@the-citadel.com",
               picture:
-                "https://www.topaz.sh/assets/templates/citadel/img/Morty%20Smith.jpg",
+                "https://www.topaz.sh/assets/templates/v32/citadel/img/Morty%20Smith.jpg",
               roles: ["editor"],
               status: "USER_STATUS_ACTIVE",
             },
@@ -948,7 +948,7 @@ describe("Integration", () => {
               status: "USER_STATUS_ACTIVE",
               email: "rick@the-citadel.com",
               picture:
-                "https://www.topaz.sh/assets/templates/citadel/img/Rick%20Sanchez.jpg",
+                "https://www.topaz.sh/assets/templates/v32/citadel/img/Rick%20Sanchez.jpg",
               roles: ["admin", "evil_genius"],
             },
             createdAt: expect.anything(),
@@ -964,7 +964,7 @@ describe("Integration", () => {
             properties: {
               email: "summer@the-smiths.com",
               picture:
-                "https://www.topaz.sh/assets/templates/citadel/img/Summer%20Smith.jpg",
+                "https://www.topaz.sh/assets/templates/v32/citadel/img/Summer%20Smith.jpg",
               roles: ["editor"],
               status: "USER_STATUS_ACTIVE",
             },
