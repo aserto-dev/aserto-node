@@ -18,3 +18,4 @@ yalc.lock
 .early.coverage
 
 tsconfig.tsbuildinfo
+.qodo
