@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 
-import { defaultLogger } from "./log";
+import { logger } from "./log";
 
 const errorHandler =
   (next: NextFunction, failWithError: boolean) =>
@@ -13,7 +13,7 @@ const errorHandler =
           message: `aserto-node: ${err_message}`,
         });
       }
-      defaultLogger.error(err_message);
+      logger.error(err_message);
       res.append(
         "WWW-Authenticate",
         `Bearer error="${encodeURIComponent(err_message)}"`,

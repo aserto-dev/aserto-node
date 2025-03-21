@@ -14,7 +14,7 @@ import {
   NotFoundError,
   UnauthenticatedError,
 } from "../errors";
-import { defaultLogger } from "../log";
+import { logger } from "../log";
 
 export const setHeader = (
   req:
@@ -27,7 +27,7 @@ export const setHeader = (
 };
 
 export const traceMessage: Interceptor = (next) => async (req) => {
-  defaultLogger.debug({
+  logger.debug({
     message: JSON.parse(JSON.stringify(req.message)),
     method: req.method.toString(),
     requestMethod: req.requestMethod.toString(),

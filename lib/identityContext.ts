@@ -5,7 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import { IdentityType } from "@aserto/node-authorizer/src/gen/cjs/aserto/authorizer/v2/api/identity_context_pb";
 
 import identityContext from "./authorizer/model/identityContext";
-import { defaultLogger } from "./log";
+import { logger } from "./log";
 
 export interface IdentityContextOptions {
   useAuthorizationHeader: boolean;
@@ -37,7 +37,7 @@ export default (req: express.Request, options: IdentityContextOptions) => {
 
       type = "JWT";
     } catch (error) {
-      defaultLogger.error(
+      logger.error(
         `Authorization header contained malformed JWT: ${(error as Error).message}`,
       );
 

@@ -3,7 +3,7 @@ import express from "express";
 
 import { IdentityContextOptions } from "./identityContext";
 import { AuthzOptions } from "./jwtAuthz";
-import { defaultLogger } from "./log";
+import { logger } from "./log";
 
 export default (
   options: AuthzOptions,
@@ -22,7 +22,7 @@ export default (
         message: `aserto-node: ${err_message}`,
       });
     }
-    defaultLogger.error(err_message);
+    logger.error(err_message);
     res.status(403).send(err_message);
   };
 
