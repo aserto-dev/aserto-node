@@ -1,5 +1,4 @@
 import { readFileSync } from "fs";
-import { EventEmitter } from "stream";
 
 import {
   Exporter,
@@ -48,7 +47,7 @@ import {
 import { createGrpcTransport } from "@connectrpc/connect-node";
 import { createAsyncIterable as createAsyncIterable$ } from "@connectrpc/connect/protocol";
 
-import Logger, { defaultLogger } from "../../log";
+import { defaultLogger } from "../../log";
 import {
   handleError,
   setCustomHeaders,
@@ -154,20 +153,13 @@ export class DirectoryV3 {
   ExporterClient: Client<typeof Exporter>;
   ModelClient: Client<typeof Model>;
   registry: DsRegistry;
-  logger: Logger;
 
   CreateTransport: (
     config: ServiceConfig | undefined,
     fallback: ServiceConfig | undefined,
   ) => Transport | undefined;
 
-  constructor(config: DirectoryV3Config, eventEmitter?: EventEmitter) {
-    if (eventEmitter) {
-      this.logger = new Logger(eventEmitter);
-    } else {
-      this.logger = defaultLogger;
-    }
-
+  constructor(config: DirectoryV3Config) {
     const baseServiceHeaders: Interceptor = (next) => async (req) => {
       config.token && setHeader(req, "authorization", `${config.token}`);
       config.apiKey &&
@@ -239,7 +231,7 @@ export class DirectoryV3 {
       ) {
         const interceptors = [createHeadersInterceptor(apiKey, tenantId)];
         if (process.env.NODE_TRACE_MESSAGE) {
-          interceptors.push(traceMessage(this.logger));
+          interceptors.push(traceMessage);
         }
         interceptors.push(setCustomHeaders(customHeaders));
         return createGrpcTransport({
@@ -283,7 +275,7 @@ export class DirectoryV3 {
     };
     const interceptors = [baseServiceHeaders];
     if (process.env.NODE_TRACE_MESSAGE) {
-      interceptors.push(traceMessage(this.logger));
+      interceptors.push(traceMessage);
     }
 
     const baseGrpcTransport =

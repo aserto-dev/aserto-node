@@ -1,4 +1,3 @@
-import EventEmitter from "events";
 import { readFileSync } from "fs";
 
 import {
@@ -21,7 +20,6 @@ import {
 } from "@connectrpc/connect";
 import { createGrpcTransport } from "@connectrpc/connect-node";
 
-import Logger, { defaultLogger } from "../log";
 import { handleError, setHeader, traceMessage } from "../util/connect";
 import policyInstance from "./model/policyInstance";
 import {
@@ -50,14 +48,7 @@ type Path = {
 };
 export class Authorizer {
   AuthClient: Client<typeof AuthorizerClient>;
-  logger: Logger;
-  constructor(config: AuthorizerConfig, eventEmitter?: EventEmitter) {
-    if (eventEmitter) {
-      this.logger = new Logger(eventEmitter);
-    } else {
-      this.logger = defaultLogger;
-    }
-
+  constructor(config: AuthorizerConfig) {
     const baseServiceHeaders: Interceptor = (next) => async (req) => {
       config.token && setHeader(req, "authorization", `${config.token}`);
       config.authorizerApiKey &&
@@ -68,7 +59,7 @@ export class Authorizer {
 
     const interceptors = [baseServiceHeaders];
     if (process.env.NODE_TRACE_MESSAGE) {
-      interceptors.push(traceMessage(this.logger));
+      interceptors.push(traceMessage);
     }
 
     const baseServiceUrl =

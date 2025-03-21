@@ -53,5 +53,4 @@ const setLogEventEmitter = (eventEmitter?: EventEmitter) => {
 
 export const getLogEventEmitter = () => logEventEmitter;
 
-export default Logger;
 export { logger as defaultLogger, setLogEventEmitter };
