@@ -47,7 +47,7 @@ import {
 import { createGrpcTransport } from "@connectrpc/connect-node";
 import { createAsyncIterable as createAsyncIterable$ } from "@connectrpc/connect/protocol";
 
-import { log } from "../../log";
+import { logger } from "../../log";
 import {
   handleError,
   setCustomHeaders,
@@ -651,7 +651,7 @@ export class DirectoryV3 {
  * @param {T[]} items - The array of items to iterate over.
  */
 export async function* createAsyncIterable<T>(items: T[]) {
-  log("[Deprecated]: please use `createImportRequest`");
+  logger.warn("[Deprecated]: please use `createImportRequest`");
   yield* createImportRequest(items as ImportRequest$[]);
 }
 
@@ -678,7 +678,7 @@ export async function* createImportRequest(params: ImportRequest$[]) {
  * @returns The converted Protobuf Struct.
  */
 export function objectPropertiesAsStruct(value: JsonObject): JsonObject {
-  log(
+  logger.warn(
     "[Deprecated]: This version of SDK does not require conversion from JSON to Struct. Use the value directly",
   );
   return value;

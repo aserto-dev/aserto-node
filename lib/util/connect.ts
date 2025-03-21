@@ -14,7 +14,7 @@ import {
   NotFoundError,
   UnauthenticatedError,
 } from "../errors";
-import { log } from "../log";
+import { logger } from "../log";
 
 export const setHeader = (
   req:
@@ -27,15 +27,13 @@ export const setHeader = (
 };
 
 export const traceMessage: Interceptor = (next) => async (req) => {
-  log(
-    JSON.stringify({
-      message: req.message,
-      method: req.method.toString(),
-      requestMethod: req.requestMethod.toString(),
-      service: req.service.toString(),
-      url: req.url.toString(),
-    }),
-  );
+  logger.debug({
+    message: JSON.parse(JSON.stringify(req.message)),
+    method: req.method.toString(),
+    requestMethod: req.requestMethod.toString(),
+    service: req.service.toString(),
+    url: req.url.toString(),
+  });
   return await next(req);
 };
 
