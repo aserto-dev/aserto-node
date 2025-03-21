@@ -1,7 +1,7 @@
 {
   "name": "@aserto/aserto-node",
   "description": "Aserto Node SDK",
-  "version": "0.33.6",
+  "version": "0.33.7",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "author": "Aserto",
