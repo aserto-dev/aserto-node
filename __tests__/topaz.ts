@@ -2,7 +2,7 @@ import fs from "fs";
 import util from "node:util";
 
 import { DirectoryServiceV3 } from "../lib";
-import { defaultLogger } from "../lib/log";
+import { logger } from "../lib/log";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const exec = util.promisify(require("node:child_process").exec);
@@ -17,11 +17,11 @@ export class Topaz {
     const certsDir = await this.caCert();
 
     await retry(async () => fs.readFileSync(certsDir), RETRY_OPTIONS);
-    defaultLogger.debug("certificates are ready");
+    logger.debug("certificates are ready");
 
     await execute("topaz config info");
 
-    defaultLogger.debug(`topaz start with ${certsDir}`);
+    logger.debug(`topaz start with ${certsDir}`);
 
     const directoryClient = DirectoryServiceV3({
       url: "localhost:9292",
@@ -63,11 +63,11 @@ const retry = async <T>(
   try {
     return await fn();
   } catch (error) {
-    defaultLogger.debug((error as Error).message);
+    logger.debug((error as Error).message);
     if (retries <= 0) {
       throw error;
     }
-    defaultLogger.debug(`Retrying...`);
+    logger.debug(`Retrying...`);
     await sleep(retryIntervalMs);
     return retry(fn, { retries: retries - 1, retryIntervalMs });
   }
@@ -77,11 +77,11 @@ const sleep = (ms = 0) => new Promise((resolve) => setTimeout(resolve, ms));
 const execute = async (command: string) => {
   const { error, stdout, stderr } = await exec(command);
   if (error) {
-    defaultLogger.debug(`error: ${error.message}`);
+    logger.debug(`error: ${error.message}`);
     return;
   }
   if (stderr) {
-    defaultLogger.debug(`stderr: ${stderr}`);
+    logger.debug(`stderr: ${stderr}`);
     return;
   }
   return stdout;
