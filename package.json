@@ -72,6 +72,7 @@
     "knip": "^5.45.0",
     "njwt": "^2.0.1",
     "node-mocks-http": "^1.16.2",
+    "pino": "^9.6.0",
     "prettier": "^3.5.3",
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.6",

@@ -47,8 +47,8 @@ class Logger {
 
 const logEventEmitter = new EventEmitter();
 let logger = new Logger(logEventEmitter);
-const setLogEventEmitter = (eventEmitter: EventEmitter) => {
-  logger = new Logger(eventEmitter);
+const setLogEventEmitter = (eventEmitter?: EventEmitter) => {
+  logger = new Logger(eventEmitter || logEventEmitter);
 };
 
 export const getLogEventEmitter = () => logEventEmitter;

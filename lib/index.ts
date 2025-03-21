@@ -46,14 +46,16 @@ const log = (message: JsonValue, level: number = LOG_LEVELS.INFO) => {
   const timestamp = new Date().toISOString();
   if (process.env.NODE_TRACE) {
     // eslint-disable-next-line no-console
-    console.trace(`${timestamp} ${level}: ${message}`);
+    console.trace(`${timestamp} ${level}: ${JSON.stringify(message)}`);
   } else {
     if (level === LOG_LEVELS.ERROR) {
       // eslint-disable-next-line no-console
-      console.error(`${timestamp} ${level}: ${message}`);
+      console.error(`${timestamp} ${level}: ${JSON.stringify(message)}`);
     } else if (level >= currentLevel) {
       // eslint-disable-next-line no-console
-      console.log(`${timestamp} ${level}: aserto-node: ${message}`);
+      console.log(
+        `${timestamp} ${level}: aserto-node: ${JSON.stringify(message)}`,
+      );
     }
   }
 };

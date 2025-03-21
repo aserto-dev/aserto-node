@@ -29,7 +29,7 @@ export const setHeader = (
 export const traceMessage = (logger: Logger): Interceptor => {
   const tracer: Interceptor = (next) => async (req) => {
     logger.debug({
-      message: req.message.toString(),
+      message: JSON.parse(JSON.stringify(req.message)),
       method: req.method.toString(),
       requestMethod: req.requestMethod.toString(),
       service: req.service.toString(),

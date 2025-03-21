@@ -1,6 +1,8 @@
+import { EventEmitter } from "events";
 import express, { Express, Request, Response } from "express";
 import nJwt from "njwt";
 import { describe } from "node:test";
+import pino from "pino";
 import request from "supertest";
 
 import {
@@ -15,12 +17,14 @@ import {
   HEADER_ASERTO_MANIFEST_REQUEST,
   ImportMsgCase,
   ImportOpCode,
+  LOG_EVENT_NAMES,
   MANIFEST_REQUEST_DEFAULT,
   NotFoundError,
   policyContext,
   policyInstance,
   readAsyncIterable,
   serializeAsyncIterable,
+  setLogEventEmitter,
 } from "../../lib";
 import { Topaz, TOPAZ_TIMEOUT } from "../topaz";
 
@@ -1715,6 +1719,59 @@ types:
           objectType: "group",
         }),
       ).rejects.toThrow(NotFoundError);
+    });
+
+    describe("logging", () => {
+      beforeAll(() => {
+        process.env.NODE_TRACE_MESSAGE = "true";
+        const log = pino(
+          {
+            name: "aserto-node",
+            timestamp: pino.stdTimeFunctions.isoTime,
+            level: "debug",
+            formatters: {
+              level: (label) => {
+                return { level: label };
+              },
+            },
+          },
+          pino.multistream(
+            [
+              { level: "trace", stream: process.stdout },
+              { level: "debug", stream: process.stdout },
+              { level: "info", stream: process.stdout },
+              { level: "warn", stream: process.stdout },
+              { level: "error", stream: process.stderr },
+              { level: "fatal", stream: process.stderr },
+            ],
+            {
+              levels: pino.levels.values,
+              dedupe: true,
+            },
+          ),
+        );
+        const eventEmitter = new EventEmitter();
+        setLogEventEmitter(eventEmitter);
+
+        eventEmitter.on(LOG_EVENT_NAMES.DEBUG, (msg) => {
+          log.debug(msg);
+        });
+      });
+
+      afterAll(() => {
+        process.env.NODE_TRACE_MESSAGE = undefined;
+        setLogEventEmitter(undefined);
+      });
+
+      it("allows a custom logger", async () => {
+        const config = {
+          url: "localhost:9292",
+          caFile: await topaz.caCert(),
+        };
+
+        const directory = DirectoryServiceV3(config);
+        directory.objects({ objectType: "user" });
+      });
     });
   });
 
