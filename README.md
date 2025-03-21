@@ -818,6 +818,47 @@ const json = toJson(GetObjectsResponseSchema, objects)
 ```
 
 
+## Custom Logging
+aserto-node publishes log events using the Node.js [Event emitter](https://nodejs.org/en/learn/asynchronous-work/the-nodejs-event-emitter#the-nodejs-event-emitter).
+The events for each log level are defined as:
+```ts
+export enum LOG_EVENT_NAMES {
+  DEBUG = "aserto-node-debug",
+  ERROR = "aserto-node-error",
+  INFO  = "aserto-node-info",
+  TRACE = "aserto-node-trace",
+  WARN  = "aserto-node-warn",
+}
+```
+Consumers can register a function when any of these events are triggered and handle the logging.
+```ts
+import { LOG_EVENT_NAMES, setLogEventEmitter } from '@aserto/aserto-node'
+
+// create a new Event emitter
+const emitter = new EventEmitter()
+
+// configure aserto-node to use the emitter
+setLogEventEmitter(emitter)
+
+// handle aserto-node log events
+emitter.on(LOG_EVENT_NAMES.TRACE, (message) => {
+  log.trace(message)
+})
+emitter.on(LOG_EVENT_NAMES.DEBUG, (message) => {
+  log.debug(message)
+})
+
+emitter.on(LOG_EVENT_NAMES.INFO, (message) => {
+  log.info(message)
+})
+emitter.on(LOG_EVENT_NAMES.WARN, (message) => {
+  log.warn(message)
+})
+emitter.on(LOG_EVENT_NAMES.ERROR, (message) => {
+  log.error(message)
+})
+```
+
 
 ## Deprecated Methods
 
