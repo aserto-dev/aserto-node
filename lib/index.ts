@@ -34,7 +34,7 @@ import { is } from "./is";
 import { AuthzOptions, jwtAuthz } from "./jwtAuthz";
 import {
   getLogEventEmitter,
-  LOG_EVENT_NAMES,
+  LOG_EVENT,
   LOG_LEVELS,
   setLogEventEmitter,
 } from "./log";
@@ -62,23 +62,23 @@ const log = (message: JsonValue, level: number = LOG_LEVELS.INFO) => {
 
 const logEventEmitter = getLogEventEmitter();
 
-logEventEmitter.on(LOG_EVENT_NAMES.DEBUG, (message) => {
+logEventEmitter.on(LOG_EVENT.DEBUG, (message) => {
   log(message, LOG_LEVELS.DEBUG);
 });
 
-logEventEmitter.on(LOG_EVENT_NAMES.ERROR, (message) => {
+logEventEmitter.on(LOG_EVENT.ERROR, (message) => {
   log(message, LOG_LEVELS.ERROR);
 });
 
-logEventEmitter.on(LOG_EVENT_NAMES.INFO, (message) => {
+logEventEmitter.on(LOG_EVENT.INFO, (message) => {
   log(message, LOG_LEVELS.INFO);
 });
 
-logEventEmitter.on(LOG_EVENT_NAMES.TRACE, (message) => {
+logEventEmitter.on(LOG_EVENT.TRACE, (message) => {
   log(message, LOG_LEVELS.TRACE);
 });
 
-logEventEmitter.on(LOG_EVENT_NAMES.WARN, (message) => {
+logEventEmitter.on(LOG_EVENT.WARN, (message) => {
   log(message, LOG_LEVELS.WARN);
 });
 
@@ -102,7 +102,7 @@ export {
   is,
   jwtAuthz,
   JWTIdentityMapper,
-  LOG_EVENT_NAMES,
+  LOG_EVENT,
   logEventEmitter,
   MANIFEST_REQUEST_DEFAULT,
   MANIFEST_REQUEST_METADATA_ONLY,

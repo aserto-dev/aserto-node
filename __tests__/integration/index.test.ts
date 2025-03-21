@@ -17,7 +17,7 @@ import {
   HEADER_ASERTO_MANIFEST_REQUEST,
   ImportMsgCase,
   ImportOpCode,
-  LOG_EVENT_NAMES,
+  LOG_EVENT,
   MANIFEST_REQUEST_DEFAULT,
   NotFoundError,
   policyContext,
@@ -1753,7 +1753,7 @@ types:
         const eventEmitter = new EventEmitter();
         setLogEventEmitter(eventEmitter);
 
-        eventEmitter.on(LOG_EVENT_NAMES.DEBUG, (msg) => {
+        eventEmitter.on(LOG_EVENT.DEBUG, (msg) => {
           log.debug(msg);
         });
       });

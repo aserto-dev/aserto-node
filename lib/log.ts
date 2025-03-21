@@ -2,7 +2,7 @@ import EventEmitter from "events";
 
 import { JsonValue } from "@bufbuild/protobuf";
 
-export enum LOG_EVENT_NAMES {
+export enum LOG_EVENT {
   DEBUG = "aserto-node-debug",
   ERROR = "aserto-node-error",
   INFO = "aserto-node-info",
@@ -26,22 +26,22 @@ class Logger {
   }
 
   trace(message: JsonValue) {
-    this.eventEmitter.emit(LOG_EVENT_NAMES.TRACE, message);
+    this.eventEmitter.emit(LOG_EVENT.TRACE, message);
   }
 
   info(message: JsonValue) {
-    this.eventEmitter.emit(LOG_EVENT_NAMES.INFO, message);
+    this.eventEmitter.emit(LOG_EVENT.INFO, message);
   }
   debug(message: JsonValue) {
-    this.eventEmitter.emit(LOG_EVENT_NAMES.DEBUG, message);
+    this.eventEmitter.emit(LOG_EVENT.DEBUG, message);
   }
 
   warn(message: JsonValue) {
-    this.eventEmitter?.emit(LOG_EVENT_NAMES.WARN, message);
+    this.eventEmitter?.emit(LOG_EVENT.WARN, message);
   }
 
   error(message: JsonValue) {
-    this.eventEmitter.emit(LOG_EVENT_NAMES.ERROR, message);
+    this.eventEmitter.emit(LOG_EVENT.ERROR, message);
   }
 }
 
