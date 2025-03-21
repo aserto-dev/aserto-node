@@ -1,4 +1,5 @@
 import { readFileSync } from "fs";
+import { EventEmitter } from "stream";
 
 import {
   Exporter,
@@ -47,7 +48,7 @@ import {
 import { createGrpcTransport } from "@connectrpc/connect-node";
 import { createAsyncIterable as createAsyncIterable$ } from "@connectrpc/connect/protocol";
 
-import { log } from "../../log";
+import Logger, { defaultLogger } from "../../log";
 import {
   handleError,
   setCustomHeaders,
@@ -153,13 +154,20 @@ export class DirectoryV3 {
   ExporterClient: Client<typeof Exporter>;
   ModelClient: Client<typeof Model>;
   registry: DsRegistry;
+  logger: Logger;
 
   CreateTransport: (
     config: ServiceConfig | undefined,
     fallback: ServiceConfig | undefined,
   ) => Transport | undefined;
 
-  constructor(config: DirectoryV3Config) {
+  constructor(config: DirectoryV3Config, eventEmitter?: EventEmitter) {
+    if (eventEmitter) {
+      this.logger = new Logger(eventEmitter);
+    } else {
+      this.logger = defaultLogger;
+    }
+
     const baseServiceHeaders: Interceptor = (next) => async (req) => {
       config.token && setHeader(req, "authorization", `${config.token}`);
       config.apiKey &&
@@ -231,7 +239,7 @@ export class DirectoryV3 {
       ) {
         const interceptors = [createHeadersInterceptor(apiKey, tenantId)];
         if (process.env.NODE_TRACE_MESSAGE) {
-          interceptors.push(traceMessage);
+          interceptors.push(traceMessage(this.logger));
         }
         interceptors.push(setCustomHeaders(customHeaders));
         return createGrpcTransport({
@@ -275,7 +283,7 @@ export class DirectoryV3 {
     };
     const interceptors = [baseServiceHeaders];
     if (process.env.NODE_TRACE_MESSAGE) {
-      interceptors.push(traceMessage);
+      interceptors.push(traceMessage(this.logger));
     }
 
     const baseGrpcTransport =
@@ -651,7 +659,7 @@ export class DirectoryV3 {
  * @param {T[]} items - The array of items to iterate over.
  */
 export async function* createAsyncIterable<T>(items: T[]) {
-  log("[Deprecated]: please use `createImportRequest`");
+  defaultLogger.warn("[Deprecated]: please use `createImportRequest`");
   yield* createImportRequest(items as ImportRequest$[]);
 }
 
@@ -678,7 +686,7 @@ export async function* createImportRequest(params: ImportRequest$[]) {
  * @returns The converted Protobuf Struct.
  */
 export function objectPropertiesAsStruct(value: JsonObject): JsonObject {
-  log(
+  defaultLogger.warn(
     "[Deprecated]: This version of SDK does not require conversion from JSON to Struct. Use the value directly",
   );
   return value;

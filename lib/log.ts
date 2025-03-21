@@ -1,28 +1,57 @@
-const currentLevel = process.env.LOG_LEVEL || "INFO";
+import EventEmitter from "events";
 
-const logLevels = {
-  ERROR: 0,
-  INFO: 1,
-  DETAIL: 2,
-};
+import { JsonValue } from "@bufbuild/protobuf";
 
-const log = (message: string, level = "INFO") => {
-  const timestamp = new Date().toISOString();
-  if (process.env.NODE_TRACE) {
-    // eslint-disable-next-line no-console
-    console.trace(`${timestamp} ${level}: ${message}`);
-  } else {
-    if (level === "ERROR") {
-      // eslint-disable-next-line no-console
-      console.error(`${timestamp} ${level}: ${message}`);
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      /* @ts-ignore */
-      //TODO: Remove this ts-ignore
-    } else if (logLevels[level] <= logLevels[currentLevel]) {
-      // eslint-disable-next-line no-console
-      console.log(`${timestamp} ${level}: aserto-node: ${message}`);
-    }
+export enum LOG_EVENT_NAMES {
+  DEBUG = "aserto-node-debug",
+  ERROR = "aserto-node-error",
+  INFO = "aserto-node-info",
+  TRACE = "aserto-node-trace",
+  WARN = "aserto-node-warn",
+}
+
+export const LOG_LEVELS = {
+  ERROR: 4,
+  WARN: 3,
+  INFO: 2,
+  DEBUG: 1,
+  TRACE: 0,
+} as const;
+
+class Logger {
+  eventEmitter: EventEmitter;
+
+  constructor(eventEmitter: EventEmitter = getLogEventEmitter()) {
+    this.eventEmitter = eventEmitter;
   }
+
+  trace(message: JsonValue) {
+    this.eventEmitter.emit(LOG_EVENT_NAMES.TRACE, message);
+  }
+
+  info(message: JsonValue) {
+    this.eventEmitter.emit(LOG_EVENT_NAMES.INFO, message);
+  }
+  debug(message: JsonValue) {
+    this.eventEmitter.emit(LOG_EVENT_NAMES.DEBUG, message);
+  }
+
+  warn(message: JsonValue) {
+    this.eventEmitter?.emit(LOG_EVENT_NAMES.WARN, message);
+  }
+
+  error(message: JsonValue) {
+    this.eventEmitter.emit(LOG_EVENT_NAMES.ERROR, message);
+  }
+}
+
+const logEventEmitter = new EventEmitter();
+let logger = new Logger(logEventEmitter);
+const setLogEventEmitter = (eventEmitter: EventEmitter) => {
+  logger = new Logger(eventEmitter);
 };
 
-export { log };
+export const getLogEventEmitter = () => logEventEmitter;
+
+export default Logger;
+export { logger as defaultLogger, setLogEventEmitter };

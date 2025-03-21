@@ -1,4 +1,5 @@
 import { Opcode } from "@aserto/node-directory/src/gen/cjs/aserto/directory/importer/v3/importer_pb";
+import { JsonValue } from "@bufbuild/protobuf";
 
 import { Authorizer, authz } from "./authorizer";
 import AnonymousIdentityMapper from "./authorizer/mapper/identity/anonymous";
@@ -31,6 +32,54 @@ import { CustomHeaders, DirectoryV3Config } from "./directory/v3/types";
 import { displayStateMap } from "./displayStateMap";
 import { is } from "./is";
 import { AuthzOptions, jwtAuthz } from "./jwtAuthz";
+import {
+  getLogEventEmitter,
+  LOG_EVENT_NAMES,
+  LOG_LEVELS,
+  setLogEventEmitter,
+} from "./log";
+
+type LogLevel = keyof typeof LOG_LEVELS;
+const currentLevel = LOG_LEVELS[(process.env.LOG_LEVEL || "INFO") as LogLevel];
+
+const log = (message: JsonValue, level: number = LOG_LEVELS.INFO) => {
+  const timestamp = new Date().toISOString();
+  if (process.env.NODE_TRACE) {
+    // eslint-disable-next-line no-console
+    console.trace(`${timestamp} ${level}: ${message}`);
+  } else {
+    if (level === LOG_LEVELS.ERROR) {
+      // eslint-disable-next-line no-console
+      console.error(`${timestamp} ${level}: ${message}`);
+    } else if (level >= currentLevel) {
+      // eslint-disable-next-line no-console
+      console.log(`${timestamp} ${level}: aserto-node: ${message}`);
+    }
+  }
+};
+
+const logEventEmitter = getLogEventEmitter();
+
+logEventEmitter.on(LOG_EVENT_NAMES.DEBUG, (message) => {
+  log(message, LOG_LEVELS.DEBUG);
+});
+
+logEventEmitter.on(LOG_EVENT_NAMES.ERROR, (message) => {
+  log(message, LOG_LEVELS.ERROR);
+});
+
+logEventEmitter.on(LOG_EVENT_NAMES.INFO, (message) => {
+  log(message, LOG_LEVELS.INFO);
+});
+
+logEventEmitter.on(LOG_EVENT_NAMES.TRACE, (message) => {
+  log(message, LOG_LEVELS.TRACE);
+});
+
+logEventEmitter.on(LOG_EVENT_NAMES.WARN, (message) => {
+  log(message, LOG_LEVELS.WARN);
+});
+
 export {
   AnonymousIdentityMapper,
   Authorizer,
@@ -51,6 +100,8 @@ export {
   is,
   jwtAuthz,
   JWTIdentityMapper,
+  LOG_EVENT_NAMES,
+  logEventEmitter,
   MANIFEST_REQUEST_DEFAULT,
   MANIFEST_REQUEST_METADATA_ONLY,
   MANIFEST_REQUEST_MODEL_ONLY,
@@ -65,6 +116,7 @@ export {
   queryOptions,
   readAsyncIterable,
   serializeAsyncIterable,
+  setLogEventEmitter,
   SubIdentityMapper,
 };
 
