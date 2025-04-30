@@ -21,12 +21,9 @@
     "test": "jest test --coverage --verbose --collectCoverageFrom='./lib/**'"
   },
   "files": [
-    "lib",
     "dist"
   ],
-  "imports": {
-    "@lib": "./lib"
-  },
+
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aserto-dev/aserto-node.git"
