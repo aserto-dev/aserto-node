@@ -30,6 +30,8 @@ import {
   QueryRequest,
 } from "./types";
 
+const ADDRESS_REGEX = /https?:\/\//;
+
 type AuthorizerConfig = {
   authorizerServiceUrl?: string;
   tenantId?: string;
@@ -62,8 +64,15 @@ export class Authorizer {
       interceptors.push(traceMessage);
     }
 
-    const baseServiceUrl =
-      config.authorizerServiceUrl || "authorizer.prod.aserto.com:8443";
+    const getServiceUrl = () => {
+      const baseServiceUrl =
+        config.authorizerServiceUrl || "authorizer.prod.aserto.com:8443";
+      const scheme = "https://";
+
+      const serviceUrlMatch = baseServiceUrl?.match(ADDRESS_REGEX);
+      return serviceUrlMatch ? baseServiceUrl : `${scheme}${baseServiceUrl}`;
+    };
+
     const caFilePath = config.authorizerCertFile || config.caFile;
     const baseCaFile = !!caFilePath ? readFileSync(caFilePath) : undefined;
 
@@ -75,7 +84,7 @@ export class Authorizer {
     };
 
     const baseGrpcTransport = createGrpcTransport({
-      baseUrl: `https://${baseServiceUrl}`,
+      baseUrl: getServiceUrl(),
       interceptors: interceptors,
       nodeOptions: baseNodeOptions,
     });

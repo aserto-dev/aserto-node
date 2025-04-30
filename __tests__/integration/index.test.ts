@@ -1790,21 +1790,18 @@ types:
         const response = await authorizerClient.DecisionTree({
           identityContext: await AnonymousIdentityMapper(),
           policyInstance: policyInstance("todo", "todo"),
-          policyContext: policyContext(),
+          policyContext: policyContext("todoApp"),
         });
 
         const expectedResult = {
           path: {
-            "rebac.check": {
-              allowed: false,
-            },
             "todoApp.DELETE.todos.__id": { allowed: false },
             "todoApp.GET.todos": { allowed: true },
             "todoApp.GET.users.__userID": { allowed: true },
             "todoApp.POST.todos": { allowed: false },
             "todoApp.PUT.todos.__id": { allowed: false },
           },
-          pathRoot: "",
+          pathRoot: "todoApp",
         };
 
         expect(response).toEqual(expectedResult);
@@ -1830,6 +1827,7 @@ types:
     describe("Query", () => {
       it("returns the correct data structure", async () => {
         const response = await authorizerClient.Query({
+          identityContext: await AnonymousIdentityMapper(),
           query: "x=data",
           input: '{"foo": "bar"}',
         });

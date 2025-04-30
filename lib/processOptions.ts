@@ -34,14 +34,7 @@ export default (
   if (!authorizerServiceUrl && res) {
     return error(res, "must provide authorizerServiceUrl in option map");
   }
-  let authorizerUrl = `${authorizerServiceUrl}`;
-  // strip any https:// or http:// prefix since this is a gRPC address
-  if (authorizerUrl.startsWith("https://")) {
-    authorizerUrl = authorizerUrl.split("https://")[1]!;
-  }
-  if (authorizerUrl.startsWith("http://")) {
-    authorizerUrl = authorizerUrl.split("http://")[1]!;
-  }
+  const authorizerUrl = `${authorizerServiceUrl}`;
 
   // set the authorizer API key
   let authorizerApiKey = null;
